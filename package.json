@@ -1,0 +1,26 @@
+{
+  "name": "project-arbol-sdk-rust",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Generates the arbol-sdk crate with Cloudflare Forge from the Arbol API's public OpenAPI.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "forge": "bun scripts/forge.ts",
+    "openapi": "curl -fsS --proto =https --max-redirs 0 --max-filesize 33554432 -o openapi.json https://api.getarbol.com/openapi.json",
+    "hash": "bun scripts/openapi-hash.ts openapi.json",
+    "generate": "bun scripts/generate.ts openapi.json",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test tests",
+    "check:rust": "cargo fmt --check && cargo clippy --locked --all-targets -- -D warnings && cargo test --locked",
+    "verify": "bun run typecheck && bun run test && bun run check:rust"
+  },
+  "devDependencies": {
+    "@bytecodealliance/jco": "1.37.0",
+    "@cloudflare/forge": "file:./generation/vendor/forge",
+    "@types/bun": "^1.4.3",
+    "@types/node": "^26.0.0",
+    "typescript": "7.0.2"
+  },
+  "packageManager": "bun@1.4.3"
+}

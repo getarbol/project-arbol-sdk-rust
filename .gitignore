@@ -1,0 +1,7 @@
+target/
+node_modules/
+# The Forge binary and the compiled plugin, built by `bun run forge` and `bun run generate`.
+.forge/
+# Downloaded at generation time from https://api.getarbol.com/openapi.json; Cargo.toml's
+# [package.metadata.arbol.openapi] names the release src/generated/ comes from.
+openapi.json

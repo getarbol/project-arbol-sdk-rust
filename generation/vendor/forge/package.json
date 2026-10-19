@@ -1,0 +1,28 @@
+{
+  "name": "@cloudflare/forge",
+  "version": "0.1.0",
+  "description": "The plugin library of Cloudflare Forge at 7f86447210b7bea3779bfdab3cd5655eade0eadb, built from source. The forge binary is built with cargo by scripts/forge.ts.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudflare/forge.git",
+    "directory": "packages/forge"
+  },
+  "bin": {
+    "forge-plugin": "bin/forge-plugin.mjs"
+  },
+  "type": "module",
+  "exports": {
+    "./plugin": {
+      "types": "./plugin/index.d.ts",
+      "default": "./plugin/index.js"
+    },
+    "./ts": {
+      "types": "./plugin/ts.d.ts",
+      "default": "./plugin/ts.js"
+    },
+    "./plugin/forge.wit": "./plugin/forge.wit",
+    "./package.json": "./package.json"
+  },
+  "private": true
+}

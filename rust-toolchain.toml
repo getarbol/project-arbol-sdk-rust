@@ -1,0 +1,5 @@
+# The toolchain CI and generation use. The crate itself supports Rust 1.85 and newer (rust-version).
+[toolchain]
+channel = "1.99.0"
+profile = "minimal"
+components = ["rustfmt", "clippy"]

@@ -1,0 +1,30 @@
+{
+  "formatVersion": 2,
+  "upstream": {
+    "repository": "https://github.com/cloudflare/forge",
+    "commit": "7f86447210b7bea3779bfdab3cd5655eade0eadb",
+    "license": "Apache-2.0",
+    "version": "0.1.0"
+  },
+  "binary": {
+    "features": [
+      "cli",
+      "wasm"
+    ]
+  },
+  "plugin": {
+    "jco": "1.37.0"
+  },
+  "files": {
+    "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "README.md": "92eb80195726653f5b9b10db2a97e75587fc7a0159f3b3be2c5d8f93e52dd950",
+    "bin/forge-plugin.mjs": "ba7e2a5b804932a1af8172977f7e295c1293d174e199979311254cdc4c6bab88",
+    "package.json": "cace85417600d6586f5abc834c0e4cd337876005932798859b7843ca5e9e91df",
+    "plugin/bundle.config.mjs": "91041b8a06af7f69823eeb39eba51e2909bfdbc7c2a87a49de4c41d7aef87b1b",
+    "plugin/forge.wit": "d002d4051d801ed690603cadeac96dfeaeca1fc3cc3fd7450c3d707dfcdbd783",
+    "plugin/index.d.ts": "ffd37b247d24723d172155b64e832ef71cbc2e6b84b0b16b0727b87d2a85be88",
+    "plugin/index.js": "3fdc5018f14c0a14746fb38eac1d17b798e0290ff81371864bfb89ab8ffd644b",
+    "plugin/ts.d.ts": "1899acfd94faf8dd4601acb53940540b9f740f92c48ae4d833308901d9b7becf",
+    "plugin/ts.js": "8234bb9fe47df1a0d38921af70ed74893a120f2a1dfe644227c16d36bc155a70"
+  }
+}
