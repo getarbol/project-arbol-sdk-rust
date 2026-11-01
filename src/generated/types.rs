@@ -599,9 +599,16 @@ pub struct AccountColombiaLookupPresentationResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountColombiaResourceEnvelopeResult {
+    Variant1(String),
+    Variant2(std::collections::BTreeMap<String, serde_json::Value>),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountColombiaResourceEnvelope {
     #[serde(rename = "result")]
-    pub result: std::collections::BTreeMap<String, serde_json::Value>,
+    pub result: AccountColombiaResourceEnvelopeResult,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]

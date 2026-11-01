@@ -124,7 +124,7 @@ pub struct AccountColombianRecordsApi<'a>(&'a Client);
 impl<'a> AccountColombianRecordsApi<'a> {
     /// Consult an included Colombian source
     ///
-    /// Read ADRES or Sisbén for an authorized document, or obtain the personal Police guide without submitting a document. A machine key needs connection read access and an explicit restriction allowing this operation. Set agentMode to true for concise Spanish text.
+    /// Read an EPS summary or Sisbén classification for an authorized document. Police reports that a judicial check was not performed. An optional document labels that message and is never submitted to Police. A machine key needs connection read access and an explicit restriction allowing this operation. Set agentMode to true for concise Spanish text.
     pub async fn lookup(&self, input: &types::AccountColombianRecordsLookupInput) -> Result<types::AccountColombianRecordsLookupOutput, Error> {
         self.0.call(&operations::ACCOUNT_COLOMBIAN_RECORDS_LOOKUP, input).await
     }
