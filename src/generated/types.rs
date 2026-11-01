@@ -25123,7 +25123,7 @@ pub struct RaizChange {
     /// Id of the changed resource.
     #[serde(rename = "resourceId")]
     pub resource_id: String,
-    /// What changed: `contact`, `contact_point`, `contact_identifier`, `agent`, `agent_tool` (its id is the Agent's), `channel`, `definition`, `knowledge_document`, `campaign`, `suppression`, `bulletin`, `provider_account`, `fact`, `task` (a person cancelled or retried it).
+    /// What changed: `contact`, `contact_point`, `contact_identifier`, `agent`, `agent_tool` (its id is the Agent's), `channel`, `definition`, `knowledge_document`, `campaign`, `suppression`, `bulletin`, `conversation_view`, `provider_account`, `fact`, `task` (a person cancelled or retried it).
     #[serde(rename = "resourceType")]
     pub resource_type: String,
     #[serde(rename = "sourceId")]
@@ -26621,6 +26621,8 @@ pub struct RaizConversation {
     /// Who works the conversation for the organization, in the order each first wrote something the contact saw (those who have not yet, last): each Agent and the team that wrote in it and, while it is open or when nobody answered it, whoever has it (the assigned Agent while the AI handles it, the team otherwise). `agentId` is the Agent assigned now.
     #[serde(rename = "workers")]
     pub workers: Vec<RaizConversationWorker>,
+    #[serde(rename = "toolCalls")]
+    pub tool_calls: RaizConversationToolCalls,
     #[serde(rename = "analysisErrorCode")]
     pub analysis_error_code: Option<String>,
     /// The current value of each definition for this subject (the newest assertion that was not rejected).
@@ -26634,6 +26636,20 @@ pub struct RaizConversation {
     pub messages: Option<RaizMessagePage>,
     #[serde(rename = "recording", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub recording: Option<Option<RaizSignedUrl>>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationCount {
+    /// True when the count reached 10000: at least that many match.
+    #[serde(rename = "capped")]
+    pub capped: bool,
+    /// How many match the filters, counted up to 10000.
+    #[serde(rename = "count")]
+    pub count: i64,
+    #[serde(rename = "averageMessageCount")]
+    pub average_message_count: Option<f64>,
+    #[serde(rename = "groups")]
+    pub groups: Option<Vec<RaizConversationGroup>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -26707,6 +26723,34 @@ pub struct RaizConversationDiagnostics {
     pub termination_reason_present: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationGroup {
+    /// Conversations in the group.
+    #[serde(rename = "count")]
+    pub count: i64,
+    #[serde(rename = "failed")]
+    pub failed: Option<i64>,
+    #[serde(rename = "key")]
+    pub key: Option<String>,
+    #[serde(rename = "label")]
+    pub label: Option<String>,
+    #[serde(rename = "outcomes")]
+    pub outcomes: RaizConversationOutcomeCounts,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationOutcomeCounts {
+    #[serde(rename = "failure")]
+    pub failure: i64,
+    /// Not analyzed yet.
+    #[serde(rename = "pending")]
+    pub pending: i64,
+    #[serde(rename = "success")]
+    pub success: i64,
+    #[serde(rename = "unknown")]
+    pub unknown: i64,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationPageObject {
     #[serde(rename = "list")]
@@ -26721,6 +26765,256 @@ pub struct RaizConversationPage {
     /// Discriminator for a resource list response.
     #[serde(rename = "object")]
     pub object: RaizConversationPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationToolCalls {
+    /// The Agent's tool calls in the conversation.
+    #[serde(rename = "count")]
+    pub count: i64,
+    /// How many of them failed.
+    #[serde(rename = "failed")]
+    pub failed: i64,
+    #[serde(rename = "lastFailure")]
+    pub last_failure: Option<RaizConversationToolFailure>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationToolFailure {
+    #[serde(rename = "errorCode")]
+    pub error_code: Option<String>,
+    #[serde(rename = "errorMessage")]
+    pub error_message: Option<String>,
+    #[serde(rename = "toolName")]
+    pub tool_name: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewLayout {
+    #[serde(rename = "table")]
+    Table,
+    #[serde(rename = "reading")]
+    Reading,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewSort {
+    #[serde(rename = "started")]
+    Started,
+    #[serde(rename = "last_message")]
+    LastMessage,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationView {
+    /// The client's own column keys, in the order it shows them; empty for its default columns.
+    #[serde(rename = "columns")]
+    pub columns: Vec<String>,
+    /// An instant in RFC 3339 format, in UTC.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    /// The filters of `list_conversations` under the same names, passed to it and to `count_conversations` as they are (resolve `period` to `startedAfter` first).
+    #[serde(rename = "filters")]
+    pub filters: RaizConversationViewFilters,
+    #[serde(rename = "groupBy")]
+    pub group_by: Option<String>,
+    /// Saved view id.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// `table`: rows with columns; `reading`: the list beside one conversation, to read them one after another.
+    #[serde(rename = "layout")]
+    pub layout: RaizConversationViewLayout,
+    /// The caller saved it.
+    #[serde(rename = "mine")]
+    pub mine: bool,
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Where the view goes in the list of views, lowest first; views with the same position keep the order they were saved in.
+    #[serde(rename = "position")]
+    pub position: i64,
+    /// `true`: everyone in the organization sees and can change it; `false`: only the person who saved it.
+    #[serde(rename = "shared")]
+    pub shared: bool,
+    /// `started` (newest first) or `last_message` (latest activity first).
+    #[serde(rename = "sort")]
+    pub sort: RaizConversationViewSort,
+    /// An instant in RFC 3339 format, in UTC.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+    #[serde(rename = "version")]
+    pub version: i64,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersConversationDirection {
+    #[serde(rename = "inbound")]
+    Inbound,
+    #[serde(rename = "outbound")]
+    Outbound,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersHandling {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+    #[serde(rename = "escalated")]
+    Escalated,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersWorker {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersStatus {
+    #[serde(rename = "open")]
+    Open,
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersToolStatus {
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "denied")]
+    Denied,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersAssessment {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "passed")]
+    Passed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersPeriod {
+    #[serde(rename = "today")]
+    Today,
+    #[serde(rename = "7d")]
+    V7d,
+    #[serde(rename = "30d")]
+    V30d,
+    #[serde(rename = "90d")]
+    V90d,
+    #[serde(rename = "365d")]
+    V365d,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationViewFilters {
+    /// Agent id.
+    #[serde(rename = "agentId", default, skip_serializing_if = "Option::is_none")]
+    pub agent_id: Option<String>,
+    /// Attempts of this campaign.
+    #[serde(rename = "campaignId", default, skip_serializing_if = "Option::is_none")]
+    pub campaign_id: Option<String>,
+    /// Channel id.
+    #[serde(rename = "channelId", default, skip_serializing_if = "Option::is_none")]
+    pub channel_id: Option<String>,
+    /// Comma-separated channel types.
+    #[serde(rename = "channelType", default, skip_serializing_if = "Option::is_none")]
+    pub channel_type: Option<String>,
+    /// Conversations with this contact as counterpart or subject. A merged duplicate's id lists the survivor's.
+    #[serde(rename = "contactId", default, skip_serializing_if = "Option::is_none")]
+    pub contact_id: Option<String>,
+    /// `inbound`: the contact started it; `outbound`: the organization did. It matches each conversation's `direction` (the query field `direction` pages the list).
+    #[serde(rename = "conversationDirection", default, skip_serializing_if = "Option::is_none")]
+    pub conversation_direction: Option<RaizConversationViewFiltersConversationDirection>,
+    /// `ai`: conversations the AI takes part in (calls and web chats, and WhatsApp conversations the AI handles or answered). `team`: WhatsApp conversations the organization's people handle on their own. `escalated`: conversations the AI handed to the team (a request it could not resolve, a contact who asked for a person, or a spent budget), also once the team gave them back to the AI; the ones `conversations_daily` counts in `escalatedCount`. A trial is not one, nor a conversation that opens while the AI is still paused for the number after an earlier handoff.
+    #[serde(rename = "handling", default, skip_serializing_if = "Option::is_none")]
+    pub handling: Option<RaizConversationViewFiltersHandling>,
+    /// Who works the conversation now. `ai`: calls and web chats, open WhatsApp conversations the AI answers (assigned to it and not paused), and closed ones the AI answered. `team`: open WhatsApp conversations the organization's people answer (not assigned to the AI, or paused) and closed ones they answered. Unlike `handling`, a conversation the AI answered and then handed to people is `team` while open.
+    #[serde(rename = "worker", default, skip_serializing_if = "Option::is_none")]
+    pub worker: Option<RaizConversationViewFiltersWorker>,
+    /// Comma-separated origins.
+    #[serde(rename = "origin", default, skip_serializing_if = "Option::is_none")]
+    pub origin: Option<String>,
+    /// Comma-separated outcomes of the analysis.
+    #[serde(rename = "outcome", default, skip_serializing_if = "Option::is_none")]
+    pub outcome: Option<String>,
+    /// Conversations whose `metadata.reference` is exactly this value: the reference a caller gave `createConversation`, to find a conversation whose answer it did not receive.
+    #[serde(rename = "metadataReference", default, skip_serializing_if = "Option::is_none")]
+    pub metadata_reference: Option<String>,
+    /// Conversations started from this communication profile.
+    #[serde(rename = "profileId", default, skip_serializing_if = "Option::is_none")]
+    pub profile_id: Option<String>,
+    /// Search participant names, channel profile names, usernames, phones, emails, identity documents, visible message text, conversation ids and exact external references. Ignores accents/case and phone/document formatting. Also searches titles and summaries with Spanish stemming (quoted phrases, `or` and `-word` apply there). Attachments without stored transcription and tool payloads are not searched.
+    #[serde(rename = "q", default, skip_serializing_if = "Option::is_none")]
+    pub q: Option<String>,
+    /// Conversations started with `createConversation` by this token subject (exact match): a machine client reads its own requests with `<client id>@clients`.
+    #[serde(rename = "requestedBy", default, skip_serializing_if = "Option::is_none")]
+    pub requested_by: Option<String>,
+    /// Started at or after this instant (RFC 3339).
+    #[serde(rename = "startedAfter", default, skip_serializing_if = "Option::is_none")]
+    pub started_after: Option<String>,
+    /// Started before this instant (RFC 3339).
+    #[serde(rename = "startedBefore", default, skip_serializing_if = "Option::is_none")]
+    pub started_before: Option<String>,
+    #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<RaizConversationViewFiltersStatus>,
+    /// Comma-separated sentiments of the analysis.
+    #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
+    pub sentiment: Option<String>,
+    /// Conversations where the Agent called this tool: its exact name, as the transcript's tool parts show it (`toolName`). `count_conversations` with `groupBy=tool` lists the names with how many conversations used each.
+    #[serde(rename = "toolName", default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
+    /// With `toolName`, a call of that tool ended this way; alone, a call of any tool did (`failed`: conversations where a tool failed).
+    #[serde(rename = "toolStatus", default, skip_serializing_if = "Option::is_none")]
+    pub tool_status: Option<RaizConversationViewFiltersToolStatus>,
+    /// Conversations whose current fact of this definition (its `key`) is known: about the conversation, or about its contact for a contact definition. With `factValue`, equal to that value.
+    #[serde(rename = "factDefinition", default, skip_serializing_if = "Option::is_none")]
+    pub fact_definition: Option<String>,
+    /// With `factDefinition`: an option's key or label, a text (ignoring case), a number, a date (YYYY-MM-DD) or `true`/`false`.
+    #[serde(rename = "factValue", default, skip_serializing_if = "Option::is_none")]
+    pub fact_value: Option<String>,
+    /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
+    #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
+    pub assessment: Option<RaizConversationViewFiltersAssessment>,
+    /// At least this many messages.
+    #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
+    pub messages_min: Option<i64>,
+    /// At most this many messages.
+    #[serde(rename = "messagesMax", default, skip_serializing_if = "Option::is_none")]
+    pub messages_max: Option<i64>,
+    /// Calls of at least this many seconds.
+    #[serde(rename = "durationMin", default, skip_serializing_if = "Option::is_none")]
+    pub duration_min: Option<i64>,
+    /// Calls of at most this many seconds.
+    #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
+    pub duration_max: Option<i64>,
+    /// Conversations started today or in the last 7, 30, 90 or 365 days when the view opens, in the organization's time zone. Use it instead of `startedAfter`/`startedBefore` for a view that keeps moving with the calendar.
+    #[serde(rename = "period", default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<RaizConversationViewFiltersPeriod>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewPageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationViewPage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<RaizConversationView>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: RaizConversationViewPageObject,
     /// Opaque navigation cursors for this page’s stable keyset order.
     #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
@@ -26845,6 +27139,24 @@ pub enum RaizConversationsCountInputStatus {
     Closed,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsCountInputToolStatus {
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "denied")]
+    Denied,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsCountInputAssessment {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "passed")]
+    Passed,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversationsCountInput {
     /// Agent id.
@@ -26897,9 +27209,42 @@ pub struct RaizConversationsCountInput {
     pub started_before: Option<String>,
     #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
     pub status: Option<RaizConversationsCountInputStatus>,
+    /// Comma-separated sentiments of the analysis.
+    #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
+    pub sentiment: Option<String>,
+    /// Conversations where the Agent called this tool: its exact name, as the transcript's tool parts show it (`toolName`). `count_conversations` with `groupBy=tool` lists the names with how many conversations used each.
+    #[serde(rename = "toolName", default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
+    /// With `toolName`, a call of that tool ended this way; alone, a call of any tool did (`failed`: conversations where a tool failed).
+    #[serde(rename = "toolStatus", default, skip_serializing_if = "Option::is_none")]
+    pub tool_status: Option<RaizConversationsCountInputToolStatus>,
+    /// Conversations whose current fact of this definition (its `key`) is known: about the conversation, or about its contact for a contact definition. With `factValue`, equal to that value.
+    #[serde(rename = "factDefinition", default, skip_serializing_if = "Option::is_none")]
+    pub fact_definition: Option<String>,
+    /// With `factDefinition`: an option's key or label, a text (ignoring case), a number, a date (YYYY-MM-DD) or `true`/`false`.
+    #[serde(rename = "factValue", default, skip_serializing_if = "Option::is_none")]
+    pub fact_value: Option<String>,
+    /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
+    #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
+    pub assessment: Option<RaizConversationsCountInputAssessment>,
+    /// At least this many messages.
+    #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
+    pub messages_min: Option<i64>,
+    /// At most this many messages.
+    #[serde(rename = "messagesMax", default, skip_serializing_if = "Option::is_none")]
+    pub messages_max: Option<i64>,
+    /// Calls of at least this many seconds.
+    #[serde(rename = "durationMin", default, skip_serializing_if = "Option::is_none")]
+    pub duration_min: Option<i64>,
+    /// Calls of at most this many seconds.
+    #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
+    pub duration_max: Option<i64>,
+    /// `outcome`, `status`, `channel` (type), `agent`, `sentiment`, `tool` (each Agent tool and the conversations that used it), `toolError` (failed calls, of `toolName` when given, by error) or `fact:<definition key>` (the current value of that definition, such as the reason for contact).
+    #[serde(rename = "groupBy", default, skip_serializing_if = "Option::is_none")]
+    pub group_by: Option<String>,
 }
 
-pub type RaizConversationsCountOutput = RaizCount;
+pub type RaizConversationsCountOutput = RaizConversationCount;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversationsDeleteInput {
@@ -26982,6 +27327,24 @@ pub enum RaizConversationsListInputStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsListInputToolStatus {
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "denied")]
+    Denied,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsListInputAssessment {
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "passed")]
+    Passed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationsListInputSort {
     #[serde(rename = "started")]
     Started,
@@ -27052,6 +27415,36 @@ pub struct RaizConversationsListInput {
     pub started_before: Option<String>,
     #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
     pub status: Option<RaizConversationsListInputStatus>,
+    /// Comma-separated sentiments of the analysis.
+    #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
+    pub sentiment: Option<String>,
+    /// Conversations where the Agent called this tool: its exact name, as the transcript's tool parts show it (`toolName`). `count_conversations` with `groupBy=tool` lists the names with how many conversations used each.
+    #[serde(rename = "toolName", default, skip_serializing_if = "Option::is_none")]
+    pub tool_name: Option<String>,
+    /// With `toolName`, a call of that tool ended this way; alone, a call of any tool did (`failed`: conversations where a tool failed).
+    #[serde(rename = "toolStatus", default, skip_serializing_if = "Option::is_none")]
+    pub tool_status: Option<RaizConversationsListInputToolStatus>,
+    /// Conversations whose current fact of this definition (its `key`) is known: about the conversation, or about its contact for a contact definition. With `factValue`, equal to that value.
+    #[serde(rename = "factDefinition", default, skip_serializing_if = "Option::is_none")]
+    pub fact_definition: Option<String>,
+    /// With `factDefinition`: an option's key or label, a text (ignoring case), a number, a date (YYYY-MM-DD) or `true`/`false`.
+    #[serde(rename = "factValue", default, skip_serializing_if = "Option::is_none")]
+    pub fact_value: Option<String>,
+    /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
+    #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
+    pub assessment: Option<RaizConversationsListInputAssessment>,
+    /// At least this many messages.
+    #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
+    pub messages_min: Option<i64>,
+    /// At most this many messages.
+    #[serde(rename = "messagesMax", default, skip_serializing_if = "Option::is_none")]
+    pub messages_max: Option<i64>,
+    /// Calls of at least this many seconds.
+    #[serde(rename = "durationMin", default, skip_serializing_if = "Option::is_none")]
+    pub duration_min: Option<i64>,
+    /// Calls of at most this many seconds.
+    #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
+    pub duration_max: Option<i64>,
     /// `started` (newest first), `last_message` (most recent activity first) or `changed`: the changed feed, oldest change first, with deleted conversations as tombstones; a forward page's `pageInfo.nextCursor` is always a position to save and poll from.
     #[serde(rename = "sort", default, skip_serializing_if = "Option::is_none")]
     pub sort: Option<RaizConversationsListInputSort>,
@@ -27896,6 +28289,18 @@ pub enum RaizFactAuthor {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFactDefinitionKind {
+    #[serde(rename = "attribute")]
+    Attribute,
+    #[serde(rename = "assessment")]
+    Assessment,
+    #[serde(rename = "category")]
+    Category,
+    #[serde(rename = "metric")]
+    Metric,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizFactDefinitionValueType {
     #[serde(rename = "text")]
     Text,
@@ -27916,6 +28321,9 @@ pub struct RaizFactDefinition {
     pub id: String,
     #[serde(rename = "key")]
     pub key: String,
+    /// What the definition captures: an `attribute` (a datum), an `assessment` (a yes/no check of the conversation), a `category` (a classification such as the reason for contact) or a `metric`.
+    #[serde(rename = "kind")]
+    pub kind: RaizFactDefinitionKind,
     #[serde(rename = "name")]
     pub name: String,
     #[serde(rename = "valueType")]
@@ -29182,6 +29590,78 @@ pub struct RaizFailureResponseErrorPart2CHANNELTYPEMISMATCH {
     pub code: RaizFailureResponseErrorPart2CHANNELTYPEMISMATCHCode,
     #[serde(rename = "message")]
     pub message: RaizFailureResponseErrorPart2CHANNELTYPEMISMATCHMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLYCode {
+    #[serde(rename = "CONVERSATION_VIEW_AUTHOR_ONLY")]
+    CONVERSATIONVIEWAUTHORONLY,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLYMessage {
+    #[serde(rename = "Only the person who saved this view can make it private; it would disappear for the rest of the team.")]
+    OnlyThePersonWhoSavedThisViewCanMakeItPrivateItWouldDisappearForTheRestOfTheTeam,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLY {
+    #[serde(rename = "code")]
+    pub code: RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLYCode,
+    #[serde(rename = "message")]
+    pub message: RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLYMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHEDCode {
+    #[serde(rename = "CONVERSATION_VIEW_LIMIT_REACHED")]
+    CONVERSATIONVIEWLIMITREACHED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHEDMessage {
+    #[serde(rename = "The organization already has 200 saved views. Delete one before saving another.")]
+    TheOrganizationAlreadyHas200SavedViewsDeleteOneBeforeSavingAnother,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHED {
+    #[serde(rename = "code")]
+    pub code: RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHEDCode,
+    #[serde(rename = "message")]
+    pub message: RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKENCode {
+    #[serde(rename = "CONVERSATION_VIEW_NAME_TAKEN")]
+    CONVERSATIONVIEWNAMETAKEN,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKENMessage {
+    #[serde(rename = "Another saved view already has this name. Choose a different name.")]
+    AnotherSavedViewAlreadyHasThisNameChooseADifferentName,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKEN {
+    #[serde(rename = "code")]
+    pub code: RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKENCode,
+    #[serde(rename = "message")]
+    pub message: RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKENMessage,
     #[serde(rename = "retryable")]
     pub retryable: serde_json::Value,
     #[serde(rename = "data")]
@@ -30646,6 +31126,9 @@ pub enum RaizFailureResponseErrorPart2 {
     CHANNELENDPOINTINUSE(RaizFailureResponseErrorPart2CHANNELENDPOINTINUSE),
     CHANNELNOTREADY(RaizFailureResponseErrorPart2CHANNELNOTREADY),
     CHANNELTYPEMISMATCH(RaizFailureResponseErrorPart2CHANNELTYPEMISMATCH),
+    CONVERSATIONVIEWAUTHORONLY(RaizFailureResponseErrorPart2CONVERSATIONVIEWAUTHORONLY),
+    CONVERSATIONVIEWLIMITREACHED(RaizFailureResponseErrorPart2CONVERSATIONVIEWLIMITREACHED),
+    CONVERSATIONVIEWNAMETAKEN(RaizFailureResponseErrorPart2CONVERSATIONVIEWNAMETAKEN),
     TEMPLATEHEADERMISMATCH(RaizFailureResponseErrorPart2TEMPLATEHEADERMISMATCH),
     TEMPLATEHEADERREQUIRED(RaizFailureResponseErrorPart2TEMPLATEHEADERREQUIRED),
     TEMPLATENOTAPPROVED(RaizFailureResponseErrorPart2TEMPLATENOTAPPROVED),
