@@ -21490,6 +21490,9 @@ pub struct RaizAgentChannelsItem {
     /// Channel id.
     #[serde(rename = "id")]
     pub id: String,
+    /// WhatsApp only. Last observed message from the phone app matching the configured greeting. Null when none has been recognized. The phone's current greeting setting is unknown.
+    #[serde(rename = "lastBusinessAppGreetingAt", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub last_business_app_greeting_at: Option<Option<String>>,
     #[serde(rename = "name")]
     pub name: Option<String>,
     #[serde(rename = "status")]
@@ -36989,7 +36992,7 @@ pub struct SomosServiceMatch {
     /// The service's name in the contract's catalog.
     #[serde(rename = "name")]
     pub name: String,
-    /// words: the code or the name contains the query. meaning: Cloudflare AI Search found it close to the query in meaning; confirm it with the person or the order before using it.
+    /// words: the code or the name contains the query. meaning: the catalog search found it close to the query in meaning; confirm it with the person or the order before using it.
     #[serde(rename = "match")]
     pub r#match: SomosServiceMatchMatch,
     /// How close the service is to the query: 1 for a match by words, otherwise AI Search's score.
