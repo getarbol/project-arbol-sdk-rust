@@ -124,7 +124,7 @@ pub struct AccountColombianRecordsApi<'a>(&'a Client);
 impl<'a> AccountColombianRecordsApi<'a> {
     /// Consult an included Colombian source
     ///
-    /// Look up one authorized person by document type and number. ADRES returns their name when reported. Sisbén returns the official classification.
+    /// Read ADRES or Sisbén for an authorized document, or obtain the personal Police guide without submitting a document. A machine key needs connection read access and an explicit restriction allowing this operation. Set agentMode to true for concise Spanish text.
     pub async fn lookup(&self, input: &types::AccountColombianRecordsLookupInput) -> Result<types::AccountColombianRecordsLookupOutput, Error> {
         self.0.call(&operations::ACCOUNT_COLOMBIAN_RECORDS_LOOKUP, input).await
     }

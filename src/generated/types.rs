@@ -58,6 +58,9 @@ pub struct AccountApiKey {
     pub scopes: Vec<String>,
     #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
+    /// The UTC instant at which the key stops working. Null for a legacy key without a deadline.
+    #[serde(rename = "expiresAt")]
+    pub expires_at: Option<String>,
     #[serde(rename = "createdBy")]
     pub created_by: Option<String>,
     /// What the key may use per integration beyond its scopes; null: its scopes alone.
@@ -163,6 +166,9 @@ pub struct AccountApiKeysCreateInput {
     pub name: String,
     #[serde(rename = "scopes")]
     pub scopes: Vec<String>,
+    /// Exclusive expiration instant, with timezone. Defaults to seven days from creation.
+    #[serde(rename = "expiresAt", default, skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<String>,
     /// Per integration (sura, visoft, agenda): what the key may use there. An integration left out is decided by the key's scopes alone.
     #[serde(rename = "restrictions", default, skip_serializing_if = "Option::is_none")]
     pub restrictions: Option<std::collections::BTreeMap<String, AccountApiKeysCreateInputRestrictionsValue>>,
@@ -566,6 +572,33 @@ pub struct AccountBillingUnavailableFailure {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountColombiaLookupPresentationVariant2 {
+    #[serde(rename = "text")]
+    pub text: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountColombiaLookupPresentation {
+    AccountColombiaResourceEnvelope(AccountColombiaResourceEnvelope),
+    Variant2(AccountColombiaLookupPresentationVariant2),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountColombiaLookupPresentationResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountColombiaLookupPresentation,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountColombiaResourceEnvelope {
     #[serde(rename = "result")]
     pub result: std::collections::BTreeMap<String, serde_json::Value>,
@@ -587,25 +620,53 @@ pub struct AccountColombiaResourceEnvelopeResponse {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AccountColombianRecordsLookupInputIntegration {
+pub enum AccountColombianRecordsLookupInputInnerPart1Integration {
     #[serde(rename = "adres")]
     Adres,
     #[serde(rename = "sisben")]
     Sisben,
+    #[serde(rename = "policia-colombia")]
+    PoliciaColombia,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AccountColombianRecordsLookupInput {
+pub struct AccountColombianRecordsLookupInputInnerPart1 {
     #[serde(rename = "integration")]
-    pub integration: AccountColombianRecordsLookupInputIntegration,
-    #[serde(rename = "documentType")]
-    pub document_type: String,
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
+    pub integration: AccountColombianRecordsLookupInputInnerPart1Integration,
+    /// Required for ADRES and Sisbén.
+    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
+    pub document_type: Option<String>,
+    /// Required for ADRES and Sisbén. Preserve leading zeros.
+    #[serde(rename = "documentNumber", default, skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+    /// Return a concise Spanish tool answer. Authorization is the same in both formats.
+    #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
+    pub agent_mode: Option<bool>,
 }
 
-/// The result from the selected Colombian source or the holder’s personal consent receipt.
-pub type AccountColombianRecordsLookupOutput = AccountColombiaResourceEnvelope;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountColombianRecordsLookupInputInnerPart2Integration {
+    #[serde(rename = "policia-colombia")]
+    PoliciaColombia,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AccountColombianRecordsLookupInputInnerPart2 {
+    #[serde(rename = "integration", default, skip_serializing_if = "Option::is_none")]
+    pub integration: Option<AccountColombianRecordsLookupInputInnerPart2Integration>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountColombianRecordsLookupInputInner {
+    #[serde(flatten)]
+    pub part1: AccountColombianRecordsLookupInputInnerPart1,
+    #[serde(flatten)]
+    pub part2: AccountColombianRecordsLookupInputInnerPart2,
+}
+
+pub type AccountColombianRecordsLookupInput = AccountColombianRecordsLookupInputInner;
+
+pub type AccountColombianRecordsLookupOutput = AccountColombiaLookupPresentation;
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct AccountConfigureOrganizationBody {
@@ -917,22 +978,51 @@ pub struct AccountConnectionsListInput {
 pub type AccountConnectionsListOutput = AccountConnectionPage;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AccountConsultIncludedRecordBodyIntegration {
+pub enum AccountConsultIncludedRecordBodyInnerPart1Integration {
     #[serde(rename = "adres")]
     Adres,
     #[serde(rename = "sisben")]
     Sisben,
+    #[serde(rename = "policia-colombia")]
+    PoliciaColombia,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AccountConsultIncludedRecordBody {
+pub struct AccountConsultIncludedRecordBodyInnerPart1 {
     #[serde(rename = "integration")]
-    pub integration: AccountConsultIncludedRecordBodyIntegration,
-    #[serde(rename = "documentType")]
-    pub document_type: String,
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
+    pub integration: AccountConsultIncludedRecordBodyInnerPart1Integration,
+    /// Required for ADRES and Sisbén.
+    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
+    pub document_type: Option<String>,
+    /// Required for ADRES and Sisbén. Preserve leading zeros.
+    #[serde(rename = "documentNumber", default, skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+    /// Return a concise Spanish tool answer. Authorization is the same in both formats.
+    #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
+    pub agent_mode: Option<bool>,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConsultIncludedRecordBodyInnerPart2Integration {
+    #[serde(rename = "policia-colombia")]
+    PoliciaColombia,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AccountConsultIncludedRecordBodyInnerPart2 {
+    #[serde(rename = "integration", default, skip_serializing_if = "Option::is_none")]
+    pub integration: Option<AccountConsultIncludedRecordBodyInnerPart2Integration>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConsultIncludedRecordBodyInner {
+    #[serde(flatten)]
+    pub part1: AccountConsultIncludedRecordBodyInnerPart1,
+    #[serde(flatten)]
+    pub part2: AccountConsultIncludedRecordBodyInnerPart2,
+}
+
+pub type AccountConsultIncludedRecordBody = AccountConsultIncludedRecordBodyInner;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountCreateApiKeyBody {
@@ -941,6 +1031,9 @@ pub struct AccountCreateApiKeyBody {
     pub name: String,
     #[serde(rename = "scopes")]
     pub scopes: Vec<String>,
+    /// Exclusive expiration instant, with timezone. Defaults to seven days from creation.
+    #[serde(rename = "expiresAt", default, skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<String>,
     /// Per integration (sura, visoft, agenda): what the key may use there. An integration left out is decided by the key's scopes alone.
     #[serde(rename = "restrictions", default, skip_serializing_if = "Option::is_none")]
     pub restrictions: Option<std::collections::BTreeMap<String, AccountApiKeyRestriction>>,
