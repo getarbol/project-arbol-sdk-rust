@@ -34872,6 +34872,16 @@ pub struct SomosAvailabilityLookupInput {
 
 pub type SomosAvailabilityLookupOutput = SomosAvailabilitySlotPage;
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SomosAvailabilitySlotHearingPair {
+    #[serde(rename = "audiometryTime")]
+    pub audiometry_time: String,
+    #[serde(rename = "logoaudiometryTime")]
+    pub logoaudiometry_time: String,
+    #[serde(rename = "minutesPerExam")]
+    pub minutes_per_exam: serde_json::Value,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SomosAvailabilitySlotWindow {
     #[serde(rename = "requested")]
@@ -34926,6 +34936,9 @@ pub struct SomosAvailabilitySlot {
     pub fono_group: Option<String>,
     #[serde(rename = "toGroup", default, skip_serializing_if = "Option::is_none")]
     pub to_group: Option<String>,
+    /// The two verified exam times on this slot's local date, with its professional. This is an offer, not a booking.
+    #[serde(rename = "hearingPair", default, skip_serializing_if = "Option::is_none")]
+    pub hearing_pair: Option<SomosAvailabilitySlotHearingPair>,
     /// For a pair of consecutive exams: whether the next slot with the same professional is free too.
     #[serde(rename = "pairable", default, skip_serializing_if = "Option::is_none")]
     pub pairable: Option<bool>,
