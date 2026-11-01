@@ -6,6 +6,8 @@ The Arbol API over HTTPS for Rust services. Its types, operations and client met
 [`@arbol-ai/sdk`](https://www.npmjs.com/package/@arbol-ai/sdk) for TypeScript. It uses `reqwest` with
 rustls, `serde` and `thiserror`, runs on any Tokio runtime, and needs Rust 1.85 or newer.
 
+Arbol Bot regenerates the Git dependency after a deployed Gateway release changes the OpenAPI content hash. Generation, formatting, Clippy and the crate’s tests must pass before the bot publishes the commit. The workflow also reconciles the deployed specification every six hours.
+
 ## Install
 
 Add it as a git dependency:
