@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261101.11848";
+pub const RELEASE: &str = "1.20261101.15904";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -276,6 +276,17 @@ pub const ACCOUNT_PERSONAL_CONSENTS_PREPARE: Operation = Operation {
     path_field: None,
     query: None,
     effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.registryInstallations.update`: Set the installation of a Colombian registry
+pub const ACCOUNT_REGISTRY_INSTALLATIONS_UPDATE: Operation = Operation {
+    name: "account.registryInstallations.update",
+    method: "PATCH",
+    path: "/v1/account/registry-installations",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 262144,
 };
 

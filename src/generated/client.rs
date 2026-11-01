@@ -124,7 +124,7 @@ pub struct AccountColombianRecordsApi<'a>(&'a Client);
 impl<'a> AccountColombianRecordsApi<'a> {
     /// Consult an included Colombian source
     ///
-    /// Run one included consultation in the signed-in organization.
+    /// Look up one authorized person by document type and number. ADRES returns their name when reported. Sisbén returns the official classification.
     pub async fn lookup(&self, input: &types::AccountColombianRecordsLookupInput) -> Result<types::AccountColombianRecordsLookupOutput, Error> {
         self.0.call(&operations::ACCOUNT_COLOMBIAN_RECORDS_LOOKUP, input).await
     }
@@ -309,6 +309,19 @@ impl<'a> AccountPersonalConsentsApi<'a> {
     }
 }
 
+/// `account.registryInstallations`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountRegistryInstallationsApi<'a>(&'a Client);
+
+impl<'a> AccountRegistryInstallationsApi<'a> {
+    /// Set the installation of a Colombian registry
+    ///
+    /// Install or disable one Colombian registry in your organization. Agents also need an assignment to its tool.
+    pub async fn update(&self, input: &types::AccountRegistryInstallationsUpdateInput) -> Result<types::AccountRegistryInstallationsUpdateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_REGISTRY_INSTALLATIONS_UPDATE, input).await
+    }
+}
+
 /// `account.roles`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountRolesApi<'a>(&'a Client);
@@ -420,6 +433,10 @@ impl<'a> AccountApi<'a> {
 
     pub fn personal_consents(&self) -> AccountPersonalConsentsApi<'a> {
         AccountPersonalConsentsApi(self.0)
+    }
+
+    pub fn registry_installations(&self) -> AccountRegistryInstallationsApi<'a> {
+        AccountRegistryInstallationsApi(self.0)
     }
 
     pub fn roles(&self) -> AccountRolesApi<'a> {

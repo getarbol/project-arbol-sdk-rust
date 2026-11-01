@@ -2948,6 +2948,38 @@ pub struct AccountProductRoleCatalogPageResponse {
     pub metadata: ResponseMetadata,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountRegistryInstallation {
+    #[serde(rename = "integration")]
+    pub integration: String,
+    #[serde(rename = "installed")]
+    pub installed: bool,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountRegistryInstallationResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountRegistryInstallation,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountRegistryInstallationsUpdateInput {
+    #[serde(rename = "integration")]
+    pub integration: String,
+    #[serde(rename = "installed")]
+    pub installed: bool,
+}
+
+pub type AccountRegistryInstallationsUpdateOutput = AccountRegistryInstallation;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountRoleNotAssignableFailureCode {
     #[serde(rename = "ROLE_NOT_ASSIGNABLE")]
@@ -3139,6 +3171,14 @@ pub enum AccountUpdateMemberServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     AccountAccountNotConfiguredFailure(AccountAccountNotConfiguredFailure),
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountUpdateRegistryInstallationBody {
+    #[serde(rename = "integration")]
+    pub integration: String,
+    #[serde(rename = "installed")]
+    pub installed: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
