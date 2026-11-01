@@ -17,8 +17,8 @@ publish = false
 # The OpenAPI src/generated/ was generated from (`bun run generate` writes it): its info.version, and the
 # SHA-256 of its canonical JSON without info.version (generation/openapi-hash.ts).
 [package.metadata.arbol.openapi]
-release = "1.20261101.31954"
-sha256 = "73d13da2ed2bc32d58a246b86b26ed7e6ac1ba2ea72c3d5fcf494f79cc62ef3d"
+release = "1.20261101.42905"
+sha256 = "f4cc346e1a7389c2e8490ad863d667107f9721408ed856db98fa2130d6bbd6bb"
 
 [dependencies]
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }

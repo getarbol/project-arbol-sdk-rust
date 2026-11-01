@@ -9,6 +9,10 @@ impl Client {
         AccountApi(self)
     }
 
+    pub fn adres(&self) -> AdresApi<'_> {
+        AdresApi(self)
+    }
+
     pub fn agenda(&self) -> AgendaApi<'_> {
         AgendaApi(self)
     }
@@ -29,12 +33,20 @@ impl Client {
         OrsovisionApi(self)
     }
 
+    pub fn policia_colombia(&self) -> PoliciaColombiaApi<'_> {
+        PoliciaColombiaApi(self)
+    }
+
     pub fn raiz(&self) -> RaizApi<'_> {
         RaizApi(self)
     }
 
     pub fn salud_total(&self) -> SaludTotalApi<'_> {
         SaludTotalApi(self)
+    }
+
+    pub fn sisben(&self) -> SisbenApi<'_> {
+        SisbenApi(self)
     }
 
     pub fn somos(&self) -> SomosApi<'_> {
@@ -124,7 +136,7 @@ pub struct AccountColombianRecordsApi<'a>(&'a Client);
 impl<'a> AccountColombianRecordsApi<'a> {
     /// Consult an included Colombian source
     ///
-    /// Read an EPS summary or Sisbén classification for an authorized document. Police reports that a judicial check was not performed. An optional document labels that message and is never submitted to Police. A machine key needs connection read access and an explicit restriction allowing this operation. Set agentMode to true for concise Spanish text.
+    /// Compatibility operation. For new integrations use the dedicated ADRES, Sisbén and Policía Colombia lookups. Read an EPS summary or Sisbén classification for an authorized document. Police reports that a judicial check was not performed. An optional document labels that message and is never submitted to Police. A machine key needs connection read access and an explicit restriction allowing this operation. Set agentMode to true for concise Spanish text.
     pub async fn lookup(&self, input: &types::AccountColombianRecordsLookupInput) -> Result<types::AccountColombianRecordsLookupOutput, Error> {
         self.0.call(&operations::ACCOUNT_COLOMBIAN_RECORDS_LOOKUP, input).await
     }
@@ -436,6 +448,29 @@ impl<'a> AccountApi<'a> {
 
     pub fn wallet_transactions(&self) -> AccountWalletTransactionsApi<'a> {
         AccountWalletTransactionsApi(self.0)
+    }
+}
+
+/// `adres.affiliations`
+#[derive(Debug, Clone, Copy)]
+pub struct AdresAffiliationsApi<'a>(&'a Client);
+
+impl<'a> AdresAffiliationsApi<'a> {
+    /// Look up EPS affiliation
+    ///
+    /// Read the person and all reported EPS affiliations for a document. A last-known observation is dated and does not establish current coverage.
+    pub async fn lookup(&self, input: &types::AdresAffiliationsLookupInput) -> Result<types::AdresAffiliationsLookupOutput, Error> {
+        self.0.call(&operations::ADRES_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `adres`
+#[derive(Debug, Clone, Copy)]
+pub struct AdresApi<'a>(&'a Client);
+
+impl<'a> AdresApi<'a> {
+    pub fn affiliations(&self) -> AdresAffiliationsApi<'a> {
+        AdresAffiliationsApi(self.0)
     }
 }
 
@@ -1517,6 +1552,29 @@ impl<'a> OrsovisionApi<'a> {
     }
 }
 
+/// `policia-colombia.judicialRecords`
+#[derive(Debug, Clone, Copy)]
+pub struct PoliciaColombiaJudicialRecordsApi<'a>(&'a Client);
+
+impl<'a> PoliciaColombiaJudicialRecordsApi<'a> {
+    /// Look up a Colombian judicial statement
+    ///
+    /// Read the document-matched identity fields and verbatim source statement, when available. A statement about pending matters is not a criminal conviction history.
+    pub async fn lookup(&self, input: &types::PoliciaColombiaJudicialRecordsLookupInput) -> Result<types::PoliciaColombiaJudicialRecordsLookupOutput, Error> {
+        self.0.call(&operations::POLICIA_COLOMBIA_JUDICIAL_RECORDS_LOOKUP, input).await
+    }
+}
+
+/// `policia-colombia`
+#[derive(Debug, Clone, Copy)]
+pub struct PoliciaColombiaApi<'a>(&'a Client);
+
+impl<'a> PoliciaColombiaApi<'a> {
+    pub fn judicial_records(&self) -> PoliciaColombiaJudicialRecordsApi<'a> {
+        PoliciaColombiaJudicialRecordsApi(self.0)
+    }
+}
+
 /// `raiz.agents`
 #[derive(Debug, Clone, Copy)]
 pub struct RaizAgentsApi<'a>(&'a Client);
@@ -2263,6 +2321,29 @@ impl<'a> SaludTotalApi<'a> {
 
     pub fn notices(&self) -> SaludTotalNoticesApi<'a> {
         SaludTotalNoticesApi(self.0)
+    }
+}
+
+/// `sisben.classifications`
+#[derive(Debug, Clone, Copy)]
+pub struct SisbenClassificationsApi<'a>(&'a Client);
+
+impl<'a> SisbenClassificationsApi<'a> {
+    /// Look up a Sisbén classification
+    ///
+    /// Read registration and the official group and subgroup. A null registration means the source could not verify the document.
+    pub async fn lookup(&self, input: &types::SisbenClassificationsLookupInput) -> Result<types::SisbenClassificationsLookupOutput, Error> {
+        self.0.call(&operations::SISBEN_CLASSIFICATIONS_LOOKUP, input).await
+    }
+}
+
+/// `sisben`
+#[derive(Debug, Clone, Copy)]
+pub struct SisbenApi<'a>(&'a Client);
+
+impl<'a> SisbenApi<'a> {
+    pub fn classifications(&self) -> SisbenClassificationsApi<'a> {
+        SisbenClassificationsApi(self.0)
     }
 }
 

@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261101.31954";
+pub const RELEASE: &str = "1.20261101.42905";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -319,6 +319,17 @@ pub const ACCOUNT_WALLET_TRANSACTIONS_LIST: Operation = Operation {
     path: "/v1/account/wallet-transactions",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `adres.affiliations.lookup`: Look up EPS affiliation
+pub const ADRES_AFFILIATIONS_LOOKUP: Operation = Operation {
+    name: "adres.affiliations.lookup",
+    method: "POST",
+    path: "/v1/adres/affiliations/lookup",
+    path_field: None,
+    query: None,
     effect: Effect::Read,
     max_output_bytes: 262144,
 };
@@ -1247,6 +1258,17 @@ pub const ORSOVISION_TOOLS_LIST: Operation = Operation {
     max_output_bytes: 1048576,
 };
 
+/// `policia-colombia.judicialRecords.lookup`: Look up a Colombian judicial statement
+pub const POLICIA_COLOMBIA_JUDICIAL_RECORDS_LOOKUP: Operation = Operation {
+    name: "policia-colombia.judicialRecords.lookup",
+    method: "POST",
+    path: "/v1/policia-colombia/judicial-records/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
 /// `raiz.agents.create`: Create an Agent
 pub const RAIZ_AGENTS_CREATE: Operation = Operation {
     name: "raiz.agents.create",
@@ -2024,6 +2046,17 @@ pub const SALUD_TOTAL_NOTICES_COUNT: Operation = Operation {
     path: "/v1/salud-total/notices/count",
     path_field: None,
     query: Some(&[("connectionId", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `sisben.classifications.lookup`: Look up a Sisbén classification
+pub const SISBEN_CLASSIFICATIONS_LOOKUP: Operation = Operation {
+    name: "sisben.classifications.lookup",
+    method: "POST",
+    path: "/v1/sisben/classifications/lookup",
+    path_field: None,
+    query: None,
     effect: Effect::Read,
     max_output_bytes: 262144,
 };
