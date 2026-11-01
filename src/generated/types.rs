@@ -602,7 +602,7 @@ pub struct AccountColombiaLookupPresentationResponse {
 #[serde(untagged)]
 pub enum AccountColombiaResourceEnvelopeResult {
     Variant1(String),
-    SisbenClassification(SisbenClassification),
+    AccountSisbenClassification(AccountSisbenClassification),
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -3086,6 +3086,221 @@ pub enum AccountRotateApiKeyServiceUnavailableFailure {
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIVSource {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIVVerification {
+    #[serde(rename = "source_report")]
+    SourceReport,
+    #[serde(rename = "last_known")]
+    LastKnown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIVGroup {
+    #[serde(rename = "A")]
+    A,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIVSource,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIVVerification,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: AccountSisbenClassificationDNPSISBENIVGroup,
+    #[serde(rename = "subgroup")]
+    pub subgroup: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV2Source {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV2Verification {
+    #[serde(rename = "source_report")]
+    SourceReport,
+    #[serde(rename = "last_known")]
+    LastKnown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV2Group {
+    #[serde(rename = "B")]
+    B,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV2 {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIV2Source,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIV2Verification,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: AccountSisbenClassificationDNPSISBENIV2Group,
+    #[serde(rename = "subgroup")]
+    pub subgroup: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV23Source {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV23Verification {
+    #[serde(rename = "source_report")]
+    SourceReport,
+    #[serde(rename = "last_known")]
+    LastKnown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV23Group {
+    #[serde(rename = "C")]
+    C,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV23 {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIV23Source,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIV23Verification,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: AccountSisbenClassificationDNPSISBENIV23Group,
+    #[serde(rename = "subgroup")]
+    pub subgroup: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV234Source {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV234Verification {
+    #[serde(rename = "source_report")]
+    SourceReport,
+    #[serde(rename = "last_known")]
+    LastKnown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV234Group {
+    #[serde(rename = "D")]
+    D,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV234 {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIV234Source,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIV234Verification,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: AccountSisbenClassificationDNPSISBENIV234Group,
+    #[serde(rename = "subgroup")]
+    pub subgroup: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV2345Source {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV2345Verification {
+    #[serde(rename = "source_report")]
+    SourceReport,
+    #[serde(rename = "last_known")]
+    LastKnown,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV2345 {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIV2345Source,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIV2345Verification,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: serde_json::Value,
+    #[serde(rename = "subgroup")]
+    pub subgroup: serde_json::Value,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV23456Source {
+    #[serde(rename = "DNP-SISBEN-IV")]
+    DNPSISBENIV,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountSisbenClassificationDNPSISBENIV23456Verification {
+    #[serde(rename = "unavailable")]
+    Unavailable,
+    #[serde(rename = "unsupported_document")]
+    UnsupportedDocument,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountSisbenClassificationDNPSISBENIV23456 {
+    #[serde(rename = "source")]
+    pub source: AccountSisbenClassificationDNPSISBENIV23456Source,
+    #[serde(rename = "verification")]
+    pub verification: AccountSisbenClassificationDNPSISBENIV23456Verification,
+    #[serde(rename = "registered")]
+    pub registered: serde_json::Value,
+    #[serde(rename = "group")]
+    pub group: serde_json::Value,
+    #[serde(rename = "subgroup")]
+    pub subgroup: serde_json::Value,
+    #[serde(rename = "observedAt")]
+    pub observed_at: serde_json::Value,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountSisbenClassification {
+    DNPSISBENIV(AccountSisbenClassificationDNPSISBENIV),
+    DNPSISBENIV2(AccountSisbenClassificationDNPSISBENIV2),
+    DNPSISBENIV23(AccountSisbenClassificationDNPSISBENIV23),
+    DNPSISBENIV234(AccountSisbenClassificationDNPSISBENIV234),
+    DNPSISBENIV2345(AccountSisbenClassificationDNPSISBENIV2345),
+    DNPSISBENIV23456(AccountSisbenClassificationDNPSISBENIV23456),
+}
+
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct AccountUpdateBillingProfileBody {
     #[serde(rename = "legalName", default, skip_serializing_if = "Option::is_none")]
@@ -3466,27 +3681,6 @@ pub enum AdresAffiliationPresentationCOVerification {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AdresAffiliationPresentationCOSisbenStatus {
-    #[serde(rename = "reported")]
-    Reported,
-    #[serde(rename = "explicitly_absent")]
-    ExplicitlyAbsent,
-    #[serde(rename = "not_reported")]
-    NotReported,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AdresAffiliationPresentationCOSisben {
-    #[serde(rename = "status")]
-    pub status: AdresAffiliationPresentationCOSisbenStatus,
-    #[serde(rename = "value")]
-    pub value: Option<String>,
-    /// DNP registration and household classification at the source observation time. Unknown registration is null.
-    #[serde(rename = "official")]
-    pub official: SisbenClassification,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AdresAffiliationPresentationCOOutcome {
     #[serde(rename = "found")]
     Found,
@@ -3591,8 +3785,6 @@ pub struct AdresAffiliationPresentationCO {
     pub consulted_at: String,
     #[serde(rename = "verification")]
     pub verification: AdresAffiliationPresentationCOVerification,
-    #[serde(rename = "sisben")]
-    pub sisben: AdresAffiliationPresentationCOSisben,
     #[serde(rename = "outcome")]
     pub outcome: AdresAffiliationPresentationCOOutcome,
     #[serde(rename = "person")]
@@ -3613,27 +3805,6 @@ pub enum AdresAffiliationPresentationCO2Verification {
     SourceReport,
     #[serde(rename = "last_known")]
     LastKnown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AdresAffiliationPresentationCO2SisbenStatus {
-    #[serde(rename = "reported")]
-    Reported,
-    #[serde(rename = "explicitly_absent")]
-    ExplicitlyAbsent,
-    #[serde(rename = "not_reported")]
-    NotReported,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AdresAffiliationPresentationCO2Sisben {
-    #[serde(rename = "status")]
-    pub status: AdresAffiliationPresentationCO2SisbenStatus,
-    #[serde(rename = "value")]
-    pub value: Option<String>,
-    /// DNP registration and household classification at the source observation time. Unknown registration is null.
-    #[serde(rename = "official")]
-    pub official: SisbenClassification,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -3693,8 +3864,6 @@ pub struct AdresAffiliationPresentationCO2 {
     pub consulted_at: String,
     #[serde(rename = "verification")]
     pub verification: AdresAffiliationPresentationCO2Verification,
-    #[serde(rename = "sisben")]
-    pub sisben: AdresAffiliationPresentationCO2Sisben,
     #[serde(rename = "outcome")]
     pub outcome: AdresAffiliationPresentationCO2Outcome,
     #[serde(rename = "person")]
@@ -21858,6 +22027,8 @@ pub enum PoliciaColombiaJudicialRecordPresentationVariant1DocumentType {
 pub enum PoliciaColombiaJudicialRecordPresentationVariant1JudicialStatus {
     #[serde(rename = "no_pending_matters")]
     NoPendingMatters,
+    #[serde(rename = "not_currently_required")]
+    NotCurrentlyRequired,
     #[serde(rename = "pending_matters")]
     PendingMatters,
     #[serde(rename = "in_person_required")]
@@ -21880,14 +22051,8 @@ pub struct PoliciaColombiaJudicialRecordPresentationVariant1 {
     pub document_type: PoliciaColombiaJudicialRecordPresentationVariant1DocumentType,
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    #[serde(rename = "givenName")]
-    pub given_name: Option<String>,
-    #[serde(rename = "familyName")]
-    pub family_name: Option<String>,
     #[serde(rename = "fullName")]
     pub full_name: Option<String>,
-    #[serde(rename = "arrayName")]
-    pub array_name: Option<Vec<String>>,
     #[serde(rename = "judicialStatus")]
     pub judicial_status: PoliciaColombiaJudicialRecordPresentationVariant1JudicialStatus,
     #[serde(rename = "observedAt")]
@@ -21931,14 +22096,8 @@ pub struct PoliciaColombiaJudicialRecordPresentationUnverified {
     pub document_type: PoliciaColombiaJudicialRecordPresentationUnverifiedDocumentType,
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    #[serde(rename = "givenName")]
-    pub given_name: serde_json::Value,
-    #[serde(rename = "familyName")]
-    pub family_name: serde_json::Value,
     #[serde(rename = "fullName")]
     pub full_name: serde_json::Value,
-    #[serde(rename = "arrayName")]
-    pub array_name: serde_json::Value,
     #[serde(rename = "identityStatus")]
     pub identity_status: PoliciaColombiaJudicialRecordPresentationUnverifiedIdentityStatus,
     #[serde(rename = "judicialStatus")]
@@ -35165,221 +35324,6 @@ pub struct SaludTotalSiteUnavailableFailure {
     /// No fields.
     #[serde(rename = "data")]
     pub data: Empty,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIVSource {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIVVerification {
-    #[serde(rename = "source_report")]
-    SourceReport,
-    #[serde(rename = "last_known")]
-    LastKnown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIVGroup {
-    #[serde(rename = "A")]
-    A,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIVSource,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIVVerification,
-    #[serde(rename = "observedAt")]
-    pub observed_at: String,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: SisbenClassificationDNPSISBENIVGroup,
-    #[serde(rename = "subgroup")]
-    pub subgroup: Option<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV2Source {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV2Verification {
-    #[serde(rename = "source_report")]
-    SourceReport,
-    #[serde(rename = "last_known")]
-    LastKnown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV2Group {
-    #[serde(rename = "B")]
-    B,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV2 {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIV2Source,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIV2Verification,
-    #[serde(rename = "observedAt")]
-    pub observed_at: String,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: SisbenClassificationDNPSISBENIV2Group,
-    #[serde(rename = "subgroup")]
-    pub subgroup: Option<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV23Source {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV23Verification {
-    #[serde(rename = "source_report")]
-    SourceReport,
-    #[serde(rename = "last_known")]
-    LastKnown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV23Group {
-    #[serde(rename = "C")]
-    C,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV23 {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIV23Source,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIV23Verification,
-    #[serde(rename = "observedAt")]
-    pub observed_at: String,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: SisbenClassificationDNPSISBENIV23Group,
-    #[serde(rename = "subgroup")]
-    pub subgroup: Option<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV234Source {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV234Verification {
-    #[serde(rename = "source_report")]
-    SourceReport,
-    #[serde(rename = "last_known")]
-    LastKnown,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV234Group {
-    #[serde(rename = "D")]
-    D,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV234 {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIV234Source,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIV234Verification,
-    #[serde(rename = "observedAt")]
-    pub observed_at: String,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: SisbenClassificationDNPSISBENIV234Group,
-    #[serde(rename = "subgroup")]
-    pub subgroup: Option<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV2345Source {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV2345Verification {
-    #[serde(rename = "source_report")]
-    SourceReport,
-    #[serde(rename = "last_known")]
-    LastKnown,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV2345 {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIV2345Source,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIV2345Verification,
-    #[serde(rename = "observedAt")]
-    pub observed_at: String,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: serde_json::Value,
-    #[serde(rename = "subgroup")]
-    pub subgroup: serde_json::Value,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV23456Source {
-    #[serde(rename = "DNP-SISBEN-IV")]
-    DNPSISBENIV,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SisbenClassificationDNPSISBENIV23456Verification {
-    #[serde(rename = "unavailable")]
-    Unavailable,
-    #[serde(rename = "unsupported_document")]
-    UnsupportedDocument,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SisbenClassificationDNPSISBENIV23456 {
-    #[serde(rename = "source")]
-    pub source: SisbenClassificationDNPSISBENIV23456Source,
-    #[serde(rename = "verification")]
-    pub verification: SisbenClassificationDNPSISBENIV23456Verification,
-    #[serde(rename = "registered")]
-    pub registered: serde_json::Value,
-    #[serde(rename = "group")]
-    pub group: serde_json::Value,
-    #[serde(rename = "subgroup")]
-    pub subgroup: serde_json::Value,
-    #[serde(rename = "observedAt")]
-    pub observed_at: serde_json::Value,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-#[serde(untagged)]
-pub enum SisbenClassification {
-    DNPSISBENIV(SisbenClassificationDNPSISBENIV),
-    DNPSISBENIV2(SisbenClassificationDNPSISBENIV2),
-    DNPSISBENIV23(SisbenClassificationDNPSISBENIV23),
-    DNPSISBENIV234(SisbenClassificationDNPSISBENIV234),
-    DNPSISBENIV2345(SisbenClassificationDNPSISBENIV2345),
-    DNPSISBENIV23456(SisbenClassificationDNPSISBENIV23456),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
