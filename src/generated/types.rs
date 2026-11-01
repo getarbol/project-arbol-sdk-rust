@@ -26646,6 +26646,8 @@ pub struct RaizConversationCount {
     /// How many match the filters, counted up to 10000.
     #[serde(rename = "count")]
     pub count: i64,
+    #[serde(rename = "averageDurationSeconds")]
+    pub average_duration_seconds: Option<f64>,
     #[serde(rename = "averageMessageCount")]
     pub average_message_count: Option<f64>,
     #[serde(rename = "groups")]
@@ -26725,6 +26727,10 @@ pub struct RaizConversationDiagnostics {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversationGroup {
+    #[serde(rename = "averageDurationSeconds")]
+    pub average_duration_seconds: Option<f64>,
+    #[serde(rename = "averageMessageCount")]
+    pub average_message_count: Option<f64>,
     /// Conversations in the group.
     #[serde(rename = "count")]
     pub count: i64,
@@ -26816,7 +26822,7 @@ pub struct RaizConversationView {
     /// An instant in RFC 3339 format, in UTC.
     #[serde(rename = "createdAt")]
     pub created_at: String,
-    /// The filters of `list_conversations` under the same names, passed to it and to `count_conversations` as they are (resolve `period` to `startedAfter` first).
+    /// The filters of `list_conversations` under the same names, passed to it and to `count_conversations` as they are. A rolling `period` keeps the view moving with the calendar; `startedAfter`/`startedBefore` fix it to dates.
     #[serde(rename = "filters")]
     pub filters: RaizConversationViewFilters,
     #[serde(rename = "groupBy")]
@@ -26883,6 +26889,20 @@ pub enum RaizConversationViewFiltersStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersPeriod {
+    #[serde(rename = "today")]
+    Today,
+    #[serde(rename = "7d")]
+    V7d,
+    #[serde(rename = "30d")]
+    V30d,
+    #[serde(rename = "90d")]
+    V90d,
+    #[serde(rename = "365d")]
+    V365d,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationViewFiltersToolStatus {
     #[serde(rename = "completed")]
     Completed,
@@ -26898,20 +26918,6 @@ pub enum RaizConversationViewFiltersAssessment {
     Failed,
     #[serde(rename = "passed")]
     Passed,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum RaizConversationViewFiltersPeriod {
-    #[serde(rename = "today")]
-    Today,
-    #[serde(rename = "7d")]
-    V7d,
-    #[serde(rename = "30d")]
-    V30d,
-    #[serde(rename = "90d")]
-    V90d,
-    #[serde(rename = "365d")]
-    V365d,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
@@ -26966,6 +26972,9 @@ pub struct RaizConversationViewFilters {
     pub started_before: Option<String>,
     #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
     pub status: Option<RaizConversationViewFiltersStatus>,
+    /// Started today or in the last 7, 30, 90 or 365 days including today, counting days in the organization's time zone as `get_report` does. A saved view keeps its period this way, so it moves with the calendar.
+    #[serde(rename = "period", default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<RaizConversationViewFiltersPeriod>,
     /// Comma-separated sentiments of the analysis.
     #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
     pub sentiment: Option<String>,
@@ -26984,6 +26993,9 @@ pub struct RaizConversationViewFilters {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationViewFiltersAssessment>,
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
+    pub to_review: Option<bool>,
     /// At least this many messages.
     #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
     pub messages_min: Option<i64>,
@@ -26996,9 +27008,6 @@ pub struct RaizConversationViewFilters {
     /// Calls of at most this many seconds.
     #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
     pub duration_max: Option<i64>,
-    /// Conversations started today or in the last 7, 30, 90 or 365 days when the view opens, in the organization's time zone. Use it instead of `startedAfter`/`startedBefore` for a view that keeps moving with the calendar.
-    #[serde(rename = "period", default, skip_serializing_if = "Option::is_none")]
-    pub period: Option<RaizConversationViewFiltersPeriod>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -27140,6 +27149,20 @@ pub enum RaizConversationsCountInputStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsCountInputPeriod {
+    #[serde(rename = "today")]
+    Today,
+    #[serde(rename = "7d")]
+    V7d,
+    #[serde(rename = "30d")]
+    V30d,
+    #[serde(rename = "90d")]
+    V90d,
+    #[serde(rename = "365d")]
+    V365d,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationsCountInputToolStatus {
     #[serde(rename = "completed")]
     Completed,
@@ -27209,6 +27232,9 @@ pub struct RaizConversationsCountInput {
     pub started_before: Option<String>,
     #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
     pub status: Option<RaizConversationsCountInputStatus>,
+    /// Started today or in the last 7, 30, 90 or 365 days including today, counting days in the organization's time zone as `get_report` does. A saved view keeps its period this way, so it moves with the calendar.
+    #[serde(rename = "period", default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<RaizConversationsCountInputPeriod>,
     /// Comma-separated sentiments of the analysis.
     #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
     pub sentiment: Option<String>,
@@ -27227,6 +27253,9 @@ pub struct RaizConversationsCountInput {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationsCountInputAssessment>,
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
+    pub to_review: Option<bool>,
     /// At least this many messages.
     #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
     pub messages_min: Option<i64>,
@@ -27327,6 +27356,20 @@ pub enum RaizConversationsListInputStatus {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsListInputPeriod {
+    #[serde(rename = "today")]
+    Today,
+    #[serde(rename = "7d")]
+    V7d,
+    #[serde(rename = "30d")]
+    V30d,
+    #[serde(rename = "90d")]
+    V90d,
+    #[serde(rename = "365d")]
+    V365d,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationsListInputToolStatus {
     #[serde(rename = "completed")]
     Completed,
@@ -27415,6 +27458,9 @@ pub struct RaizConversationsListInput {
     pub started_before: Option<String>,
     #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
     pub status: Option<RaizConversationsListInputStatus>,
+    /// Started today or in the last 7, 30, 90 or 365 days including today, counting days in the organization's time zone as `get_report` does. A saved view keeps its period this way, so it moves with the calendar.
+    #[serde(rename = "period", default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<RaizConversationsListInputPeriod>,
     /// Comma-separated sentiments of the analysis.
     #[serde(rename = "sentiment", default, skip_serializing_if = "Option::is_none")]
     pub sentiment: Option<String>,
@@ -27433,6 +27479,9 @@ pub struct RaizConversationsListInput {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationsListInputAssessment>,
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
+    pub to_review: Option<bool>,
     /// At least this many messages.
     #[serde(rename = "messagesMin", default, skip_serializing_if = "Option::is_none")]
     pub messages_min: Option<i64>,
