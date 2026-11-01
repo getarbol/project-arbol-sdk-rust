@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261101.22054";
+pub const RELEASE: &str = "1.20261101.23052";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -264,17 +264,6 @@ pub const ACCOUNT_PERMISSIONS_LIST: Operation = Operation {
     path: "/v1/account/permissions",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.personalConsents.prepare`: Prepare a personal Colombian Police declaration
-pub const ACCOUNT_PERSONAL_CONSENTS_PREPARE: Operation = Operation {
-    name: "account.personalConsents.prepare",
-    method: "POST",
-    path: "/v1/account/personal-consents/prepare",
-    path_field: None,
-    query: None,
     effect: Effect::Read,
     max_output_bytes: 262144,
 };

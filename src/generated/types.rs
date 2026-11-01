@@ -604,21 +604,6 @@ pub struct AccountColombiaResourceEnvelope {
     pub result: std::collections::BTreeMap<String, serde_json::Value>,
 }
 
-/// A successful answer.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AccountColombiaResourceEnvelopeResponse {
-    #[serde(rename = "success")]
-    pub success: serde_json::Value,
-    /// The result from the selected Colombian source or the holder’s personal consent receipt.
-    #[serde(rename = "data")]
-    pub data: AccountColombiaResourceEnvelope,
-    #[serde(rename = "error")]
-    pub error: serde_json::Value,
-    /// What every answer carries besides its data or error.
-    #[serde(rename = "metadata")]
-    pub metadata: ResponseMetadata,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountColombianRecordsLookupInputInnerPart1Integration {
     #[serde(rename = "adres")]
@@ -2902,53 +2887,6 @@ pub struct AccountPermissionsListInput {
 }
 
 pub type AccountPermissionsListOutput = AccountPermissionPage;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AccountPersonalConsentsPrepareInputDocumentType {
-    #[serde(rename = "CC")]
-    CC,
-    #[serde(rename = "CE")]
-    CE,
-    #[serde(rename = "PA")]
-    PA,
-    #[serde(rename = "DP")]
-    DP,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AccountPersonalConsentsPrepareInput {
-    #[serde(rename = "documentType")]
-    pub document_type: AccountPersonalConsentsPrepareInputDocumentType,
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
-    #[serde(rename = "consent")]
-    pub consent: serde_json::Value,
-}
-
-/// The result from the selected Colombian source or the holder’s personal consent receipt.
-pub type AccountPersonalConsentsPrepareOutput = AccountColombiaResourceEnvelope;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum AccountPrepareColombiaConsentBodyDocumentType {
-    #[serde(rename = "CC")]
-    CC,
-    #[serde(rename = "CE")]
-    CE,
-    #[serde(rename = "PA")]
-    PA,
-    #[serde(rename = "DP")]
-    DP,
-}
-
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct AccountPrepareColombiaConsentBody {
-    #[serde(rename = "documentType")]
-    pub document_type: AccountPrepareColombiaConsentBodyDocumentType,
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
-    #[serde(rename = "consent")]
-    pub consent: serde_json::Value,
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountProductRoleProduct {

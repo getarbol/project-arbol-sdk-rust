@@ -296,19 +296,6 @@ impl<'a> AccountPermissionsApi<'a> {
     }
 }
 
-/// `account.personalConsents`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountPersonalConsentsApi<'a>(&'a Client);
-
-impl<'a> AccountPersonalConsentsApi<'a> {
-    /// Prepare a personal Colombian Police declaration
-    ///
-    /// Send the holder’s explicitly accepted document and receive the matching personal-use declaration.
-    pub async fn prepare(&self, input: &types::AccountPersonalConsentsPrepareInput) -> Result<types::AccountPersonalConsentsPrepareOutput, Error> {
-        self.0.call(&operations::ACCOUNT_PERSONAL_CONSENTS_PREPARE, input).await
-    }
-}
-
 /// `account.registryInstallations`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountRegistryInstallationsApi<'a>(&'a Client);
@@ -429,10 +416,6 @@ impl<'a> AccountApi<'a> {
 
     pub fn permissions(&self) -> AccountPermissionsApi<'a> {
         AccountPermissionsApi(self.0)
-    }
-
-    pub fn personal_consents(&self) -> AccountPersonalConsentsApi<'a> {
-        AccountPersonalConsentsApi(self.0)
     }
 
     pub fn registry_installations(&self) -> AccountRegistryInstallationsApi<'a> {
