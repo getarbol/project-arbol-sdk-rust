@@ -7985,6 +7985,366 @@ pub struct AgendaFailureResponseErrorPart2ARBOLREFUSED {
     pub data: serde_json::Map<String, serde_json::Value>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCHCode {
+    #[serde(rename = "FOLLOWUP_SETTINGS_VERSION_MISMATCH")]
+    FOLLOWUPSETTINGSVERSIONMISMATCH,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCHMessage {
+    #[serde(rename = "Follow-up email settings changed; reload before saving.")]
+    FollowUpEmailSettingsChangedReloadBeforeSaving,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCH {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCHCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCHMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPDISABLEDCode {
+    #[serde(rename = "FOLLOWUP_DISABLED")]
+    FOLLOWUPDISABLED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPDISABLEDMessage {
+    #[serde(rename = "Turn this follow-up email on in the notification settings first.")]
+    TurnThisFollowUpEmailOnInTheNotificationSettingsFirst,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2FOLLOWUPDISABLED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2FOLLOWUPDISABLEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2FOLLOWUPDISABLEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIREDCode {
+    #[serde(rename = "FOLLOWUP_CONSENT_REQUIRED")]
+    FOLLOWUPCONSENTREQUIRED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIREDMessage {
+    #[serde(rename = "The patient has not consented to this follow-up email for their current address.")]
+    ThePatientHasNotConsentedToThisFollowUpEmailForTheirCurrentAddress,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIRED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIREDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIREDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2PATIENTEMAILREQUIREDCode {
+    #[serde(rename = "PATIENT_EMAIL_REQUIRED")]
+    PATIENTEMAILREQUIRED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2PATIENTEMAILREQUIREDMessage {
+    #[serde(rename = "Record the patient's email before this action.")]
+    RecordThePatientSEmailBeforeThisAction,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2PATIENTEMAILREQUIRED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2PATIENTEMAILREQUIREDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2PATIENTEMAILREQUIREDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2PATIENTARCHIVEDCode {
+    #[serde(rename = "PATIENT_ARCHIVED")]
+    PATIENTARCHIVED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2PATIENTARCHIVEDMessage {
+    #[serde(rename = "Restore the patient before this action.")]
+    RestoreThePatientBeforeThisAction,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2PATIENTARCHIVED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2PATIENTARCHIVEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2PATIENTARCHIVEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLALREADYACTIVECode {
+    #[serde(rename = "RECALL_ALREADY_ACTIVE")]
+    RECALLALREADYACTIVE,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLALREADYACTIVEMessage {
+    #[serde(rename = "The patient already has an active recall for this service.")]
+    ThePatientAlreadyHasAnActiveRecallForThisService,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2RECALLALREADYACTIVE {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2RECALLALREADYACTIVECode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2RECALLALREADYACTIVEMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLMONTHPASSEDCode {
+    #[serde(rename = "RECALL_MONTH_PASSED")]
+    RECALLMONTHPASSED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLMONTHPASSEDMessage {
+    #[serde(rename = "The recall's month has already passed.")]
+    TheRecallSMonthHasAlreadyPassed,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2RECALLMONTHPASSED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2RECALLMONTHPASSEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2RECALLMONTHPASSEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVISITREQUIREDCode {
+    #[serde(rename = "RECALL_VISIT_REQUIRED")]
+    RECALLVISITREQUIRED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVISITREQUIREDMessage {
+    #[serde(rename = "Enter the last visit: there is no attended appointment of this service for the patient.")]
+    EnterTheLastVisitThereIsNoAttendedAppointmentOfThisServiceForThePatient,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2RECALLVISITREQUIRED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2RECALLVISITREQUIREDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2RECALLVISITREQUIREDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVISITINFUTURECode {
+    #[serde(rename = "RECALL_VISIT_IN_FUTURE")]
+    RECALLVISITINFUTURE,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVISITINFUTUREMessage {
+    #[serde(rename = "The last visit must be a past date.")]
+    TheLastVisitMustBeAPastDate,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2RECALLVISITINFUTURE {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2RECALLVISITINFUTURECode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2RECALLVISITINFUTUREMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCHCode {
+    #[serde(rename = "RECALL_VERSION_MISMATCH")]
+    RECALLVERSIONMISMATCH,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCHMessage {
+    #[serde(rename = "The recall changed after it was loaded.")]
+    TheRecallChangedAfterItWasLoaded,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCH {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCHCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCHMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWEDCode {
+    #[serde(rename = "SLOT_OFFER_NOT_ALLOWED")]
+    SLOTOFFERNOTALLOWED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWEDMessage {
+    #[serde(rename = "Only an open waiting-list entry of a registered patient can receive a slot offer.")]
+    OnlyAnOpenWaitingListEntryOfARegisteredPatientCanReceiveASlotOffer,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERMISMATCHCode {
+    #[serde(rename = "SLOT_OFFER_MISMATCH")]
+    SLOTOFFERMISMATCH,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERMISMATCHMessage {
+    #[serde(rename = "The slot belongs to another service or agenda than the entry asks for.")]
+    TheSlotBelongsToAnotherServiceOrAgendaThanTheEntryAsksFor,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2SLOTOFFERMISMATCH {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2SLOTOFFERMISMATCHCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2SLOTOFFERMISMATCHMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERTOOSOONCode {
+    #[serde(rename = "SLOT_OFFER_TOO_SOON")]
+    SLOTOFFERTOOSOON,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERTOOSOONMessage {
+    #[serde(rename = "The slot starts too soon to hold it for the patient; offer a later one.")]
+    TheSlotStartsTooSoonToHoldItForThePatientOfferALaterOne,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2SLOTOFFERTOOSOON {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2SLOTOFFERTOOSOONCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2SLOTOFFERTOOSOONMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPENCode {
+    #[serde(rename = "SLOT_OFFER_ALREADY_OPEN")]
+    SLOTOFFERALREADYOPEN,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPENMessage {
+    #[serde(rename = "This waiting-list entry already has an open slot offer.")]
+    ThisWaitingListEntryAlreadyHasAnOpenSlotOffer,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPEN {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPENCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPENMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERCLOSEDCode {
+    #[serde(rename = "SLOT_OFFER_CLOSED")]
+    SLOTOFFERCLOSED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2SLOTOFFERCLOSEDMessage {
+    #[serde(rename = "The slot offer is no longer open.")]
+    TheSlotOfferIsNoLongerOpen,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2SLOTOFFERCLOSED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2SLOTOFFERCLOSEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2SLOTOFFERCLOSEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum AgendaFailureResponseErrorPart2 {
@@ -8076,6 +8436,21 @@ pub enum AgendaFailureResponseErrorPart2 {
     REMOVALJOBCONFLICT(AgendaFailureResponseErrorPart2REMOVALJOBCONFLICT),
     INVALIDBODY(AgendaFailureResponseErrorPart2INVALIDBODY),
     ARBOLREFUSED(AgendaFailureResponseErrorPart2ARBOLREFUSED),
+    FOLLOWUPSETTINGSVERSIONMISMATCH(AgendaFailureResponseErrorPart2FOLLOWUPSETTINGSVERSIONMISMATCH),
+    FOLLOWUPDISABLED(AgendaFailureResponseErrorPart2FOLLOWUPDISABLED),
+    FOLLOWUPCONSENTREQUIRED(AgendaFailureResponseErrorPart2FOLLOWUPCONSENTREQUIRED),
+    PATIENTEMAILREQUIRED(AgendaFailureResponseErrorPart2PATIENTEMAILREQUIRED),
+    PATIENTARCHIVED(AgendaFailureResponseErrorPart2PATIENTARCHIVED),
+    RECALLALREADYACTIVE(AgendaFailureResponseErrorPart2RECALLALREADYACTIVE),
+    RECALLMONTHPASSED(AgendaFailureResponseErrorPart2RECALLMONTHPASSED),
+    RECALLVISITREQUIRED(AgendaFailureResponseErrorPart2RECALLVISITREQUIRED),
+    RECALLVISITINFUTURE(AgendaFailureResponseErrorPart2RECALLVISITINFUTURE),
+    RECALLVERSIONMISMATCH(AgendaFailureResponseErrorPart2RECALLVERSIONMISMATCH),
+    SLOTOFFERNOTALLOWED(AgendaFailureResponseErrorPart2SLOTOFFERNOTALLOWED),
+    SLOTOFFERMISMATCH(AgendaFailureResponseErrorPart2SLOTOFFERMISMATCH),
+    SLOTOFFERTOOSOON(AgendaFailureResponseErrorPart2SLOTOFFERTOOSOON),
+    SLOTOFFERALREADYOPEN(AgendaFailureResponseErrorPart2SLOTOFFERALREADYOPEN),
+    SLOTOFFERCLOSED(AgendaFailureResponseErrorPart2SLOTOFFERCLOSED),
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -8686,6 +9061,134 @@ pub struct AgendaOfferingsUpdateInput {
 }
 
 pub type AgendaOfferingsUpdateOutput = AgendaOffering;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaPatientFollowupPageDataItemObject {
+    #[serde(rename = "scheduling.patient_followup")]
+    SchedulingPatientFollowup,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaPatientFollowupPageDataItemOutcome {
+    #[serde(rename = "consent_missing")]
+    ConsentMissing,
+    #[serde(rename = "consent_revoked")]
+    ConsentRevoked,
+    #[serde(rename = "recipient_changed")]
+    RecipientChanged,
+    #[serde(rename = "patient_without_email")]
+    PatientWithoutEmail,
+    #[serde(rename = "patient_archived")]
+    PatientArchived,
+    #[serde(rename = "status_changed")]
+    StatusChanged,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "disabled")]
+    Disabled,
+    #[serde(rename = "booking_url_missing")]
+    BookingUrlMissing,
+    #[serde(rename = "already_booked")]
+    AlreadyBooked,
+    #[serde(rename = "no_previous_visit")]
+    NoPreviousVisit,
+    #[serde(rename = "preparation_failed")]
+    PreparationFailed,
+    #[serde(rename = "provider_refused")]
+    ProviderRefused,
+    #[serde(rename = "provider_unknown")]
+    ProviderUnknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaPatientFollowupPageDataItemPurpose {
+    #[serde(rename = "missed_appointment")]
+    MissedAppointment,
+    #[serde(rename = "visit_survey")]
+    VisitSurvey,
+    #[serde(rename = "check_up_due")]
+    CheckUpDue,
+    #[serde(rename = "slot_offer")]
+    SlotOffer,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaPatientFollowupPageDataItemState {
+    #[serde(rename = "pending")]
+    Pending,
+    #[serde(rename = "sending")]
+    Sending,
+    #[serde(rename = "sent")]
+    Sent,
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "uncertain")]
+    Uncertain,
+    #[serde(rename = "cancelled")]
+    Cancelled,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaPatientFollowupPageDataItem {
+    /// Recorded send attempts; not a retry guarantee.
+    #[serde(rename = "attempts")]
+    pub attempts: i64,
+    /// When it was planned.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    /// When it is due, or was due, to go out.
+    #[serde(rename = "dueAt")]
+    pub due_at: String,
+    /// Past this instant it never goes out: its words would no longer be true.
+    #[serde(rename = "expiresAt")]
+    pub expires_at: String,
+    /// Follow-up email identifier.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// Provider message reference after acceptance; null otherwise.
+    #[serde(rename = "messageId")]
+    pub message_id: Option<String>,
+    /// Discriminator for a follow-up email.
+    #[serde(rename = "object")]
+    pub object: AgendaPatientFollowupPageDataItemObject,
+    /// Why it ended without going out (consent_missing, consent_revoked, recipient_changed, status_changed, expired, disabled…) or how sending ended (provider_refused, provider_unknown); null while open or once sent.
+    #[serde(rename = "outcome")]
+    pub outcome: Option<AgendaPatientFollowupPageDataItemOutcome>,
+    /// Patient within the verified organization; another organization's record is never admitted.
+    #[serde(rename = "patientId")]
+    pub patient_id: String,
+    /// Follow-up email purpose: missed_appointment, visit_survey, check_up_due or slot_offer. Consent and the clinic opt-in are per purpose.
+    #[serde(rename = "purpose")]
+    pub purpose: AgendaPatientFollowupPageDataItemPurpose,
+    /// Outbox state; sent means provider acceptance, while sending and uncertain are never retried blindly.
+    #[serde(rename = "state")]
+    pub state: AgendaPatientFollowupPageDataItemState,
+    /// What it is about: the appointment (missed_appointment, visit_survey), the recall (check_up_due) or the slot offer (slot_offer).
+    #[serde(rename = "subjectId")]
+    pub subject_id: String,
+    /// Latest state change.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaPatientFollowupPageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaPatientFollowupPage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<AgendaPatientFollowupPageDataItem>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: AgendaPatientFollowupPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AgendaPatientIdentity {
@@ -9872,6 +10375,59 @@ pub struct AgendaSlotPage {
     /// Discriminator for a resource list response.
     #[serde(rename = "object")]
     pub object: AgendaSlotPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaVisitSurveyResponsePageDataItemObject {
+    #[serde(rename = "scheduling.visit_survey_response")]
+    SchedulingVisitSurveyResponse,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaVisitSurveyResponsePageDataItem {
+    /// When the patient first answered.
+    #[serde(rename = "answeredAt")]
+    pub answered_at: String,
+    /// The attended appointment the survey asked about.
+    #[serde(rename = "appointmentId")]
+    pub appointment_id: String,
+    /// The survey email answered.
+    #[serde(rename = "followupId")]
+    pub followup_id: String,
+    /// Discriminator for a visit survey answer.
+    #[serde(rename = "object")]
+    pub object: AgendaVisitSurveyResponsePageDataItemObject,
+    /// Patient within the verified organization; another organization's record is never admitted.
+    #[serde(rename = "patientId")]
+    pub patient_id: String,
+    /// The patient’s rating, 1 (very bad) to 5 (excellent).
+    #[serde(rename = "score")]
+    pub score: i64,
+    /// The appointment's service name; null when it has none.
+    #[serde(rename = "service")]
+    pub service: Option<String>,
+    /// When the answer last changed; a second answer replaces the first.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaVisitSurveyResponsePageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaVisitSurveyResponsePage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<AgendaVisitSurveyResponsePageDataItem>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: AgendaVisitSurveyResponsePageObject,
     /// Opaque navigation cursors for this page’s stable keyset order.
     #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
@@ -25010,7 +25566,7 @@ pub struct RaizConversationsCountInput {
     /// Calls of at most this many seconds.
     #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
     pub duration_max: Option<i64>,
-    /// `outcome`, `status`, `channel` (type), `agent`, `sentiment`, `tool` (each Agent tool and the conversations that used it), `toolError` (failed calls, of `toolName` when given, by error) or `fact:<definition key>` (the current value of that definition, such as the reason for contact).
+    /// `outcome`, `status`, `channel` (type), `agent`, `sentiment`, `tool` (each Agent tool and the conversations that used it; null for those that used none), `toolError` (failed calls, of `toolName` when given, by error) or `fact:<definition key>` (the current value of that definition, such as the reason for contact).
     #[serde(rename = "groupBy", default, skip_serializing_if = "Option::is_none")]
     pub group_by: Option<String>,
 }
@@ -29874,6 +30430,69 @@ pub struct RaizOrganizationSettingsDailyReport {
     pub send_at: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOrganizationSettingsProductNoticesEventsItem {
+    #[serde(rename = "agent-idle")]
+    AgentIdle,
+    #[serde(rename = "agent-live")]
+    AgentLive,
+    #[serde(rename = "budget-reached")]
+    BudgetReached,
+    #[serde(rename = "budget-warning")]
+    BudgetWarning,
+    #[serde(rename = "campaign-finished")]
+    CampaignFinished,
+    #[serde(rename = "channel-disconnected")]
+    ChannelDisconnected,
+    #[serde(rename = "channel-limit")]
+    ChannelLimit,
+    #[serde(rename = "channel-quality")]
+    ChannelQuality,
+    #[serde(rename = "channel-restored")]
+    ChannelRestored,
+    #[serde(rename = "import-finished")]
+    ImportFinished,
+    #[serde(rename = "knowledge-failed")]
+    KnowledgeFailed,
+    #[serde(rename = "milestone")]
+    Milestone,
+    #[serde(rename = "monthly-summary")]
+    MonthlySummary,
+    #[serde(rename = "outage-resolved")]
+    OutageResolved,
+    #[serde(rename = "template-approved")]
+    TemplateApproved,
+    #[serde(rename = "template-rejected")]
+    TemplateRejected,
+    #[serde(rename = "weekly-summary")]
+    WeeklySummary,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizOrganizationSettingsProductNotices {
+    /// Product emails enabled for this organization. Each event is opt-in.
+    #[serde(rename = "events")]
+    pub events: Vec<RaizOrganizationSettingsProductNoticesEventsItem>,
+    #[serde(rename = "recipients")]
+    pub recipients: Vec<RaizEmailAddress>,
+    #[serde(rename = "administrators")]
+    pub administrators: Vec<RaizEmailAddress>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOrganizationSettingsNotificationsFrequency {
+    #[serde(rename = "immediate")]
+    Immediate,
+    #[serde(rename = "hourly")]
+    Hourly,
+    #[serde(rename = "every3Hours")]
+    Every3Hours,
+    #[serde(rename = "every6Hours")]
+    Every6Hours,
+    #[serde(rename = "every12Hours")]
+    Every12Hours,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationSettingsNotifications {
     /// Email the recipients, and send the phones a WhatsApp message, when the AI hands a conversation to the team: it escalates a request it cannot resolve, the contact asks for a person, or the Agent's monthly budget is spent (default false).
@@ -29885,6 +30504,9 @@ pub struct RaizOrganizationSettingsNotifications {
     /// Email the recipients when the AI could not answer: a WhatsApp reply that ended with the fallback message, or a call that failed or in which one of the Agent's functions failed (default false).
     #[serde(rename = "failures")]
     pub failures: bool,
+    /// How often the notices reach the team (default `immediate`). `immediate` sends each notice as it happens, one email per conversation; a failure that repeats is notified once when its cause first appears, and the conversations the same cause touches in the next hour go out together an hour later, one follow-up an hour while it lasts. `hourly`, `every3Hours`, `every6Hours` and `every12Hours` send one digest at the end of each window of that length, counted from local midnight in the organization's time zone (every six hours: 00:00, 06:00, 12:00 and 18:00), listing the conversations that still need the team; the escalation's WhatsApp message follows the same schedule. A window without notices sends nothing.
+    #[serde(rename = "frequency")]
+    pub frequency: RaizOrganizationSettingsNotificationsFrequency,
     /// Who also receives the escalation notice by WhatsApp, at most 10 numbers in E.164 (default none). The message names the Agent, the organization and why the conversation was handed over, with a link to it; never the contact, the summary or the transcript. The other notices go by email only.
     #[serde(rename = "phones")]
     pub phones: Vec<String>,
@@ -29906,6 +30528,8 @@ pub struct RaizOrganizationSettings {
     pub channels: RaizOrganizationSettingsChannels,
     #[serde(rename = "dailyReport")]
     pub daily_report: RaizOrganizationSettingsDailyReport,
+    #[serde(rename = "productNotices", default, skip_serializing_if = "Option::is_none")]
+    pub product_notices: Option<RaizOrganizationSettingsProductNotices>,
     #[serde(rename = "notifications")]
     pub notifications: RaizOrganizationSettingsNotifications,
     #[serde(rename = "whatsapp")]
@@ -29977,6 +30601,68 @@ pub struct RaizOrganizationUpdateInputSettingsDailyReport {
     pub send_at: Option<Option<String>>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOrganizationUpdateInputSettingsProductNoticesEventsItem {
+    #[serde(rename = "agent-idle")]
+    AgentIdle,
+    #[serde(rename = "agent-live")]
+    AgentLive,
+    #[serde(rename = "budget-reached")]
+    BudgetReached,
+    #[serde(rename = "budget-warning")]
+    BudgetWarning,
+    #[serde(rename = "campaign-finished")]
+    CampaignFinished,
+    #[serde(rename = "channel-disconnected")]
+    ChannelDisconnected,
+    #[serde(rename = "channel-limit")]
+    ChannelLimit,
+    #[serde(rename = "channel-quality")]
+    ChannelQuality,
+    #[serde(rename = "channel-restored")]
+    ChannelRestored,
+    #[serde(rename = "import-finished")]
+    ImportFinished,
+    #[serde(rename = "knowledge-failed")]
+    KnowledgeFailed,
+    #[serde(rename = "milestone")]
+    Milestone,
+    #[serde(rename = "monthly-summary")]
+    MonthlySummary,
+    #[serde(rename = "outage-resolved")]
+    OutageResolved,
+    #[serde(rename = "template-approved")]
+    TemplateApproved,
+    #[serde(rename = "template-rejected")]
+    TemplateRejected,
+    #[serde(rename = "weekly-summary")]
+    WeeklySummary,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizOrganizationUpdateInputSettingsProductNotices {
+    #[serde(rename = "events", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub events: Option<Option<Vec<RaizOrganizationUpdateInputSettingsProductNoticesEventsItem>>>,
+    #[serde(rename = "recipients", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub recipients: Option<Option<Vec<RaizEmailAddress>>>,
+    #[serde(rename = "administrators", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub administrators: Option<Option<Vec<RaizEmailAddress>>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOrganizationUpdateInputSettingsNotificationsFrequency {
+    #[serde(rename = "immediate")]
+    Immediate,
+    #[serde(rename = "hourly")]
+    Hourly,
+    #[serde(rename = "every3Hours")]
+    Every3Hours,
+    #[serde(rename = "every6Hours")]
+    Every6Hours,
+    #[serde(rename = "every12Hours")]
+    Every12Hours,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationUpdateInputSettingsNotifications {
     #[serde(rename = "escalations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -29985,6 +30671,8 @@ pub struct RaizOrganizationUpdateInputSettingsNotifications {
     pub failed_outcomes: Option<Option<bool>>,
     #[serde(rename = "failures", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub failures: Option<Option<bool>>,
+    #[serde(rename = "frequency", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub frequency: Option<Option<RaizOrganizationUpdateInputSettingsNotificationsFrequency>>,
     #[serde(rename = "phones", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub phones: Option<Option<Vec<String>>>,
     #[serde(rename = "recipients", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -30003,6 +30691,8 @@ pub struct RaizOrganizationUpdateInputSettings {
     pub channels: Option<RaizOrganizationUpdateInputSettingsChannels>,
     #[serde(rename = "dailyReport", default, skip_serializing_if = "Option::is_none")]
     pub daily_report: Option<RaizOrganizationUpdateInputSettingsDailyReport>,
+    #[serde(rename = "productNotices", default, skip_serializing_if = "Option::is_none")]
+    pub product_notices: Option<RaizOrganizationUpdateInputSettingsProductNotices>,
     #[serde(rename = "notifications", default, skip_serializing_if = "Option::is_none")]
     pub notifications: Option<RaizOrganizationUpdateInputSettingsNotifications>,
     #[serde(rename = "whatsapp", default, skip_serializing_if = "Option::is_none")]

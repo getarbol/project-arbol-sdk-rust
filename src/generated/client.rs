@@ -1826,7 +1826,7 @@ pub struct RaizOrganizationApi<'a>(&'a Client);
 impl<'a> RaizOrganizationApi<'a> {
     /// Get the organization
     ///
-    /// Read your organization: name, default language and time zone, deployment capabilities, and the settings in effect (defaults included), such as how many outbound calls may run at once, who is emailed when the AI escalates a conversation or fails in it, and the daily report. capabilities.managedVoiceOutbound reports whether the shared outbound line is configured; settings.channels.managedVoiceOutboundEnabled is the organization's separate permission to use it.
+    /// Read your organization: name, default language and time zone, deployment capabilities, and the settings in effect (defaults included), such as how many outbound calls may run at once, who is emailed when the AI escalates a conversation or fails in it and how often (each notice at once, or a digest every few hours), and the daily report. capabilities.managedVoiceOutbound reports whether the shared outbound line is configured; settings.channels.managedVoiceOutboundEnabled is the organization's separate permission to use it.
     pub async fn get(&self, input: &types::RaizOrganizationGetInput) -> Result<types::RaizOrganizationGetOutput, Error> {
         self.0.call(&operations::RAIZ_ORGANIZATION_GET, input).await
     }
