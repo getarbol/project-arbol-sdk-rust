@@ -1,8 +1,8 @@
 {
   "formatVersion": 6,
-  "release": "1.20261103.4925",
-  "openapiSha256": "b123bc2aea9c0b46d7259e5502606f99c7a3fd615973235936401d5d650c8168",
-  "openapiContentSha256": "1b8418752d9fdb3ac6d5455a90e7e5b36b1b0d832459c350a49048d1cb3ae626",
+  "release": "1.20261103.203558",
+  "openapiSha256": "d447f31f01b56f6b95d2b2f7019399b42edf25b99eb6f1eb32c3dd4d85959f7d",
+  "openapiContentSha256": "4f7c46eb0ec3879adf357e4c8a4c766c1d6b4d46e894d7dbc265c40ae34b50ed",
   "forge": {
     "repository": "https://github.com/cloudflare/forge",
     "commit": "7f86447210b7bea3779bfdab3cd5655eade0eadb",
@@ -15,7 +15,7 @@
   "outputs": [
     {
       "path": "src/generated/client.rs",
-      "sha256": "4a8d99f249ab15575a7e1fc190b80b163569d2e0ea885b0e186a4ac5c86ee13e"
+      "sha256": "2b9d4489f8d9a34ed3b7bac863e1bf223758c5ec4dcf96d7da1e87aa8051500d"
     },
     {
       "path": "src/generated/mod.rs",
@@ -23,7 +23,7 @@
     },
     {
       "path": "src/generated/operations.rs",
-      "sha256": "667c60f3e43a61752decaf05e8fed30601ab31d0afd442ef497d53f4d54972ab"
+      "sha256": "e526f019e8c2be7b7f9a50ce3192162ee7b66ee370ab19ce144776e24cb5a160"
     },
     {
       "path": "src/generated/types.rs",
