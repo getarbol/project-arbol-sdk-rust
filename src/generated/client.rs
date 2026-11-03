@@ -1833,7 +1833,7 @@ impl<'a> RaizOrganizationApi<'a> {
 
     /// Send the daily report now
     ///
-    /// Email the daily report now to the recipients in `settings.dailyReport`, whether or not it goes out by itself each day: the calls and conversations registered in the last 24 hours, the conversations waiting for the team and those that need a review. It arrives within a minute. Fails with DAILY_REPORT_RECIPIENTS_MISSING when the report has no recipients, and DAILY_REPORT_IN_PROGRESS while a report asked for earlier is still on its way.
+    /// Email the daily report now to the workspace owners with product access and the additional recipients in `settings.dailyReport`, whether or not it goes out by itself each day: the calls and conversations registered in the last 24 hours, the conversations waiting for the team and those that need a review. It arrives within a minute. Fails with DAILY_REPORT_RECIPIENTS_MISSING when the report has no recipients, and DAILY_REPORT_IN_PROGRESS while a report asked for earlier is still on its way.
     pub async fn send_daily_report(&self, input: &types::RaizOrganizationSendDailyReportInput) -> Result<types::RaizOrganizationSendDailyReportOutput, Error> {
         self.0.call(&operations::RAIZ_ORGANIZATION_SEND_DAILY_REPORT, input).await
     }

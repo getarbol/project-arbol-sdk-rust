@@ -7842,6 +7842,30 @@ pub struct AgendaFailureResponseErrorPart2REPORTSETTINGSVERSIONMISMATCH {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLEDCode {
+    #[serde(rename = "REPORT_NOTIFICATIONS_DISABLED")]
+    REPORTNOTIFICATIONSDISABLED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLEDMessage {
+    #[serde(rename = "Enable the notifications module before sending a daily agenda.")]
+    EnableTheNotificationsModuleBeforeSendingADailyAgenda,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLED {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLEDCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLEDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaFailureResponseErrorPart2REPORTRECIPIENTSREQUIREDCode {
     #[serde(rename = "REPORT_RECIPIENTS_REQUIRED")]
     REPORTRECIPIENTSREQUIRED,
@@ -7849,8 +7873,8 @@ pub enum AgendaFailureResponseErrorPart2REPORTRECIPIENTSREQUIREDCode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaFailureResponseErrorPart2REPORTRECIPIENTSREQUIREDMessage {
-    #[serde(rename = "Give or save at least one recipient before sending the daily agenda.")]
-    GiveOrSaveAtLeastOneRecipientBeforeSendingTheDailyAgenda,
+    #[serde(rename = "No eligible organization owner or additional delivery address is available for this agenda.")]
+    NoEligibleOrganizationOwnerOrAdditionalDeliveryAddressIsAvailableForThisAgenda,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -8430,6 +8454,7 @@ pub enum AgendaFailureResponseErrorPart2 {
     PATIENTVERSIONMISMATCH(AgendaFailureResponseErrorPart2PATIENTVERSIONMISMATCH),
     DAILYREPORTTOOLARGE(AgendaFailureResponseErrorPart2DAILYREPORTTOOLARGE),
     REPORTSETTINGSVERSIONMISMATCH(AgendaFailureResponseErrorPart2REPORTSETTINGSVERSIONMISMATCH),
+    REPORTNOTIFICATIONSDISABLED(AgendaFailureResponseErrorPart2REPORTNOTIFICATIONSDISABLED),
     REPORTRECIPIENTSREQUIRED(AgendaFailureResponseErrorPart2REPORTRECIPIENTSREQUIRED),
     WAITLISTENTRYVERSIONMISMATCH(AgendaFailureResponseErrorPart2WAITLISTENTRYVERSIONMISMATCH),
     REMOVALWORKFLOWUNAVAILABLE(AgendaFailureResponseErrorPart2REMOVALWORKFLOWUNAVAILABLE),
@@ -30419,10 +30444,10 @@ pub struct RaizOrganizationSettingsChannels {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationSettingsDailyReport {
-    /// Email the daily report every day at `sendAt`, in the organization's time zone: the calls and conversations registered in the last 24 hours, the conversations waiting for the team and those that need a review (default false). A day without activity sends nothing.
+    /// Email the daily report every day at `sendAt`, in the organization's time zone: the calls and conversations registered in the last 24 hours, the conversations waiting for the team and those that need a review (default true). A day without activity sends nothing.
     #[serde(rename = "enabled")]
     pub enabled: bool,
-    /// Who receives the daily report, at most 10 addresses (default none: nothing is sent). It lists the contacts of calls and conversations by name and number: choose recipients who may read the organization's conversations.
+    /// Additional recipients for the daily report alongside eligible workspace owners, at most 10 addresses (default none). It lists the contacts of calls and conversations by name and number: choose recipients who may read the organization's conversations.
     #[serde(rename = "recipients")]
     pub recipients: Vec<RaizEmailAddress>,
     /// The local time the daily report goes out, `HH:MM` in 24 hours (default `18:00`). Moving it later the same day sends nothing more that day; turning the report on after the day's time sends that day's report at once.
@@ -30470,7 +30495,7 @@ pub enum RaizOrganizationSettingsProductNoticesEventsItem {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationSettingsProductNotices {
-    /// Product emails enabled for this organization. Each event is opt-in.
+    /// Product emails enabled for this organization. All are enabled unless the organization saves a selection. An empty selection turns all of them off.
     #[serde(rename = "events")]
     pub events: Vec<RaizOrganizationSettingsProductNoticesEventsItem>,
     #[serde(rename = "recipients")]
@@ -30495,13 +30520,13 @@ pub enum RaizOrganizationSettingsNotificationsFrequency {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationSettingsNotifications {
-    /// Email the recipients, and send the phones a WhatsApp message, when the AI hands a conversation to the team: it escalates a request it cannot resolve, the contact asks for a person, or the Agent's monthly budget is spent (default false).
+    /// Email the recipients, and send the phones a WhatsApp message, when the AI hands a conversation to the team: it escalates a request it cannot resolve, the contact asks for a person, or the Agent's monthly budget is spent (default true).
     #[serde(rename = "escalations")]
     pub escalations: bool,
-    /// Email the recipients when the analysis of a closed conversation concludes that the contact's request was not resolved (outcome failure). A conversation closed for inactivity never counts (default false).
+    /// Email the recipients when the analysis of a closed conversation concludes that the contact's request was not resolved (outcome failure). A conversation closed for inactivity never counts (default true).
     #[serde(rename = "failedOutcomes")]
     pub failed_outcomes: bool,
-    /// Email the recipients when the AI could not answer: a WhatsApp reply that ended with the fallback message, or a call that failed or in which one of the Agent's functions failed (default false).
+    /// Email the recipients when the AI could not answer: a WhatsApp reply that ended with the fallback message, or a call that failed or in which one of the Agent's functions failed (default true).
     #[serde(rename = "failures")]
     pub failures: bool,
     /// How often the notices reach the team (default `immediate`). `immediate` sends each notice as it happens, one email per conversation; a failure that repeats is notified once when its cause first appears, and the conversations the same cause touches in the next hour go out together an hour later, one follow-up an hour while it lasts. `hourly`, `every3Hours`, `every6Hours` and `every12Hours` send one digest at the end of each window of that length, counted from local midnight in the organization's time zone (every six hours: 00:00, 06:00, 12:00 and 18:00), listing the conversations that still need the team; the escalation's WhatsApp message follows the same schedule. A window without notices sends nothing.
@@ -30510,7 +30535,7 @@ pub struct RaizOrganizationSettingsNotifications {
     /// Who also receives the escalation notice by WhatsApp, at most 10 numbers in E.164 (default none). The message names the Agent, the organization and why the conversation was handed over, with a link to it; never the contact, the summary or the transcript. The other notices go by email only.
     #[serde(rename = "phones")]
     pub phones: Vec<String>,
-    /// Who receives the team notifications, at most 10 addresses (default none: nothing is sent). An email carries the conversation's link, channel, times, Agent and state, its title and summary and the analysis' evaluations; never the transcript or the captured data. A summary may name the person: choose recipients who may read the organization's conversations.
+    /// Additional recipients for team notices alongside eligible workspace owners, at most 10 addresses (default none). An email carries the conversation's link, channel, times, Agent and state, its title and summary and the analysis' evaluations; never the transcript or the captured data. A summary may name the person: choose recipients who may read the organization's conversations.
     #[serde(rename = "recipients")]
     pub recipients: Vec<RaizEmailAddress>,
 }
@@ -30572,7 +30597,7 @@ pub struct RaizOrganizationSendDailyReportOutput {
     /// The end of the 24 hours the report covers, in RFC 3339 format, in UTC.
     #[serde(rename = "endsAt")]
     pub ends_at: String,
-    /// How many addresses the report goes to.
+    /// How many addresses Account resolved when the report was requested. Delivery resolves them again.
     #[serde(rename = "recipients")]
     pub recipients: i64,
     /// An instant in RFC 3339 format, in UTC.
