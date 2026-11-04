@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261104.21009";
+pub const RELEASE: &str = "1.20261104.175529";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -686,6 +686,17 @@ pub const AGENDA_SERVICES_UPDATE: Operation = Operation {
     max_output_bytes: 8388608,
 };
 
+/// `agenda.waitlist.create`: Create Waitlist Entry
+pub const AGENDA_WAITLIST_CREATE: Operation = Operation {
+    name: "agenda.waitlist.create",
+    method: "POST",
+    path: "/v1/agenda/waitlist",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 8388608,
+};
+
 /// `agenda.waitlist.join`: Add a patient to the waiting list
 pub const AGENDA_WAITLIST_JOIN: Operation = Operation {
     name: "agenda.waitlist.join",
@@ -705,6 +716,17 @@ pub const AGENDA_WAITLIST_LIST: Operation = Operation {
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("offeringId", QueryKind::String), ("resourceId", QueryKind::String), ("serviceId", QueryKind::String)]),
     effect: Effect::Read,
+    max_output_bytes: 8388608,
+};
+
+/// `agenda.waitlist.update`: Update Waitlist Entry
+pub const AGENDA_WAITLIST_UPDATE: Operation = Operation {
+    name: "agenda.waitlist.update",
+    method: "PATCH",
+    path: "/v1/agenda/waitlist/{waitlistEntryId}",
+    path_field: Some("waitlistEntryId"),
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 8388608,
 };
 

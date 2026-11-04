@@ -6090,6 +6090,78 @@ pub struct AgendaFailureResponseErrorPart2OUTCOMEUNKNOWN {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLECode {
+    #[serde(rename = "WAITLIST_SERVICE_UNAVAILABLE")]
+    WAITLISTSERVICEUNAVAILABLE,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLEMessage {
+    #[serde(rename = "Correct serviceId using serviceId from bookingOfferings.list. Search a short service term such as neurología, then inspect the matching service name. Never invent an ID. No waiting-list entry was changed; correct this field and retry with the same consent.")]
+    CorrectServiceIdUsingServiceIdFromBookingOfferingsListSearchAShortServiceTermSuchAsNeurologAThenInspectTheMatchingServiceNameNeverInventAnIDNoWaitingListEntryWasChangedCorrectThisFieldAndRetryWithTheSameConsent,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLE {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLECode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLEMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLECode {
+    #[serde(rename = "WAITLIST_RESOURCE_UNAVAILABLE")]
+    WAITLISTRESOURCEUNAVAILABLE,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLEMessage {
+    #[serde(rename = "The requested professional is not an active agenda for this service. Use resourceName for the requested professional or copy agendas[].id from bookingOfferings.list, never the offering id. If both are supplied, they must agree. No waiting-list entry was changed. Correct the reference with the same consent. If a verified provider professional is absent from Agenda, omit resourceName, clear resourceId and explicitly restrict the manual request to that professional in note.")]
+    TheRequestedProfessionalIsNotAnActiveAgendaForThisServiceUseResourceNameForTheRequestedProfessionalOrCopyAgendasIdFromBookingOfferingsListNeverTheOfferingIdIfBothAreSuppliedTheyMustAgreeNoWaitingListEntryWasChangedCorrectTheReferenceWithTheSameConsentIfAVerifiedProviderProfessionalIsAbsentFromAgendaOmitResourceNameClearResourceIdAndExplicitlyRestrictTheManualRequestToThatProfessionalInNote,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLE {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLECode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLEMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUSCode {
+    #[serde(rename = "WAITLIST_RESOURCE_AMBIGUOUS")]
+    WAITLISTRESOURCEAMBIGUOUS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUSMessage {
+    #[serde(rename = "More than one active agenda matches resourceName for this service. Read bookingOfferings.list and provide the complete requested professional name or its agendas[].id. No waiting-list entry was changed.")]
+    MoreThanOneActiveAgendaMatchesResourceNameForThisServiceReadBookingOfferingsListAndProvideTheCompleteRequestedProfessionalNameOrItsAgendasIdNoWaitingListEntryWasChanged,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUS {
+    #[serde(rename = "code")]
+    pub code: AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUSCode,
+    #[serde(rename = "message")]
+    pub message: AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUSMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaFailureResponseErrorPart2INVALIDAPPOINTMENTINTAKECode {
     #[serde(rename = "INVALID_APPOINTMENT_INTAKE")]
     INVALIDAPPOINTMENTINTAKE,
@@ -8384,6 +8456,9 @@ pub enum AgendaFailureResponseErrorPart2 {
     UPSTREAMUNAVAILABLE(AgendaFailureResponseErrorPart2UPSTREAMUNAVAILABLE),
     UPSTREAMTIMEOUT(AgendaFailureResponseErrorPart2UPSTREAMTIMEOUT),
     OUTCOMEUNKNOWN(AgendaFailureResponseErrorPart2OUTCOMEUNKNOWN),
+    WAITLISTSERVICEUNAVAILABLE(AgendaFailureResponseErrorPart2WAITLISTSERVICEUNAVAILABLE),
+    WAITLISTRESOURCEUNAVAILABLE(AgendaFailureResponseErrorPart2WAITLISTRESOURCEUNAVAILABLE),
+    WAITLISTRESOURCEAMBIGUOUS(AgendaFailureResponseErrorPart2WAITLISTRESOURCEAMBIGUOUS),
     INVALIDAPPOINTMENTINTAKE(AgendaFailureResponseErrorPart2INVALIDAPPOINTMENTINTAKE),
     INVALIDPATIENTFIELDS(AgendaFailureResponseErrorPart2INVALIDPATIENTFIELDS),
     PAYERSTAFFONLY(AgendaFailureResponseErrorPart2PAYERSTAFFONLY),
@@ -10458,6 +10533,97 @@ pub struct AgendaVisitSurveyResponsePage {
     pub page_info: PageInfo,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaWaitlistCreateInputPatient {
+    /// Patient document number as typed ("12.345.678"), stored normalized; null when the patient has none. Identity combines its type and number.
+    #[serde(rename = "documentNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub document_number: Option<Option<String>>,
+    /// Organization-configured document type code. A number without a supplied type uses the configured first type; no number means no stored type.
+    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub document_type: Option<Option<String>>,
+    /// Patient display name with surrounding whitespace removed.
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Deprecated: use `documentNumber`. Answered until 2027-01-28.
+    #[serde(rename = "document", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub document: Option<Option<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AgendaWaitlistCreateInputPreferences {
+    /// From this local date (YYYY-MM-DD).
+    #[serde(rename = "from", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub from: Option<Option<String>>,
+    /// "Martes y jueves en la mañana".
+    #[serde(rename = "times", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub times: Option<Option<String>>,
+    /// Until this local date (YYYY-MM-DD).
+    #[serde(rename = "to", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub to: Option<Option<String>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaWaitlistCreateInputPriority {
+    #[serde(rename = "normal")]
+    Normal,
+    #[serde(rename = "urgent")]
+    Urgent,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaWaitlistCreateInputReason {
+    #[serde(rename = "manual")]
+    Manual,
+    #[serde(rename = "payer_review")]
+    PayerReview,
+    #[serde(rename = "priority")]
+    Priority,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaWaitlistCreateInput {
+    /// The appointment it relates to: a priority to bring forward.
+    #[serde(rename = "appointmentId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub appointment_id: Option<Option<String>>,
+    /// Agent conversation URL retained so the scheduling team can reopen the referring conversation.
+    #[serde(rename = "conversationUrl", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub conversation_url: Option<Option<String>>,
+    /// Desk note attached to the waiting-list entry; null means no note is recorded.
+    #[serde(rename = "note", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub note: Option<Option<String>>,
+    #[serde(rename = "patient")]
+    pub patient: AgendaWaitlistCreateInputPatient,
+    /// Registered patient selected by the desk; document resolution remains authoritative for patient identity.
+    #[serde(rename = "patientId", default, skip_serializing_if = "Option::is_none")]
+    pub patient_id: Option<String>,
+    /// The payer the patient named, as said.
+    #[serde(rename = "payer", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub payer: Option<Option<String>>,
+    /// Patient contact telephone number; null when no number was recorded.
+    #[serde(rename = "phone", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub phone: Option<Option<String>>,
+    /// Patient availability preferences retained with the waiting-list entry.
+    #[serde(rename = "preferences", default, skip_serializing_if = "Option::is_none")]
+    pub preferences: Option<AgendaWaitlistCreateInputPreferences>,
+    /// Whether the waiting-list entry requests normal handling or an urgent appointment.
+    #[serde(rename = "priority", default, skip_serializing_if = "Option::is_none")]
+    pub priority: Option<AgendaWaitlistCreateInputPriority>,
+    /// Why: by hand, a payer only the team books, or a priority to bring forward.
+    #[serde(rename = "reason", default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<AgendaWaitlistCreateInputReason>,
+    /// One professional or agenda: copy agendas[].id from bookingOfferings.list, never the offering id or a rewritten prefix. Null means no Agenda resource filter; retain any external professional restriction explicitly in note.
+    #[serde(rename = "resourceId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub resource_id: Option<Option<String>>,
+    /// The requested professional or agenda name. Resolves only one active agenda offering this service, ignoring accents and professional titles. If resourceId is supplied too, it must identify the same agenda. For a documented external professional absent from Agenda, omit resourceName/resourceId and explicitly restrict the manual request to that professional in note.
+    #[serde(rename = "resourceName", default, skip_serializing_if = "Option::is_none")]
+    pub resource_name: Option<String>,
+    /// Service identifier within the authenticated organization.
+    #[serde(rename = "serviceId")]
+    pub service_id: String,
+}
+
+pub type AgendaWaitlistCreateOutput = AgendaWaitlistEntry;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaWaitlistEntryChannel {
     #[serde(rename = "calendar")]
@@ -10683,10 +10849,13 @@ pub struct AgendaWaitlistJoinInput {
     /// Patient availability preferences retained with the waiting-list entry.
     #[serde(rename = "preferences", default, skip_serializing_if = "Option::is_none")]
     pub preferences: Option<AgendaWaitlistJoinInputPreferences>,
+    /// The requested professional or agenda name. Resolves only one active agenda offering this service, ignoring accents and professional titles. If resourceId is supplied too, it must identify the same agenda. For a documented external professional absent from Agenda, omit resourceName/resourceId and explicitly restrict the manual request to that professional in note.
+    #[serde(rename = "resourceName", default, skip_serializing_if = "Option::is_none")]
+    pub resource_name: Option<String>,
     /// manual records a consented waitlist request after no suitable availability; payer_review asks staff to coordinate a restricted payer; priority asks staff to bring an existing booking forward.
     #[serde(rename = "reason")]
     pub reason: AgendaWaitlistJoinInputReason,
-    /// One professional or agenda; null = any that offers the service.
+    /// One professional or agenda: copy agendas[].id from bookingOfferings.list, never the offering id or a rewritten prefix. Null means no Agenda resource filter; retain any external professional restriction explicitly in note.
     #[serde(rename = "resourceId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub resource_id: Option<Option<String>>,
     /// Service identifier within the authenticated organization.
@@ -10724,7 +10893,7 @@ pub struct AgendaWaitlistListInput {
     /// Only entries recorded for this exact offering, which only entries from before services and agendas were chosen separately have; newer entries carry serviceId and resourceId instead.
     #[serde(rename = "offeringId", default, skip_serializing_if = "Option::is_none")]
     pub offering_id: Option<String>,
-    /// Only entries that asked for this professional or agenda; entries open to any agenda (resourceId null) are left out.
+    /// Only entries that asked for this professional or agenda; entries with no Agenda resource filter (resourceId null, including manual professional restrictions in note) are left out.
     #[serde(rename = "resourceId", default, skip_serializing_if = "Option::is_none")]
     pub resource_id: Option<String>,
     /// Only entries for this service, whichever agenda they asked for.
@@ -10733,6 +10902,73 @@ pub struct AgendaWaitlistListInput {
 }
 
 pub type AgendaWaitlistListOutput = AgendaWaitlistEntryPage;
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AgendaWaitlistUpdateInputPreferences {
+    /// From this local date (YYYY-MM-DD).
+    #[serde(rename = "from", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub from: Option<Option<String>>,
+    /// "Martes y jueves en la mañana".
+    #[serde(rename = "times", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub times: Option<Option<String>>,
+    /// Until this local date (YYYY-MM-DD).
+    #[serde(rename = "to", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub to: Option<Option<String>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaWaitlistUpdateInputPriority {
+    #[serde(rename = "normal")]
+    Normal,
+    #[serde(rename = "urgent")]
+    Urgent,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaWaitlistUpdateInputStatus {
+    #[serde(rename = "waiting")]
+    Waiting,
+    #[serde(rename = "offered")]
+    Offered,
+    #[serde(rename = "booked")]
+    Booked,
+    #[serde(rename = "cancelled")]
+    Cancelled,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaWaitlistUpdateInput {
+    /// Appointment associated with this waiting-list entry; null clears the association.
+    #[serde(rename = "appointmentId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub appointment_id: Option<Option<String>>,
+    /// Version last read by the caller. The mutation fails if another writer has changed this record.
+    #[serde(rename = "expectedVersion")]
+    pub expected_version: i64,
+    /// HTTPS link to the originating Arbol conversation on an admitted product hostname; null when absent.
+    #[serde(rename = "conversationUrl", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub conversation_url: Option<Option<String>>,
+    #[serde(rename = "preferences", default, skip_serializing_if = "Option::is_none")]
+    pub preferences: Option<AgendaWaitlistUpdateInputPreferences>,
+    #[serde(rename = "resourceId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub resource_id: Option<Option<String>>,
+    /// The requested professional or agenda name. Resolves only one active agenda offering this service, ignoring accents and professional titles. If resourceId is supplied too, it must identify the same agenda. For a documented external professional absent from Agenda, omit resourceName/resourceId and explicitly restrict the manual request to that professional in note.
+    #[serde(rename = "resourceName", default, skip_serializing_if = "Option::is_none")]
+    pub resource_name: Option<String>,
+    /// Desk note attached to the waiting-list entry; null means no note is recorded.
+    #[serde(rename = "note", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub note: Option<Option<String>>,
+    /// Whether the waiting-list entry requests normal handling or an urgent appointment.
+    #[serde(rename = "priority", default, skip_serializing_if = "Option::is_none")]
+    pub priority: Option<AgendaWaitlistUpdateInputPriority>,
+    /// Current waiting-list state: waiting, contacted, booked, expired or removed.
+    #[serde(rename = "status", default, skip_serializing_if = "Option::is_none")]
+    pub status: Option<AgendaWaitlistUpdateInputStatus>,
+    /// Organization-owned waiting-list entry identifier.
+    #[serde(rename = "waitlistEntryId")]
+    pub waitlist_entry_id: String,
+}
+
+pub type AgendaWaitlistUpdateOutput = AgendaWaitlistEntry;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AxxaAccountMismatchFailureCode {
@@ -30553,8 +30789,8 @@ pub struct RaizOrganizationSettings {
     pub channels: RaizOrganizationSettingsChannels,
     #[serde(rename = "dailyReport")]
     pub daily_report: RaizOrganizationSettingsDailyReport,
-    #[serde(rename = "productNotices", default, skip_serializing_if = "Option::is_none")]
-    pub product_notices: Option<RaizOrganizationSettingsProductNotices>,
+    #[serde(rename = "productNotices")]
+    pub product_notices: RaizOrganizationSettingsProductNotices,
     #[serde(rename = "notifications")]
     pub notifications: RaizOrganizationSettingsNotifications,
     #[serde(rename = "whatsapp")]
