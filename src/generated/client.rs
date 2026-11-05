@@ -943,6 +943,19 @@ impl<'a> AxxaConnectionsApi<'a> {
     }
 }
 
+/// `axxa.coverage`
+#[derive(Debug, Clone, Copy)]
+pub struct AxxaCoverageApi<'a>(&'a Client);
+
+impl<'a> AxxaCoverageApi<'a> {
+    /// Look up coverage of a service
+    ///
+    /// Read whether a person's plan and this provider cover one exact service code in one service category, whether it requires an authorization and, when both cover it, the voucher quote. AXA lists each service under one category, so service_not_found there does not mean it is not covered. Generates no authorization.
+    pub async fn lookup(&self, input: &types::AxxaCoverageLookupInput) -> Result<types::AxxaCoverageLookupOutput, Error> {
+        self.0.call(&operations::AXXA_COVERAGE_LOOKUP, input).await
+    }
+}
+
 /// `axxa.eligibility`
 #[derive(Debug, Clone, Copy)]
 pub struct AxxaEligibilityApi<'a>(&'a Client);
@@ -982,6 +995,10 @@ impl<'a> AxxaApi<'a> {
         AxxaConnectionsApi(self.0)
     }
 
+    pub fn coverage(&self) -> AxxaCoverageApi<'a> {
+        AxxaCoverageApi(self.0)
+    }
+
     pub fn eligibility(&self) -> AxxaEligibilityApi<'a> {
         AxxaEligibilityApi(self.0)
     }
@@ -998,7 +1015,7 @@ pub struct ComfachocoAffiliationsApi<'a>(&'a Client);
 impl<'a> ComfachocoAffiliationsApi<'a> {
     /// Lookup affiliations
     ///
-    /// Look up a citizen document in Comfachocó through an active organization connection. Returns found only for an exact source identity and not_found only for an explicit source negative. Provider failures are never evidence of non-affiliation. This does not verify the identity of the person presenting the document or determine eligibility.
+    /// Look up a citizen document in Comfachocó through an active organization connection. Returns found only for an exact source identity and not_found only for an explicit source negative. Provider failures are never evidence of non-affiliation. This does not verify the identity of the person presenting the document or determine eligibility. Set agentMode to true to receive the same observation as one concise Spanish text in the text field instead of structured fields; failures are unchanged.
     pub async fn lookup(&self, input: &types::ComfachocoAffiliationsLookupInput) -> Result<types::ComfachocoAffiliationsLookupOutput, Error> {
         self.0.call(&operations::COMFACHOCO_AFFILIATIONS_LOOKUP, input).await
     }
@@ -1519,16 +1536,108 @@ impl<'a> NuevaEpsApi<'a> {
     }
 }
 
+/// `oficlinic.affiliateTypes`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicAffiliateTypesApi<'a>(&'a Client);
+
+impl<'a> OficlinicAffiliateTypesApi<'a> {
+    /// List affiliate types
+    ///
+    /// List the affiliate types e-Oficlinic offers for one regime, in the provider's order, as its booking screen loads them (cbtipoafiliado). The regime must be one list_regimes answers, or BOOKING_OPTION_NOT_FOUND. A booking takes one as classification.affiliateType, listed for its classification.regime. Which one applies to a patient is the clinic's decision, never derived here. Pass pageInfo.nextCursor with the same regimeId for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicAffiliateTypesListInput) -> Result<types::OficlinicAffiliateTypesListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_AFFILIATE_TYPES_LIST, input).await
+    }
+}
+
 /// `oficlinic.appointments`
 #[derive(Debug, Clone, Copy)]
 pub struct OficlinicAppointmentsApi<'a>(&'a Client);
 
 impl<'a> OficlinicAppointmentsApi<'a> {
+    /// Create an appointment
+    ///
+    /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that list_booking_slots offered in an availability flow. Requires confirm true and an idempotencyKey. Before anything is written, the patient is resolved by citizenship card; the program and attention type must be the flow's, and the source must still count exactly one unit for them; the regime, affiliate type and relationship must be listed by the provider; the payer, plan, subplan and contract must be listed by the provider for the connection; the service must be configured for the slot's professional; and a fresh read must still show the slot. The classification, billing and referral values are the clinic's own provider codes, which the caller supplies explicitly: this service never guesses them, never derives them from a program and never loads the clinic's tariff matrix. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement; this path has no live receipt yet). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the same idempotencyKey and request answers the recorded outcome. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
+    pub async fn create(&self, input: &types::OficlinicAppointmentsCreateInput) -> Result<types::OficlinicAppointmentsCreateOutput, Error> {
+        self.0.call(&operations::OFICLINIC_APPOINTMENTS_CREATE, input).await
+    }
+
     /// Lookup appointments
     ///
-    /// Look up one patient's e-Oficlinic appointment history by status: assigned, cancelled, absence (no-show) or legalized (attendance registered). The patient is resolved by citizenship card number first, sent in the body; PATIENT_NOT_FOUND answers only the provider explicit negative, and every row must name the resolved patient. Staff usernames and free-text observations are never returned. Mapped from the provider's source: a live positive answer has not been verified yet. Read-only: it never books, cancels or marks attendance. Pass pageInfo.nextCursor as cursor for more.
+    /// Look up one patient's e-Oficlinic appointment history by status: assigned, cancelled, absence (no-show) or legalized (attendance registered). The patient is resolved by citizenship card number first, sent in the body; PATIENT_NOT_FOUND answers only the provider explicit negative, and every row must name the resolved patient. Staff usernames and free-text observations are never returned. serviceNumber is the appointment's CAS, which reschedule_appointment takes for an assigned appointment. Mapped from the provider's source: a live positive answer has not been verified yet. Read-only. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
     pub async fn lookup(&self, input: &types::OficlinicAppointmentsLookupInput) -> Result<types::OficlinicAppointmentsLookupOutput, Error> {
         self.0.call(&operations::OFICLINIC_APPOINTMENTS_LOOKUP, input).await
+    }
+
+    /// Reschedule an appointment
+    ///
+    /// Reschedule one assigned e-Oficlinic appointment. The provider has no individual reschedule (its REPROGRAMAR_AGENDA moves a professional's whole agenda and is never used), so this is a saga, never atomic: the original must be an upcoming assigned appointment of the patient resolved by citizenship card (its CAS, serviceNumber in lookup_appointments); the cancellation reason must be exactly one list_cancellation_reasons answers; the new slot is booked first exactly as create_appointment books it; only after the provider acknowledged the new booking is the original cancelled (CANECELAR_CITAS) with the given reason and observations. If the new booking fails, nothing changes; if its outcome is unknown, OUTCOME_UNKNOWN answers and the original is never cancelled. Once the new booking is acknowledged the answer reports each phase: completed when the cancellation was confirmed too, partial otherwise (cancellation pending, unknown or not possible), when the patient may hold both appointments. pending continues when the same request is repeated with the same idempotencyKey, which resumes the cancellation alone; nothing is ever resent. The slot and the original are fenced from the first dispatch: WRITE_TARGET_UNRESOLVED means another key's write to either has no final outcome, and nothing was sent. agentMode true answers concise Spanish text instead.
+    pub async fn reschedule(&self, input: &types::OficlinicAppointmentsRescheduleInput) -> Result<types::OficlinicAppointmentsRescheduleOutput, Error> {
+        self.0.call(&operations::OFICLINIC_APPOINTMENTS_RESCHEDULE, input).await
+    }
+}
+
+/// `oficlinic.bookingDays`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicBookingDaysApi<'a>(&'a Client);
+
+impl<'a> OficlinicBookingDaysApi<'a> {
+    /// List booking days
+    ///
+    /// List the agenda days e-Oficlinic offers for one professional and room of the flow, for the flow's payer and service (LISTAR_AGENDAS_DISPONIBLES). The room must be one list_booking_rooms offered for that professional in the same flow. An empty list is the provider's answer for this exact combination alone, never for the whole clinic. Read-only: nothing is locked. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicBookingDaysListInput) -> Result<types::OficlinicBookingDaysListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_BOOKING_DAYS_LIST, input).await
+    }
+}
+
+/// `oficlinic.bookingProfessionals`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicBookingProfessionalsApi<'a>(&'a Client);
+
+impl<'a> OficlinicBookingProfessionalsApi<'a> {
+    /// List booking professionals
+    ///
+    /// List the professionals e-Oficlinic schedules for one service (LISTAR_PROFESIONALES_AGENDA) and open an availability flow for that payer, service, program and attention type; every item carries the flowId the next steps take (list_booking_rooms, list_booking_days, list_booking_slots, then create_appointment). The flow keeps, server-side, the provider's own flow identifier its booking screen generates; no slot is locked or reserved by listing. The payer must be one list_payers answers, or PAYER_NOT_FOUND. The program and attention type come from list_programs, or BOOKING_OPTION_NOT_FOUND; an attention type whose source unit count is not exactly one answers PROGRAM_UNITS_NOT_SUPPORTED, since multi-unit programs are not supported. The flow expires 30 minutes after this first list. Use a configured service id (search_services, or list_services with professionalId). An empty list means the provider schedules no professional for that service now. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicBookingProfessionalsListInput) -> Result<types::OficlinicBookingProfessionalsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_BOOKING_PROFESSIONALS_LIST, input).await
+    }
+}
+
+/// `oficlinic.bookingRooms`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicBookingRoomsApi<'a>(&'a Client);
+
+impl<'a> OficlinicBookingRoomsApi<'a> {
+    /// List booking rooms
+    ///
+    /// List the rooms where e-Oficlinic schedules one professional for the flow's service (LISTAR_CONSULTORIOSxPROFE_AGENDA). The professional must be one list_booking_professionals offered in the same flow, or SELECTION_NOT_AVAILABLE; an expired or unknown flow answers SELECTION_EXPIRED. Read-only: nothing is locked. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicBookingRoomsListInput) -> Result<types::OficlinicBookingRoomsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_BOOKING_ROOMS_LIST, input).await
+    }
+}
+
+/// `oficlinic.bookingSlots`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicBookingSlotsApi<'a>(&'a Client);
+
+impl<'a> OficlinicBookingSlotsApi<'a> {
+    /// List booking slots
+    ///
+    /// List the slots e-Oficlinic shows for one agenda day of the flow, for the flow's payer and its one-unit attention type, as its booking screen shows them (LISTAR_HORARIOS_AGENDAS_DISPONIBLES with the screen's display filter). The day must be one list_booking_days offered in the same flow. startsAt and endsAt come from the source's exact time range, and are null rather than guessed when it is unrecognized. Observed live for one agenda; the rows observed had no Estado, so status is usually null. Read-only: nothing is locked or reserved. Book one with create_appointment and its id as slotId. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicBookingSlotsListInput) -> Result<types::OficlinicBookingSlotsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_BOOKING_SLOTS_LIST, input).await
+    }
+}
+
+/// `oficlinic.cancellationReasons`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicCancellationReasonsApi<'a>(&'a Client);
+
+impl<'a> OficlinicCancellationReasonsApi<'a> {
+    /// List cancellation reasons
+    ///
+    /// List the cancellation reasons e-Oficlinic offers (cbmotivocancelainasiste), in the provider's order. The source gives them no id: pass one exactly as cancellation.reason of reschedule_appointment, which refuses any other text with BOOKING_OPTION_NOT_FOUND. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicCancellationReasonsListInput) -> Result<types::OficlinicCancellationReasonsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_CANCELLATION_REASONS_LIST, input).await
     }
 }
 
@@ -1559,9 +1668,48 @@ pub struct OficlinicPatientsApi<'a>(&'a Client);
 impl<'a> OficlinicPatientsApi<'a> {
     /// Look up a patient by document
     ///
-    /// Look up one patient in e-Oficlinic by citizenship card (CC) number, sent in the body and never in a URL. found answers a deliberately projected record (provider id, names, birth date, sex, address, phones, email, municipality) only when the provider returned a record with the requested document; not_found answers only the provider explicit negative. Any failure is not evidence that the patient is absent. This does not verify payer rights or the identity of the person presenting the document.
+    /// Look up one patient in e-Oficlinic by citizenship card (CC) number, sent in the body and never in a URL. found answers a deliberately projected record (provider id, names, birth date, sex, address, phones, email, municipality) only when the provider returned a record with the requested document; not_found answers only the provider explicit negative. Any failure is not evidence that the patient is absent. This does not verify payer rights or the identity of the person presenting the document. agentMode true answers concise Spanish text instead.
     pub async fn lookup(&self, input: &types::OficlinicPatientsLookupInput) -> Result<types::OficlinicPatientsLookupOutput, Error> {
         self.0.call(&operations::OFICLINIC_PATIENTS_LOOKUP, input).await
+    }
+}
+
+/// `oficlinic.payerContracts`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPayerContractsApi<'a>(&'a Client);
+
+impl<'a> OficlinicPayerContractsApi<'a> {
+    /// List payer contracts
+    ///
+    /// List the contracts e-Oficlinic holds for one payer of the connection, in the provider's order, as its booking screen loads them (cbclientescontrato): id, names, number, validity days and active flag. Financial and internal contract fields are never returned. The payer must be one list_payers answers, or PAYER_NOT_FOUND. A contract is not proof of coverage for a patient. Pass pageInfo.nextCursor with the same payerId for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicPayerContractsListInput) -> Result<types::OficlinicPayerContractsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PAYER_CONTRACTS_LIST, input).await
+    }
+}
+
+/// `oficlinic.payerPlans`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPayerPlansApi<'a>(&'a Client);
+
+impl<'a> OficlinicPayerPlansApi<'a> {
+    /// List payer plans
+    ///
+    /// List the plans e-Oficlinic offers for one payer of the connection, in the provider's order, as its booking screen loads them (cbclientesplan). The payer must be one list_payers answers for the connection, or PAYER_NOT_FOUND. A booking takes one of these plans. Pass pageInfo.nextCursor with the same payerId for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicPayerPlansListInput) -> Result<types::OficlinicPayerPlansListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PAYER_PLANS_LIST, input).await
+    }
+}
+
+/// `oficlinic.payerSubplans`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPayerSubplansApi<'a>(&'a Client);
+
+impl<'a> OficlinicPayerSubplansApi<'a> {
+    /// List payer subplans
+    ///
+    /// List the subplans e-Oficlinic offers for one plan of a payer, in the provider's order, as its booking screen loads them (cbclientessubplan). The payer must be the connection's and the plan one of the payer's (list_payer_plans), or PAYER_NOT_FOUND or PAYER_OPTION_NOT_FOUND. A booking takes one of these subplans. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicPayerSubplansListInput) -> Result<types::OficlinicPayerSubplansListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PAYER_SUBPLANS_LIST, input).await
     }
 }
 
@@ -1572,7 +1720,7 @@ pub struct OficlinicPayersApi<'a>(&'a Client);
 impl<'a> OficlinicPayersApi<'a> {
     /// List payers
     ///
-    /// List the payers (EPS, insurers and other contracting clients) configured in e-Oficlinic for the connection's verified company and IPS, in the provider's order. Flags the provider does not spell in a recognized way are null. Pass connectionId when the organization has several active connections, and pageInfo.nextCursor as cursor for more.
+    /// List the payers (EPS, insurers and other contracting clients) configured in e-Oficlinic for the connection's verified company and IPS, in the provider's order. Flags the provider does not spell in a recognized way are null. Pass connectionId when the organization has several active connections, and pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
     pub async fn list(&self, input: &types::OficlinicPayersListInput) -> Result<types::OficlinicPayersListOutput, Error> {
         self.0.call(&operations::OFICLINIC_PAYERS_LIST, input).await
     }
@@ -1585,9 +1733,68 @@ pub struct OficlinicProfessionalsApi<'a>(&'a Client);
 impl<'a> OficlinicProfessionalsApi<'a> {
     /// List professionals
     ///
-    /// List the professionals of the e-Oficlinic account's directory, a page at a time in the provider's order: id, name, specialty and active flag. Identity documents, addresses and phones of professionals are never returned. This directory is not an availability or scheduling answer. Pass pageInfo.nextCursor as cursor for more.
+    /// List the professionals of the e-Oficlinic account's directory, a page at a time in the provider's order: id, name, specialty and active flag. Identity documents, addresses and phones of professionals are never returned. This directory is not an availability or scheduling answer: list_booking_professionals answers who the provider schedules for a service. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
     pub async fn list(&self, input: &types::OficlinicProfessionalsListInput) -> Result<types::OficlinicProfessionalsListOutput, Error> {
         self.0.call(&operations::OFICLINIC_PROFESSIONALS_LIST, input).await
+    }
+}
+
+/// `oficlinic.programs`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicProgramsApi<'a>(&'a Client);
+
+impl<'a> OficlinicProgramsApi<'a> {
+    /// List programs
+    ///
+    /// List the programs e-Oficlinic offers on its booking screen (cbprograma), each with the attention types it offers (cbprogramatipoatencion), in the provider's order. Opening an availability flow and booking take a program and one of its attention types whose bookable is true: the source counts exactly one unit for it. Multi-unit programs are listed and not bookable here, and a missing or unrecognized count is null, never assumed to be one. sourcePurpose and exempt are catalog facts: they decide nothing about a booking, whose purposeId and billing values stay explicit. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicProgramsListInput) -> Result<types::OficlinicProgramsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PROGRAMS_LIST, input).await
+    }
+}
+
+/// `oficlinic.regimes`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicRegimesApi<'a>(&'a Client);
+
+impl<'a> OficlinicRegimesApi<'a> {
+    /// List regimes
+    ///
+    /// List the regimes e-Oficlinic offers on its booking screen (cbtipousuario), in the provider's order. A booking takes one as classification.regime, and list_affiliate_types takes its id as regimeId. Which regime applies to a patient is the clinic's decision, never derived here. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicRegimesListInput) -> Result<types::OficlinicRegimesListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_REGIMES_LIST, input).await
+    }
+}
+
+/// `oficlinic.relationships`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicRelationshipsApi<'a>(&'a Client);
+
+impl<'a> OficlinicRelationshipsApi<'a> {
+    /// List relationships
+    ///
+    /// List the relationships to the policy holder e-Oficlinic offers on its booking screen (cbparentesco), in the provider's order. A booking may take one as classification.relationship. Which one applies to a patient is the clinic's decision, never derived here. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicRelationshipsListInput) -> Result<types::OficlinicRelationshipsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_RELATIONSHIPS_LIST, input).await
+    }
+}
+
+/// `oficlinic.serviceCatalog`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicServiceCatalogApi<'a>(&'a Client);
+
+impl<'a> OficlinicServiceCatalogApi<'a> {
+    /// Get the service catalog index
+    ///
+    /// Read the state of the connection's local index of the e-Oficlinic service catalog that search_services ranks: whether a complete generation serves searches and when it was completed, its counts, and the progress or last failure of its sync. It never contacts the provider. agentMode true answers concise Spanish text instead.
+    pub async fn get(&self, input: &types::OficlinicServiceCatalogGetInput) -> Result<types::OficlinicServiceCatalogGetOutput, Error> {
+        self.0.call(&operations::OFICLINIC_SERVICE_CATALOG_GET, input).await
+    }
+
+    /// Sync the service catalog index
+    ///
+    /// Start building a new generation of the connection's local service index from the provider's complete master catalog, professional directory and active professionals' configured services, or resume the one building. It reads in bounded batches between other calls, checks that the provider's totals stay constant and every id appears once, and publishes the generation only when complete; until then the previous generation keeps serving searches. A sync started in the last ten minutes that did not fail is not repeated. Answers the index's state.
+    pub async fn sync(&self, input: &types::OficlinicServiceCatalogSyncInput) -> Result<types::OficlinicServiceCatalogSyncOutput, Error> {
+        self.0.call(&operations::OFICLINIC_SERVICE_CATALOG_SYNC, input).await
     }
 }
 
@@ -1598,9 +1805,16 @@ pub struct OficlinicServicesApi<'a>(&'a Client);
 impl<'a> OficlinicServicesApi<'a> {
     /// List services
     ///
-    /// List the e-Oficlinic master service catalog (procedures and studies with their CUPS codes), a page at a time in the provider's order. It lists what the provider can register, about thirteen thousand entries: it is not contracted coverage, a payer authorization or a clinical recommendation. Pass pageInfo.nextCursor as cursor for more.
+    /// List the e-Oficlinic master service catalog (procedures and studies with their CUPS codes), a page at a time in the provider's order. It lists what the provider can register, about thirteen thousand entries: it is not contracted coverage, a payer authorization or a clinical recommendation. With professionalId, it lists instead the services the provider configured for that professional (GRID_PROCEDIMIENTOS), read live: configuration, not coverage or open slots, and its cupsDescription, specialPreparation and active are null. To find a service by text, use search_services. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
     pub async fn list(&self, input: &types::OficlinicServicesListInput) -> Result<types::OficlinicServicesListOutput, Error> {
         self.0.call(&operations::OFICLINIC_SERVICES_LIST, input).await
+    }
+
+    /// Search services
+    ///
+    /// Search the e-Oficlinic services by text over the connection's local index of the provider's complete master catalog and its professionals' configured services (GRID_PROCEDIMIENTOS), read through the connection and published only when complete. Results rank by an exact provider id, code or CUPS code, then the text as a phrase of the name, every word (accents ignored, prefixes allowed), then words within a small spelling distance. excludeTerms and excludeServiceIds are hard exclusions applied before ranking: no excluded service ever comes back, related ones included. configuredOnly (true by default) keeps services configured for at least one active professional; false searches the whole master catalog, which is not coverage. includeRelated adds, below every direct match, services configured for active professionals whose specialty matches the text, marked related_specialty: it is not a claim of clinical equivalence. Nothing here is coverage, an authorization or an open slot. The first search of a connection starts building the index and answers INDEX_NOT_READY until it is complete; an older index keeps serving while a refresh builds. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    pub async fn search(&self, input: &types::OficlinicServicesSearchInput) -> Result<types::OficlinicServicesSearchOutput, Error> {
+        self.0.call(&operations::OFICLINIC_SERVICES_SEARCH, input).await
     }
 }
 
@@ -1609,8 +1823,32 @@ impl<'a> OficlinicServicesApi<'a> {
 pub struct OficlinicApi<'a>(&'a Client);
 
 impl<'a> OficlinicApi<'a> {
+    pub fn affiliate_types(&self) -> OficlinicAffiliateTypesApi<'a> {
+        OficlinicAffiliateTypesApi(self.0)
+    }
+
     pub fn appointments(&self) -> OficlinicAppointmentsApi<'a> {
         OficlinicAppointmentsApi(self.0)
+    }
+
+    pub fn booking_days(&self) -> OficlinicBookingDaysApi<'a> {
+        OficlinicBookingDaysApi(self.0)
+    }
+
+    pub fn booking_professionals(&self) -> OficlinicBookingProfessionalsApi<'a> {
+        OficlinicBookingProfessionalsApi(self.0)
+    }
+
+    pub fn booking_rooms(&self) -> OficlinicBookingRoomsApi<'a> {
+        OficlinicBookingRoomsApi(self.0)
+    }
+
+    pub fn booking_slots(&self) -> OficlinicBookingSlotsApi<'a> {
+        OficlinicBookingSlotsApi(self.0)
+    }
+
+    pub fn cancellation_reasons(&self) -> OficlinicCancellationReasonsApi<'a> {
+        OficlinicCancellationReasonsApi(self.0)
     }
 
     pub fn connections(&self) -> OficlinicConnectionsApi<'a> {
@@ -1621,12 +1859,40 @@ impl<'a> OficlinicApi<'a> {
         OficlinicPatientsApi(self.0)
     }
 
+    pub fn payer_contracts(&self) -> OficlinicPayerContractsApi<'a> {
+        OficlinicPayerContractsApi(self.0)
+    }
+
+    pub fn payer_plans(&self) -> OficlinicPayerPlansApi<'a> {
+        OficlinicPayerPlansApi(self.0)
+    }
+
+    pub fn payer_subplans(&self) -> OficlinicPayerSubplansApi<'a> {
+        OficlinicPayerSubplansApi(self.0)
+    }
+
     pub fn payers(&self) -> OficlinicPayersApi<'a> {
         OficlinicPayersApi(self.0)
     }
 
     pub fn professionals(&self) -> OficlinicProfessionalsApi<'a> {
         OficlinicProfessionalsApi(self.0)
+    }
+
+    pub fn programs(&self) -> OficlinicProgramsApi<'a> {
+        OficlinicProgramsApi(self.0)
+    }
+
+    pub fn regimes(&self) -> OficlinicRegimesApi<'a> {
+        OficlinicRegimesApi(self.0)
+    }
+
+    pub fn relationships(&self) -> OficlinicRelationshipsApi<'a> {
+        OficlinicRelationshipsApi(self.0)
+    }
+
+    pub fn service_catalog(&self) -> OficlinicServiceCatalogApi<'a> {
+        OficlinicServiceCatalogApi(self.0)
     }
 
     pub fn services(&self) -> OficlinicServicesApi<'a> {
@@ -1685,7 +1951,7 @@ impl<'a> RaizAgentsApi<'a> {
 
     /// Update an Agent
     ///
-    /// Change an Agent: instructions, first message, name, language, time zone, settings, integration tools, Knowledge, procedures, connection procedures or status. Omitted fields stay and `null` clears one; `settings`, `integrationTools`, `integrationProcedures`, `procedures` and `knowledgeDocumentIds` replace the whole value when given (keep each existing procedure's `id`), so read the Agent with `get_agent` first and send its `version` as `expectedVersion` (VERSION_CONFLICT: read it again). `status: paused` stops it from answering and calling. `modality` changes only while it has no channels and no published voice line (AGENT_MODALITY_LOCKED). A voice Agent republishes in the background: check `synced`.
+    /// Change an Agent: instructions, first message, name, language, time zone, settings, integration tools, Knowledge, procedures, connection procedures or status. Omitted fields stay and `null` clears one, also inside `settings`; `integrationTools`, `integrationProcedures`, `procedures` and `knowledgeDocumentIds` replace the whole value when given (keep each existing procedure's `id`), so read the Agent with `get_agent` first and send its `version` as `expectedVersion` (VERSION_CONFLICT: read it again). `status: paused` stops it from answering and calling. `modality` changes only while it has no channels and no published voice line (AGENT_MODALITY_LOCKED). A voice Agent republishes in the background: check `synced`.
     pub async fn update(&self, input: &types::RaizAgentsUpdateInput) -> Result<types::RaizAgentsUpdateOutput, Error> {
         self.0.call(&operations::RAIZ_AGENTS_UPDATE, input).await
     }
@@ -1737,30 +2003,30 @@ impl<'a> RaizBulletinsApi<'a> {
 pub struct RaizCampaignsApi<'a>(&'a Client);
 
 impl<'a> RaizCampaignsApi<'a> {
-    /// Create a call campaign
+    /// Create a campaign
     ///
-    /// Prepare an outbound call campaign for a voice Agent with up to 10000 recipients, each a phone `address` with an optional `contactId`, `variables`, `firstMessage` and `instructions`. Nobody is called until it is started. Each recipient's contact is the one it names, or the owner of its number (created when none exists). Calls happen only inside `contactHours` (in `timeZone`, the organization's by default) and between `scheduledStartAt` and `scheduledEndAt`; each recipient gets up to `maxAttempts` calls, retried `retryAfterMinutes` later after the results in `retryOn` (`no_answer`, `failure`). Starting it (REST `POST /v1/campaigns/{campaignId}/start`) is not an AI tool. Read the `run-a-campaign` skill.
+    /// Prepare a campaign with up to 10000 recipients, each a phone `address` with an optional `contactId` and `variables`. A call campaign (the default) has a voice Agent call each one. With `channelType: whatsapp` and an approved `template`, each one is sent the template, its `parameters` filled from their `variables` (`{{name}}`), and its text Agent answers whoever replies. Nobody is reached until it is started. A list adds nobody to the organization's contacts: a recipient becomes the contact it names, or the owner of its number (created when none exists), when the campaign first reaches them. A longer list continues with `updateCampaign` and `addRecipients`. Nothing happens outside `contactHours` (in `timeZone`, the organization's by default) or outside `scheduledStartAt` and `scheduledEndAt`; each recipient gets up to `maxAttempts` attempts, `retryAfterMinutes` apart, after the results in `retryOn`. Read it with `expand=readiness` to see whether it can start. Starting it (REST `POST /v1/campaigns/{campaignId}/start`) is not an AI tool. Read the `run-a-campaign` skill.
     pub async fn create(&self, input: &types::RaizCampaignsCreateInput) -> Result<types::RaizCampaignsCreateOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_CREATE, input).await
     }
 
     /// Get a campaign
     ///
-    /// Read one campaign: Agent, schedule, contact hours, retries and progress. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call; continue with `recipientsCursor` (`recipientsDirection` reads the other way). Read it before `update_campaign` and send `expectedVersion`.
+    /// Read one campaign: Agent, schedule, contact hours, retries, progress and, in `errorCode`, why it cannot reach anyone now. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call or message; continue with `recipientsCursor` (`recipientsDirection` reads the other way). `expand=readiness` says whether it can start and lists what has to be fixed first, without reaching anyone. Read it before `update_campaign` and send `expectedVersion`.
     pub async fn get(&self, input: &types::RaizCampaignsGetInput) -> Result<types::RaizCampaignsGetOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_GET, input).await
     }
 
     /// List campaigns
     ///
-    /// List the organization's call campaigns, newest first, each with its progress (recipients pending, in progress, completed, failed and succeeded). Filter by `status` or `agentId`. A campaign's calls: `list_conversations` with `campaignId`; its numbers by day: `get_report` with `name: campaign_progress`.
+    /// List the organization's campaigns, newest first, each with its progress (recipients pending, in progress, completed, failed and succeeded; on WhatsApp also delivered, read and replied). Filter by `channelType`, `status` or `agentId`. A campaign's calls and messages: `list_conversations` with `campaignId`; its numbers by day: `get_report` with `name: campaign_progress`.
     pub async fn list(&self, input: &types::RaizCampaignsListInput) -> Result<types::RaizCampaignsListOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_LIST, input).await
     }
 
     /// Update a campaign
     ///
-    /// Change a campaign. Omitted fields stay. `paused: true` pauses a started campaign (no new call starts; calls in progress finish) and `paused: false` resumes it, with the same checks as starting. Before the start, `recipients` is the complete set (matched by `address`); once started it only adds, so send a long list in batches. The Agent changes only before the start, and a completed campaign accepts only its name and metadata.
+    /// Change a campaign. Omitted fields stay. `paused: true` pauses a started campaign (no new call or message starts; those in progress finish) and `paused: false` resumes it, with the same checks as starting. Before the start, `recipients` is the complete set, replacing whoever was there; once started it only adds. `addRecipients` adds at any moment, which is how a list longer than one request arrives: a number the campaign already has is skipped, so repeating a part reaches nobody twice. The Agent changes only before the start, and a completed campaign accepts only its name and metadata. A change lifts the wait of a campaign held by `errorCode`: fixing a template and sending it here tries again at once.
     pub async fn update(&self, input: &types::RaizCampaignsUpdateInput) -> Result<types::RaizCampaignsUpdateOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_UPDATE, input).await
     }
@@ -2426,7 +2692,7 @@ pub struct SanitasConnectionsApi<'a>(&'a Client);
 impl<'a> SanitasConnectionsApi<'a> {
     /// Get connection
     ///
-    /// Read safe status without contacting the provider.
+    /// Read safe status. expand providers reads the available business provider contexts with the retained session, without submitting credentials.
     pub async fn get(&self, input: &types::SanitasConnectionsGetInput) -> Result<types::SanitasConnectionsGetOutput, Error> {
         self.0.call(&operations::SANITAS_CONNECTIONS_GET, input).await
     }
@@ -2516,7 +2782,7 @@ pub struct SuraAuthorizationsApi<'a>(&'a Client);
 impl<'a> SuraAuthorizationsApi<'a> {
     /// Look up an authorization
     ///
-    /// Read an existing SaludWeb authorization for the exact CC patient, issuer and authorization number. Reports delivered status, dates, explicit charge type, fixed fee or copay percentage and provider-reported payments. Unknown balance and copay cap remain null. Does not issue, attend, modify or pay an authorization.
+    /// Read an existing SaludWeb authorization for the exact patient, issuer and authorization number. Reports its status, dates, the authorized procedures, the provider it is directed to, explicit charge type, fixed fee or copay percentage and provider-reported payments. Procedures that could not be read, unknown balance and copay cap remain null. Does not issue, attend, modify or pay an authorization.
     pub async fn lookup(&self, input: &types::SuraAuthorizationsLookupInput) -> Result<types::SuraAuthorizationsLookupOutput, Error> {
         self.0.call(&operations::SURA_AUTHORIZATIONS_LOOKUP, input).await
     }

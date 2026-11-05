@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261105.70400";
+pub const RELEASE: &str = "1.20261105.193553";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -785,6 +785,17 @@ pub const AXXA_CONNECTIONS_VERIFY: Operation = Operation {
     max_output_bytes: 262144,
 };
 
+/// `axxa.coverage.lookup`: Look up coverage of a service
+pub const AXXA_COVERAGE_LOOKUP: Operation = Operation {
+    name: "axxa.coverage.lookup",
+    method: "POST",
+    path: "/v1/axxa/coverage/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
 /// `axxa.eligibility.lookup`: Look up beneficiary eligibility
 pub const AXXA_ELIGIBILITY_LOOKUP: Operation = Operation {
     name: "axxa.eligibility.lookup",
@@ -1247,6 +1258,28 @@ pub const NUEVA_EPS_PRECURSORAS_GET: Operation = Operation {
     max_output_bytes: 262144,
 };
 
+/// `oficlinic.affiliateTypes.list`: List affiliate types
+pub const OFICLINIC_AFFILIATE_TYPES_LIST: Operation = Operation {
+    name: "oficlinic.affiliateTypes.list",
+    method: "GET",
+    path: "/v1/oficlinic/affiliate-types",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("regimeId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.appointments.create`: Create an appointment
+pub const OFICLINIC_APPOINTMENTS_CREATE: Operation = Operation {
+    name: "oficlinic.appointments.create",
+    method: "POST",
+    path: "/v1/oficlinic/appointments",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 65536,
+};
+
 /// `oficlinic.appointments.lookup`: Lookup appointments
 pub const OFICLINIC_APPOINTMENTS_LOOKUP: Operation = Operation {
     name: "oficlinic.appointments.lookup",
@@ -1254,6 +1287,72 @@ pub const OFICLINIC_APPOINTMENTS_LOOKUP: Operation = Operation {
     path: "/v1/oficlinic/appointments/lookup",
     path_field: None,
     query: None,
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.appointments.reschedule`: Reschedule an appointment
+pub const OFICLINIC_APPOINTMENTS_RESCHEDULE: Operation = Operation {
+    name: "oficlinic.appointments.reschedule",
+    method: "POST",
+    path: "/v1/oficlinic/appointments/{appointmentId}/reschedule",
+    path_field: Some("appointmentId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.bookingDays.list`: List booking days
+pub const OFICLINIC_BOOKING_DAYS_LIST: Operation = Operation {
+    name: "oficlinic.bookingDays.list",
+    method: "GET",
+    path: "/v1/oficlinic/booking-days",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("flowId", QueryKind::String), ("professionalId", QueryKind::String), ("roomId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.bookingProfessionals.list`: List booking professionals
+pub const OFICLINIC_BOOKING_PROFESSIONALS_LIST: Operation = Operation {
+    name: "oficlinic.bookingProfessionals.list",
+    method: "GET",
+    path: "/v1/oficlinic/booking-professionals",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("payerId", QueryKind::String), ("serviceId", QueryKind::String), ("programId", QueryKind::String), ("attentionTypeId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.bookingRooms.list`: List booking rooms
+pub const OFICLINIC_BOOKING_ROOMS_LIST: Operation = Operation {
+    name: "oficlinic.bookingRooms.list",
+    method: "GET",
+    path: "/v1/oficlinic/booking-rooms",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("flowId", QueryKind::String), ("professionalId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.bookingSlots.list`: List booking slots
+pub const OFICLINIC_BOOKING_SLOTS_LIST: Operation = Operation {
+    name: "oficlinic.bookingSlots.list",
+    method: "GET",
+    path: "/v1/oficlinic/booking-slots",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("flowId", QueryKind::String), ("dayId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.cancellationReasons.list`: List cancellation reasons
+pub const OFICLINIC_CANCELLATION_REASONS_LIST: Operation = Operation {
+    name: "oficlinic.cancellationReasons.list",
+    method: "GET",
+    path: "/v1/oficlinic/cancellation-reasons",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
     effect: Effect::Read,
     max_output_bytes: 65536,
 };
@@ -1291,13 +1390,46 @@ pub const OFICLINIC_PATIENTS_LOOKUP: Operation = Operation {
     max_output_bytes: 8192,
 };
 
+/// `oficlinic.payerContracts.list`: List payer contracts
+pub const OFICLINIC_PAYER_CONTRACTS_LIST: Operation = Operation {
+    name: "oficlinic.payerContracts.list",
+    method: "GET",
+    path: "/v1/oficlinic/payer-contracts",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("payerId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.payerPlans.list`: List payer plans
+pub const OFICLINIC_PAYER_PLANS_LIST: Operation = Operation {
+    name: "oficlinic.payerPlans.list",
+    method: "GET",
+    path: "/v1/oficlinic/payer-plans",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("payerId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.payerSubplans.list`: List payer subplans
+pub const OFICLINIC_PAYER_SUBPLANS_LIST: Operation = Operation {
+    name: "oficlinic.payerSubplans.list",
+    method: "GET",
+    path: "/v1/oficlinic/payer-subplans",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("payerId", QueryKind::String), ("planId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
 /// `oficlinic.payers.list`: List payers
 pub const OFICLINIC_PAYERS_LIST: Operation = Operation {
     name: "oficlinic.payers.list",
     method: "GET",
     path: "/v1/oficlinic/payers",
     path_field: None,
-    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
     effect: Effect::Read,
     max_output_bytes: 65536,
 };
@@ -1308,8 +1440,63 @@ pub const OFICLINIC_PROFESSIONALS_LIST: Operation = Operation {
     method: "GET",
     path: "/v1/oficlinic/professionals",
     path_field: None,
-    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
     effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.programs.list`: List programs
+pub const OFICLINIC_PROGRAMS_LIST: Operation = Operation {
+    name: "oficlinic.programs.list",
+    method: "GET",
+    path: "/v1/oficlinic/programs",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.regimes.list`: List regimes
+pub const OFICLINIC_REGIMES_LIST: Operation = Operation {
+    name: "oficlinic.regimes.list",
+    method: "GET",
+    path: "/v1/oficlinic/regimes",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.relationships.list`: List relationships
+pub const OFICLINIC_RELATIONSHIPS_LIST: Operation = Operation {
+    name: "oficlinic.relationships.list",
+    method: "GET",
+    path: "/v1/oficlinic/relationships",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.serviceCatalog.get`: Get the service catalog index
+pub const OFICLINIC_SERVICE_CATALOG_GET: Operation = Operation {
+    name: "oficlinic.serviceCatalog.get",
+    method: "GET",
+    path: "/v1/oficlinic/service-catalog",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.serviceCatalog.sync`: Sync the service catalog index
+pub const OFICLINIC_SERVICE_CATALOG_SYNC: Operation = Operation {
+    name: "oficlinic.serviceCatalog.sync",
+    method: "POST",
+    path: "/v1/oficlinic/service-catalog/sync",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 65536,
 };
 
@@ -1319,7 +1506,18 @@ pub const OFICLINIC_SERVICES_LIST: Operation = Operation {
     method: "GET",
     path: "/v1/oficlinic/services",
     path_field: None,
-    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    query: Some(&[("connectionId", QueryKind::String), ("professionalId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.services.search`: Search services
+pub const OFICLINIC_SERVICES_SEARCH: Operation = Operation {
+    name: "oficlinic.services.search",
+    method: "POST",
+    path: "/v1/oficlinic/services/search",
+    path_field: None,
+    query: None,
     effect: Effect::Read,
     max_output_bytes: 65536,
 };
@@ -1434,7 +1632,7 @@ pub const RAIZ_BULLETINS_UPDATE: Operation = Operation {
     max_output_bytes: 1048576,
 };
 
-/// `raiz.campaigns.create`: Create a call campaign
+/// `raiz.campaigns.create`: Create a campaign
 pub const RAIZ_CAMPAIGNS_CREATE: Operation = Operation {
     name: "raiz.campaigns.create",
     method: "POST",
@@ -1451,7 +1649,7 @@ pub const RAIZ_CAMPAIGNS_GET: Operation = Operation {
     method: "GET",
     path: "/v1/raiz/campaigns/{campaignId}",
     path_field: Some("campaignId"),
-    query: Some(&[("expand", QueryKind::String), ("recipientsCursor", QueryKind::String), ("recipientsDirection", QueryKind::String), ("recipientsLimit", QueryKind::Integer)]),
+    query: Some(&[("expand", QueryKind::String), ("recipientsCursor", QueryKind::String), ("recipientsDirection", QueryKind::String), ("recipientsLimit", QueryKind::Integer), ("recipientsQ", QueryKind::String), ("recipientsStatus", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 1048576,
 };
@@ -1462,7 +1660,7 @@ pub const RAIZ_CAMPAIGNS_LIST: Operation = Operation {
     method: "GET",
     path: "/v1/raiz/campaigns",
     path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentId", QueryKind::String), ("status", QueryKind::String)]),
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentId", QueryKind::String), ("channelType", QueryKind::String), ("status", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 1048576,
 };
@@ -2133,7 +2331,7 @@ pub const SANITAS_CONNECTIONS_GET: Operation = Operation {
     method: "GET",
     path: "/v1/sanitas/connections/{connectionId}",
     path_field: Some("connectionId"),
-    query: Some(&[]),
+    query: Some(&[("expand", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 32768,
 };
