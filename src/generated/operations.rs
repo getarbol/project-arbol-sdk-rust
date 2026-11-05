@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261104.175529";
+pub const RELEASE: &str = "1.20261105.70400";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -807,6 +807,50 @@ pub const AXXA_PROVIDER_GET: Operation = Operation {
     max_output_bytes: 262144,
 };
 
+/// `comfachoco.affiliations.lookup`: Lookup affiliations
+pub const COMFACHOCO_AFFILIATIONS_LOOKUP: Operation = Operation {
+    name: "comfachoco.affiliations.lookup",
+    method: "POST",
+    path: "/v1/comfachoco/affiliations/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 32768,
+};
+
+/// `comfachoco.connections.delete`: Delete a connection
+pub const COMFACHOCO_CONNECTIONS_DELETE: Operation = Operation {
+    name: "comfachoco.connections.delete",
+    method: "DELETE",
+    path: "/v1/comfachoco/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: None,
+    effect: Effect::Delete,
+    max_output_bytes: 32768,
+};
+
+/// `comfachoco.connections.get`: Get a connection
+pub const COMFACHOCO_CONNECTIONS_GET: Operation = Operation {
+    name: "comfachoco.connections.get",
+    method: "GET",
+    path: "/v1/comfachoco/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: Some(&[]),
+    effect: Effect::Read,
+    max_output_bytes: 32768,
+};
+
+/// `comfachoco.connections.verify`: Verify a connection
+pub const COMFACHOCO_CONNECTIONS_VERIFY: Operation = Operation {
+    name: "comfachoco.connections.verify",
+    method: "POST",
+    path: "/v1/comfachoco/connections/{connectionId}/verify",
+    path_field: Some("connectionId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 32768,
+};
+
 /// `gmedic.agendaServices.list`: List agenda services
 pub const GMEDIC_AGENDA_SERVICES_LIST: Operation = Operation {
     name: "gmedic.agendaServices.list",
@@ -1157,6 +1201,127 @@ pub const NUEVA_EPS_CONNECTIONS_VERIFY: Operation = Operation {
     query: None,
     effect: Effect::Write,
     max_output_bytes: 262144,
+};
+
+/// `nueva-eps.ingestionErrorReports.get`: Download a Precursoras error report
+pub const NUEVA_EPS_INGESTION_ERROR_REPORTS_GET: Operation = Operation {
+    name: "nueva-eps.ingestionErrorReports.get",
+    method: "GET",
+    path: "/v1/nueva-eps/ingestion-error-reports/{ingestionErrorReportId}",
+    path_field: Some("ingestionErrorReportId"),
+    query: Some(&[("connectionId", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `nueva-eps.ingestions.get`: Get a Precursoras upload
+pub const NUEVA_EPS_INGESTIONS_GET: Operation = Operation {
+    name: "nueva-eps.ingestions.get",
+    method: "GET",
+    path: "/v1/nueva-eps/ingestions/{ingestionId}",
+    path_field: Some("ingestionId"),
+    query: Some(&[("connectionId", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `nueva-eps.ingestions.list`: List Precursoras uploads
+pub const NUEVA_EPS_INGESTIONS_LIST: Operation = Operation {
+    name: "nueva-eps.ingestions.list",
+    method: "GET",
+    path: "/v1/nueva-eps/ingestions",
+    path_field: None,
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("providerId", QueryKind::Integer), ("structureId", QueryKind::Integer), ("connectionId", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `nueva-eps.precursoras.get`: Get the Precursoras catalog
+pub const NUEVA_EPS_PRECURSORAS_GET: Operation = Operation {
+    name: "nueva-eps.precursoras.get",
+    method: "GET",
+    path: "/v1/nueva-eps/precursoras",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `oficlinic.appointments.lookup`: Lookup appointments
+pub const OFICLINIC_APPOINTMENTS_LOOKUP: Operation = Operation {
+    name: "oficlinic.appointments.lookup",
+    method: "POST",
+    path: "/v1/oficlinic/appointments/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.connections.delete`: Delete a connection
+pub const OFICLINIC_CONNECTIONS_DELETE: Operation = Operation {
+    name: "oficlinic.connections.delete",
+    method: "DELETE",
+    path: "/v1/oficlinic/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: None,
+    effect: Effect::Delete,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.connections.get`: Get a connection
+pub const OFICLINIC_CONNECTIONS_GET: Operation = Operation {
+    name: "oficlinic.connections.get",
+    method: "GET",
+    path: "/v1/oficlinic/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: Some(&[]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.patients.lookup`: Look up a patient by document
+pub const OFICLINIC_PATIENTS_LOOKUP: Operation = Operation {
+    name: "oficlinic.patients.lookup",
+    method: "POST",
+    path: "/v1/oficlinic/patients/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 8192,
+};
+
+/// `oficlinic.payers.list`: List payers
+pub const OFICLINIC_PAYERS_LIST: Operation = Operation {
+    name: "oficlinic.payers.list",
+    method: "GET",
+    path: "/v1/oficlinic/payers",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.professionals.list`: List professionals
+pub const OFICLINIC_PROFESSIONALS_LIST: Operation = Operation {
+    name: "oficlinic.professionals.list",
+    method: "GET",
+    path: "/v1/oficlinic/professionals",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.services.list`: List services
+pub const OFICLINIC_SERVICES_LIST: Operation = Operation {
+    name: "oficlinic.services.list",
+    method: "GET",
+    path: "/v1/oficlinic/services",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
 };
 
 /// `policia-colombia.judicialRecords.lookup`: Look up a Colombian judicial statement
@@ -1792,7 +1957,7 @@ pub const RAIZ_REPORTS_GET: Operation = Operation {
     method: "GET",
     path: "/v1/raiz/reports",
     path_field: None,
-    query: Some(&[("agentId", QueryKind::String), ("campaignId", QueryKind::String), ("channelType", QueryKind::String), ("definitionId", QueryKind::String), ("from", QueryKind::String), ("name", QueryKind::String), ("to", QueryKind::String)]),
+    query: Some(&[("specialty", QueryKind::String), ("agentId", QueryKind::String), ("campaignId", QueryKind::String), ("channelType", QueryKind::String), ("definitionId", QueryKind::String), ("from", QueryKind::String), ("name", QueryKind::String), ("to", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 1048576,
 };
@@ -1949,6 +2114,28 @@ pub const SALUD_TOTAL_NOTICES_COUNT: Operation = Operation {
     query: Some(&[("connectionId", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 262144,
+};
+
+/// `sanitas.affiliations.lookup`: Look up affiliation
+pub const SANITAS_AFFILIATIONS_LOOKUP: Operation = Operation {
+    name: "sanitas.affiliations.lookup",
+    method: "POST",
+    path: "/v1/sanitas/affiliations/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 32768,
+};
+
+/// `sanitas.connections.get`: Get connection
+pub const SANITAS_CONNECTIONS_GET: Operation = Operation {
+    name: "sanitas.connections.get",
+    method: "GET",
+    path: "/v1/sanitas/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: Some(&[]),
+    effect: Effect::Read,
+    max_output_bytes: 32768,
 };
 
 /// `sisben.classifications.lookup`: Look up a Sisbén classification
@@ -2123,6 +2310,17 @@ pub const SURA_PROFESSIONALS_LIST: Operation = Operation {
     path: "/v1/sura/professionals",
     path_field: None,
     query: Some(&[("areaId", QueryKind::String), ("serviceId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean), ("connectionId", QueryKind::String), ("channel", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `sura.schedules.lookup`: Look up a professional schedule
+pub const SURA_SCHEDULES_LOOKUP: Operation = Operation {
+    name: "sura.schedules.lookup",
+    method: "POST",
+    path: "/v1/sura/schedules/lookup",
+    path_field: None,
+    query: None,
     effect: Effect::Read,
     max_output_bytes: 262144,
 };

@@ -21,12 +21,20 @@ impl Client {
         AxxaApi(self)
     }
 
+    pub fn comfachoco(&self) -> ComfachocoApi<'_> {
+        ComfachocoApi(self)
+    }
+
     pub fn gmedic(&self) -> GmedicApi<'_> {
         GmedicApi(self)
     }
 
     pub fn nueva_eps(&self) -> NuevaEpsApi<'_> {
         NuevaEpsApi(self)
+    }
+
+    pub fn oficlinic(&self) -> OficlinicApi<'_> {
+        OficlinicApi(self)
     }
 
     pub fn policia_colombia(&self) -> PoliciaColombiaApi<'_> {
@@ -39,6 +47,10 @@ impl Client {
 
     pub fn salud_total(&self) -> SaludTotalApi<'_> {
         SaludTotalApi(self)
+    }
+
+    pub fn sanitas(&self) -> SanitasApi<'_> {
+        SanitasApi(self)
     }
 
     pub fn sisben(&self) -> SisbenApi<'_> {
@@ -979,6 +991,60 @@ impl<'a> AxxaApi<'a> {
     }
 }
 
+/// `comfachoco.affiliations`
+#[derive(Debug, Clone, Copy)]
+pub struct ComfachocoAffiliationsApi<'a>(&'a Client);
+
+impl<'a> ComfachocoAffiliationsApi<'a> {
+    /// Lookup affiliations
+    ///
+    /// Look up a citizen document in Comfachocó through an active organization connection. Returns found only for an exact source identity and not_found only for an explicit source negative. Provider failures are never evidence of non-affiliation. This does not verify the identity of the person presenting the document or determine eligibility.
+    pub async fn lookup(&self, input: &types::ComfachocoAffiliationsLookupInput) -> Result<types::ComfachocoAffiliationsLookupOutput, Error> {
+        self.0.call(&operations::COMFACHOCO_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `comfachoco.connections`
+#[derive(Debug, Clone, Copy)]
+pub struct ComfachocoConnectionsApi<'a>(&'a Client);
+
+impl<'a> ComfachocoConnectionsApi<'a> {
+    /// Delete a connection
+    ///
+    /// Remove the provider session for this organization-owned connection. Account retires the credential separately.
+    pub async fn delete(&self, input: &types::ComfachocoConnectionsDeleteInput) -> Result<types::ComfachocoConnectionsDeleteOutput, Error> {
+        self.0.call(&operations::COMFACHOCO_CONNECTIONS_DELETE, input).await
+    }
+
+    /// Get a connection
+    ///
+    /// Read safe metadata for a Comfachocó connection owned by the caller’s organization.
+    pub async fn get(&self, input: &types::ComfachocoConnectionsGetInput) -> Result<types::ComfachocoConnectionsGetOutput, Error> {
+        self.0.call(&operations::COMFACHOCO_CONNECTIONS_GET, input).await
+    }
+
+    /// Verify a connection
+    ///
+    /// Verify a provider login once before Account seals its credentials. A refused login leaves existing connections unchanged.
+    pub async fn verify(&self, input: &types::ComfachocoConnectionsVerifyInput) -> Result<types::ComfachocoConnectionsVerifyOutput, Error> {
+        self.0.call(&operations::COMFACHOCO_CONNECTIONS_VERIFY, input).await
+    }
+}
+
+/// `comfachoco`
+#[derive(Debug, Clone, Copy)]
+pub struct ComfachocoApi<'a>(&'a Client);
+
+impl<'a> ComfachocoApi<'a> {
+    pub fn affiliations(&self) -> ComfachocoAffiliationsApi<'a> {
+        ComfachocoAffiliationsApi(self.0)
+    }
+
+    pub fn connections(&self) -> ComfachocoConnectionsApi<'a> {
+        ComfachocoConnectionsApi(self.0)
+    }
+}
+
 /// `gmedic.agendaServices`
 #[derive(Debug, Clone, Copy)]
 pub struct GmedicAgendaServicesApi<'a>(&'a Client);
@@ -1381,6 +1447,52 @@ impl<'a> NuevaEpsConnectionsApi<'a> {
     }
 }
 
+/// `nueva-eps.ingestionErrorReports`
+#[derive(Debug, Clone, Copy)]
+pub struct NuevaEpsIngestionErrorReportsApi<'a>(&'a Client);
+
+impl<'a> NuevaEpsIngestionErrorReportsApi<'a> {
+    /// Download a Precursoras error report
+    ///
+    /// Get a private XLSX validation report with a download link valid for 15 minutes. The report id is its upload id. May contain patient information. Files expire from storage after 24 hours. Provider failures are returned explicitly.
+    pub async fn get(&self, input: &types::NuevaEpsIngestionErrorReportsGetInput) -> Result<types::NuevaEpsIngestionErrorReportsGetOutput, Error> {
+        self.0.call(&operations::NUEVA_EPS_INGESTION_ERROR_REPORTS_GET, input).await
+    }
+}
+
+/// `nueva-eps.ingestions`
+#[derive(Debug, Clone, Copy)]
+pub struct NuevaEpsIngestionsApi<'a>(&'a Client);
+
+impl<'a> NuevaEpsIngestionsApi<'a> {
+    /// Get a Precursoras upload
+    ///
+    /// Read one upload’s processing status and row counts after verifying it belongs to this authenticated account’s providers and structures.
+    pub async fn get(&self, input: &types::NuevaEpsIngestionsGetInput) -> Result<types::NuevaEpsIngestionsGetOutput, Error> {
+        self.0.call(&operations::NUEVA_EPS_INGESTIONS_GET, input).await
+    }
+
+    /// List Precursoras uploads
+    ///
+    /// Read upload processing summaries for a provider and structure from this account’s catalog. Cursors use the provider’s live page boundaries; concurrent uploads may shift them. No patient rows, file paths or clinical writes.
+    pub async fn list(&self, input: &types::NuevaEpsIngestionsListInput) -> Result<types::NuevaEpsIngestionsListOutput, Error> {
+        self.0.call(&operations::NUEVA_EPS_INGESTIONS_LIST, input).await
+    }
+}
+
+/// `nueva-eps.precursoras`
+#[derive(Debug, Clone, Copy)]
+pub struct NuevaEpsPrecursorasApi<'a>(&'a Client);
+
+impl<'a> NuevaEpsPrecursorasApi<'a> {
+    /// Get the Precursoras catalog
+    ///
+    /// Read this account’s available providers and reporting structures. Requires a separate Precursoras Account connection; affiliation credentials cannot be used.
+    pub async fn get(&self, input: &types::NuevaEpsPrecursorasGetInput) -> Result<types::NuevaEpsPrecursorasGetOutput, Error> {
+        self.0.call(&operations::NUEVA_EPS_PRECURSORAS_GET, input).await
+    }
+}
+
 /// `nueva-eps`
 #[derive(Debug, Clone, Copy)]
 pub struct NuevaEpsApi<'a>(&'a Client);
@@ -1392,6 +1504,133 @@ impl<'a> NuevaEpsApi<'a> {
 
     pub fn connections(&self) -> NuevaEpsConnectionsApi<'a> {
         NuevaEpsConnectionsApi(self.0)
+    }
+
+    pub fn ingestion_error_reports(&self) -> NuevaEpsIngestionErrorReportsApi<'a> {
+        NuevaEpsIngestionErrorReportsApi(self.0)
+    }
+
+    pub fn ingestions(&self) -> NuevaEpsIngestionsApi<'a> {
+        NuevaEpsIngestionsApi(self.0)
+    }
+
+    pub fn precursoras(&self) -> NuevaEpsPrecursorasApi<'a> {
+        NuevaEpsPrecursorasApi(self.0)
+    }
+}
+
+/// `oficlinic.appointments`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicAppointmentsApi<'a>(&'a Client);
+
+impl<'a> OficlinicAppointmentsApi<'a> {
+    /// Lookup appointments
+    ///
+    /// Look up one patient's e-Oficlinic appointment history by status: assigned, cancelled, absence (no-show) or legalized (attendance registered). The patient is resolved by citizenship card number first, sent in the body; PATIENT_NOT_FOUND answers only the provider explicit negative, and every row must name the resolved patient. Staff usernames and free-text observations are never returned. Mapped from the provider's source: a live positive answer has not been verified yet. Read-only: it never books, cancels or marks attendance. Pass pageInfo.nextCursor as cursor for more.
+    pub async fn lookup(&self, input: &types::OficlinicAppointmentsLookupInput) -> Result<types::OficlinicAppointmentsLookupOutput, Error> {
+        self.0.call(&operations::OFICLINIC_APPOINTMENTS_LOOKUP, input).await
+    }
+}
+
+/// `oficlinic.connections`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicConnectionsApi<'a>(&'a Client);
+
+impl<'a> OficlinicConnectionsApi<'a> {
+    /// Delete a connection
+    ///
+    /// Invalidate the provider session of an e-Oficlinic connection of the caller's organization: its cookies and session state are forgotten at once, even during a read. Account retires the sealed credentials separately. Repeating the call answers the same.
+    pub async fn delete(&self, input: &types::OficlinicConnectionsDeleteInput) -> Result<types::OficlinicConnectionsDeleteOutput, Error> {
+        self.0.call(&operations::OFICLINIC_CONNECTIONS_DELETE, input).await
+    }
+
+    /// Get a connection
+    ///
+    /// Read an e-Oficlinic connection of the caller's organization: Account's name and status, the provider session's state and why it stopped, the selected company, site and IPS, and when it was verified and last used. It never contacts the provider and never returns credentials or cookies.
+    pub async fn get(&self, input: &types::OficlinicConnectionsGetInput) -> Result<types::OficlinicConnectionsGetOutput, Error> {
+        self.0.call(&operations::OFICLINIC_CONNECTIONS_GET, input).await
+    }
+}
+
+/// `oficlinic.patients`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPatientsApi<'a>(&'a Client);
+
+impl<'a> OficlinicPatientsApi<'a> {
+    /// Look up a patient by document
+    ///
+    /// Look up one patient in e-Oficlinic by citizenship card (CC) number, sent in the body and never in a URL. found answers a deliberately projected record (provider id, names, birth date, sex, address, phones, email, municipality) only when the provider returned a record with the requested document; not_found answers only the provider explicit negative. Any failure is not evidence that the patient is absent. This does not verify payer rights or the identity of the person presenting the document.
+    pub async fn lookup(&self, input: &types::OficlinicPatientsLookupInput) -> Result<types::OficlinicPatientsLookupOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PATIENTS_LOOKUP, input).await
+    }
+}
+
+/// `oficlinic.payers`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPayersApi<'a>(&'a Client);
+
+impl<'a> OficlinicPayersApi<'a> {
+    /// List payers
+    ///
+    /// List the payers (EPS, insurers and other contracting clients) configured in e-Oficlinic for the connection's verified company and IPS, in the provider's order. Flags the provider does not spell in a recognized way are null. Pass connectionId when the organization has several active connections, and pageInfo.nextCursor as cursor for more.
+    pub async fn list(&self, input: &types::OficlinicPayersListInput) -> Result<types::OficlinicPayersListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PAYERS_LIST, input).await
+    }
+}
+
+/// `oficlinic.professionals`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicProfessionalsApi<'a>(&'a Client);
+
+impl<'a> OficlinicProfessionalsApi<'a> {
+    /// List professionals
+    ///
+    /// List the professionals of the e-Oficlinic account's directory, a page at a time in the provider's order: id, name, specialty and active flag. Identity documents, addresses and phones of professionals are never returned. This directory is not an availability or scheduling answer. Pass pageInfo.nextCursor as cursor for more.
+    pub async fn list(&self, input: &types::OficlinicProfessionalsListInput) -> Result<types::OficlinicProfessionalsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PROFESSIONALS_LIST, input).await
+    }
+}
+
+/// `oficlinic.services`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicServicesApi<'a>(&'a Client);
+
+impl<'a> OficlinicServicesApi<'a> {
+    /// List services
+    ///
+    /// List the e-Oficlinic master service catalog (procedures and studies with their CUPS codes), a page at a time in the provider's order. It lists what the provider can register, about thirteen thousand entries: it is not contracted coverage, a payer authorization or a clinical recommendation. Pass pageInfo.nextCursor as cursor for more.
+    pub async fn list(&self, input: &types::OficlinicServicesListInput) -> Result<types::OficlinicServicesListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_SERVICES_LIST, input).await
+    }
+}
+
+/// `oficlinic`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicApi<'a>(&'a Client);
+
+impl<'a> OficlinicApi<'a> {
+    pub fn appointments(&self) -> OficlinicAppointmentsApi<'a> {
+        OficlinicAppointmentsApi(self.0)
+    }
+
+    pub fn connections(&self) -> OficlinicConnectionsApi<'a> {
+        OficlinicConnectionsApi(self.0)
+    }
+
+    pub fn patients(&self) -> OficlinicPatientsApi<'a> {
+        OficlinicPatientsApi(self.0)
+    }
+
+    pub fn payers(&self) -> OficlinicPayersApi<'a> {
+        OficlinicPayersApi(self.0)
+    }
+
+    pub fn professionals(&self) -> OficlinicProfessionalsApi<'a> {
+        OficlinicProfessionalsApi(self.0)
+    }
+
+    pub fn services(&self) -> OficlinicServicesApi<'a> {
+        OficlinicServicesApi(self.0)
     }
 }
 
@@ -1650,7 +1889,7 @@ pub struct RaizConversationsApi<'a>(&'a Client);
 impl<'a> RaizConversationsApi<'a> {
     /// Give a conversation back to the AI to continue
     ///
-    /// Give a WhatsApp conversation the AI handed to the team back to the AI, which continues the contact's pending request now, though the contact has not written. `note` tells the Agent what changed; the contact never sees it. Only while WhatsApp's 24-hour window is open (WHATSAPP_WINDOW_CLOSED otherwise, and nothing changes), once per handoff (HANDOFF_ALREADY_CONTINUED), and only for a conversation the AI handed off (CONVERSATION_NOT_HANDED_OFF). Not an AI tool: it makes the Agent write to a real person.
+    /// Give a WhatsApp conversation the AI handed to the team back to the AI, which continues the contact's pending request now, though the contact has not written. Review the resolved blocker first; use expectedVersion and expectedHandoffMessageId to refuse a stale decision with VERSION_CONFLICT. `note` preserves the evidence and remaining request for the Agent. Only inside WhatsApp's 24-hour window, once per handoff, and for an AI handoff. Preserve explicit human requests, unresolved clinical/administrative decisions, identity conflicts and uncertain writes with the team. Not an AI tool: it makes the Agent write to a real person.
     pub async fn r#continue(&self, input: &types::RaizConversationsContinueInput) -> Result<types::RaizConversationsContinueOutput, Error> {
         self.0.call(&operations::RAIZ_CONVERSATIONS_CONTINUE, input).await
     }
@@ -1901,7 +2140,7 @@ pub struct RaizReportsApi<'a>(&'a Client);
 impl<'a> RaizReportsApi<'a> {
     /// Get a report
     ///
-    /// Get the numbers behind a question. `name`: `conversations_daily` (conversations the AI took part in, per day), `booking_outcomes` (verified saved booking receipts by completion day and integration, excluding tests, imports and deleted conversations; createdCount counts new appointments created by the AI, not confirmations of existing appointments; confirmedCount is its compatibility alias and must not be added again; reschedules, cancellations, failures, pending and unverified results separately), `tool_calls_daily` (Agent tool calls per day), `tool_calls` (each call, newest first), `assessment_results_daily` (assessment results per day), `pqrsf_daily` (PQRSF classification, confirmed informational resolution and correct referrals from current pqrsf_* facts; unknown and pending analysis remain visible; excludes tests/imports/deleted records), each over days in the organization's time zone (`from`, `to`; the last 30 days by default), or `campaign_progress`. Narrow with `agentId`, `channelType`, `campaignId` or `definitionId`; unsupported filters fail. At most 1000 rows: `hasMore` means split the range or filter. Booking outcomes return no partial totals when their evidence scan exceeds its bound. Conversation success and completed tool calls never establish a booking; these are historical receipts, not the provider's current appointment status.
+    /// Get the numbers behind a question. `name`: `conversations_daily` (conversations the AI took part in, per day), `booking_details` (verified individual creation receipts with patient, specialty, appointments and later recorded cancellations; also requires conversation read/write permission; filter specialty by its recorded code), `booking_outcomes` (verified saved booking receipts by completion day and integration, excluding tests, imports and deleted conversations; createdCount counts new appointments created by the AI, not confirmations of existing appointments; confirmedCount is its compatibility alias and must not be added again; reschedules, cancellations, failures, pending and unverified results separately), `tool_calls_daily` (Agent tool calls per day), `tool_calls` (each call, newest first), `assessment_results_daily` (assessment results per day), `pqrsf_daily` (PQRSF classification, confirmed informational resolution and correct referrals from current pqrsf_* facts; unknown and pending analysis remain visible; excludes tests/imports/deleted records), each over days in the organization's time zone (`from`, `to`; the last 30 days by default), or `campaign_progress`. Narrow with `agentId`, `channelType`, `campaignId` or `definitionId`; unsupported filters fail. At most 1000 rows: `hasMore` means split the range or filter. Booking outcomes return no partial totals when their evidence scan exceeds its bound. Conversation success and completed tool calls never establish a booking; these are historical receipts, not the provider's current appointment status.
     pub async fn get(&self, input: &types::RaizReportsGetInput) -> Result<types::RaizReportsGetOutput, Error> {
         self.0.call(&operations::RAIZ_REPORTS_GET, input).await
     }
@@ -2167,6 +2406,46 @@ impl<'a> SaludTotalApi<'a> {
     }
 }
 
+/// `sanitas.affiliations`
+#[derive(Debug, Clone, Copy)]
+pub struct SanitasAffiliationsApi<'a>(&'a Client);
+
+impl<'a> SanitasAffiliationsApi<'a> {
+    /// Look up affiliation
+    ///
+    /// Read one matching member contract from an active Account connection. Unknown or unresolved is never inactive. Session cookies are reused; one renewal is admitted only on expiry. This does not authorize care.
+    pub async fn lookup(&self, input: &types::SanitasAffiliationsLookupInput) -> Result<types::SanitasAffiliationsLookupOutput, Error> {
+        self.0.call(&operations::SANITAS_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `sanitas.connections`
+#[derive(Debug, Clone, Copy)]
+pub struct SanitasConnectionsApi<'a>(&'a Client);
+
+impl<'a> SanitasConnectionsApi<'a> {
+    /// Get connection
+    ///
+    /// Read safe status without contacting the provider.
+    pub async fn get(&self, input: &types::SanitasConnectionsGetInput) -> Result<types::SanitasConnectionsGetOutput, Error> {
+        self.0.call(&operations::SANITAS_CONNECTIONS_GET, input).await
+    }
+}
+
+/// `sanitas`
+#[derive(Debug, Clone, Copy)]
+pub struct SanitasApi<'a>(&'a Client);
+
+impl<'a> SanitasApi<'a> {
+    pub fn affiliations(&self) -> SanitasAffiliationsApi<'a> {
+        SanitasAffiliationsApi(self.0)
+    }
+
+    pub fn connections(&self) -> SanitasConnectionsApi<'a> {
+        SanitasConnectionsApi(self.0)
+    }
+}
+
 /// `sisben.classifications`
 #[derive(Debug, Clone, Copy)]
 pub struct SisbenClassificationsApi<'a>(&'a Client);
@@ -2250,7 +2529,7 @@ pub struct SuraAvailabilityApi<'a>(&'a Client);
 impl<'a> SuraAvailabilityApi<'a> {
     /// Find availability
     ///
-    /// Find the free appointment times for one patient and one service. With no date it answers with the soonest day that has room; with a date it answers for that day. times[] are the hours you may book, otherDates[] are other days that month with room, and otherProfessionals[] are the other doctors who see this service. Offer two or three times, never the whole list.
+    /// Find the free appointment times for one patient and one service. With a date it answers for that day. With no date it answers for the professional's next day with an agenda, which can be full. times[] are the hours you may book, and only free ones are ever listed; otherDates[] are other days that month with room; days[] says how every day of that month stands (available, full or no_agenda); reserved says the day's only free slot is held back; and otherProfessionals[] are the other doctors who see this service. An empty times[] does not mean the whole agenda is full: prepare_appointment searches other months. Offer two or three times, never the whole list.
     pub async fn lookup(&self, input: &types::SuraAvailabilityLookupInput) -> Result<types::SuraAvailabilityLookupOutput, Error> {
         self.0.call(&operations::SURA_AVAILABILITY_LOOKUP, input).await
     }
@@ -2355,6 +2634,19 @@ impl<'a> SuraProfessionalsApi<'a> {
     }
 }
 
+/// `sura.schedules`
+#[derive(Debug, Clone, Copy)]
+pub struct SuraSchedulesApi<'a>(&'a Client);
+
+impl<'a> SuraSchedulesApi<'a> {
+    /// Look up a professional schedule
+    ///
+    /// Read a professional’s generated schedule and capacity on one date without a patient document. Omit serviceId to inspect all their registered services at the connection’s institution. Distinguishes a full day from no schedule, an ungenerated period, blocked capacity and a generated period not offered. Returns real configured hours and created, offered, assigned, available and blocked counts. Counts are administrative capacity, never patient eligibility or a booking proposal. Does not create periods, change hours, book or cancel appointments. Use bookingOptions.lookup with the patient before offering a bookable slot. A technical failure never means no schedule.
+    pub async fn lookup(&self, input: &types::SuraSchedulesLookupInput) -> Result<types::SuraSchedulesLookupOutput, Error> {
+        self.0.call(&operations::SURA_SCHEDULES_LOOKUP, input).await
+    }
+}
+
 /// `sura.services`
 #[derive(Debug, Clone, Copy)]
 pub struct SuraServicesApi<'a>(&'a Client);
@@ -2411,6 +2703,10 @@ impl<'a> SuraApi<'a> {
 
     pub fn professionals(&self) -> SuraProfessionalsApi<'a> {
         SuraProfessionalsApi(self.0)
+    }
+
+    pub fn schedules(&self) -> SuraSchedulesApi<'a> {
+        SuraSchedulesApi(self.0)
     }
 
     pub fn services(&self) -> SuraServicesApi<'a> {
