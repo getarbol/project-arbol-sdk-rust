@@ -20336,6 +20336,239 @@ pub enum GmedicVerifyConnectionServiceUnavailableFailure {
 
 pub type HttpsUrl = String;
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsGetReportResult {
+    /// A day, as YYYY-MM-DD.
+    #[serde(rename = "from")]
+    pub from: String,
+    #[serde(rename = "reportId")]
+    pub report_id: String,
+    /// One row per day and dimension, with the report's figures.
+    #[serde(rename = "rows")]
+    pub rows: Vec<std::collections::BTreeMap<String, serde_json::Value>>,
+    /// A day, as YYYY-MM-DD.
+    #[serde(rename = "to")]
+    pub to: String,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsGetReportResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: InsightsGetReportResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsGetReportServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: InsightsGetReportServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum InsightsGetReportServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    InsightsReportUnavailableFailure(InsightsReportUnavailableFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum InsightsInvalidCursorFailureCode {
+    #[serde(rename = "INVALID_CURSOR")]
+    INVALIDCURSOR,
+}
+
+/// The cursor does not name a page of this list.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsInvalidCursorFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: InsightsInvalidCursorFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsListReportsBadRequestError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: InsightsListReportsBadRequestFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum InsightsListReportsBadRequestFailure {
+    InvalidInputFailure(InvalidInputFailure),
+    InsightsInvalidCursorFailure(InsightsInvalidCursorFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// There is no such report.
+    #[serde(rename = "error")]
+    pub error: InsightsReportNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum InsightsReportNotFoundFailureCode {
+    #[serde(rename = "REPORT_NOT_FOUND")]
+    REPORTNOTFOUND,
+}
+
+/// There is no such report.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportNotFoundFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: InsightsReportNotFoundFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum InsightsReportPageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportPage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<InsightsReportSummary>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: InsightsReportPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportPageResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: InsightsReportPage,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportSummary {
+    #[serde(rename = "description")]
+    pub description: String,
+    #[serde(rename = "reportId")]
+    pub report_id: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum InsightsReportUnavailableFailureCode {
+    #[serde(rename = "REPORT_UNAVAILABLE")]
+    REPORTUNAVAILABLE,
+}
+
+/// The report cannot be read right now. Try again in a few minutes.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: InsightsReportUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportsGetInput {
+    /// A day, as YYYY-MM-DD.
+    #[serde(rename = "from")]
+    pub from: String,
+    #[serde(rename = "reportId")]
+    pub report_id: String,
+    /// A day, as YYYY-MM-DD.
+    #[serde(rename = "to")]
+    pub to: String,
+}
+
+pub type InsightsReportsGetOutput = InsightsGetReportResult;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum InsightsReportsListInputDirection {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct InsightsReportsListInput {
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction")]
+    pub direction: InsightsReportsListInputDirection,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit")]
+    pub limit: i64,
+}
+
+pub type InsightsReportsListOutput = InsightsReportPage;
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct InternalError {
@@ -33653,6 +33886,14 @@ pub enum RaizConversationTitleAuthor {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationOutcomeReviewBasis {
+    #[serde(rename = "business_completion")]
+    BusinessCompletion,
+    #[serde(rename = "policy_referral")]
+    PolicyReferral,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationOutcomeReviewOutcome {
     #[serde(rename = "success")]
     Success,
@@ -33664,12 +33905,16 @@ pub enum RaizConversationOutcomeReviewOutcome {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversationOutcomeReview {
+    #[serde(rename = "basis", default, skip_serializing_if = "Option::is_none")]
+    pub basis: Option<RaizConversationOutcomeReviewBasis>,
     #[serde(rename = "confirmationMessageId")]
     pub confirmation_message_id: Option<String>,
     #[serde(rename = "evidence")]
     pub evidence: String,
     #[serde(rename = "outcome")]
     pub outcome: RaizConversationOutcomeReviewOutcome,
+    #[serde(rename = "policyMessageId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub policy_message_id: Option<Option<String>>,
     #[serde(rename = "reason")]
     pub reason: String,
     /// An instant in RFC 3339 format, in UTC.
@@ -35768,8 +36013,8 @@ pub enum RaizFailureResponseErrorPart2NOTFOUNDCode {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizFailureResponseErrorPart2NOTFOUNDMessage {
-    #[serde(rename = "The requested operation does not exist.")]
-    TheRequestedOperationDoesNotExist,
+    #[serde(rename = "The requested resource does not exist.")]
+    TheRequestedResourceDoesNotExist,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -42332,14 +42577,255 @@ pub struct SaludTotalAffiliationsLookupInput {
 
 pub type SaludTotalAffiliationsLookupOutput = SaludTotalAffiliationLookup;
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationPatient {
+    #[serde(rename = "id")]
+    pub id: i64,
+    #[serde(rename = "documentType")]
+    pub document_type: String,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+    #[serde(rename = "fullName")]
+    pub full_name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationItemsItem {
+    #[serde(rename = "id")]
+    pub id: i64,
+    #[serde(rename = "serviceCode")]
+    pub service_code: String,
+    #[serde(rename = "serviceName")]
+    pub service_name: String,
+    #[serde(rename = "quantity")]
+    pub quantity: f64,
+    #[serde(rename = "orderNumber")]
+    pub order_number: Option<String>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SaludTotalAuthorizationsLookupInputDocumentType {
+pub enum SaludTotalAuthorizationDocumentStatus {
+    #[serde(rename = "not_downloaded")]
+    NotDownloaded,
+    #[serde(rename = "stored")]
+    Stored,
+    #[serde(rename = "requires_provider_action")]
+    RequiresProviderAction,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationDocumentContentType {
+    #[serde(rename = "application/pdf")]
+    ApplicationPdf,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationDocument {
+    #[serde(rename = "status")]
+    pub status: SaludTotalAuthorizationDocumentStatus,
+    #[serde(rename = "contentType")]
+    pub content_type: SaludTotalAuthorizationDocumentContentType,
+    #[serde(rename = "byteLength")]
+    pub byte_length: Option<i64>,
+    #[serde(rename = "sha256")]
+    pub sha256: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorization {
+    #[serde(rename = "id")]
+    pub id: i64,
+    #[serde(rename = "number")]
+    pub number: Option<String>,
+    #[serde(rename = "status")]
+    pub status: String,
+    #[serde(rename = "statusId")]
+    pub status_id: i64,
+    #[serde(rename = "patient")]
+    pub patient: SaludTotalAuthorizationPatient,
+    #[serde(rename = "siteId")]
+    pub site_id: i64,
+    #[serde(rename = "siteName")]
+    pub site_name: String,
+    #[serde(rename = "issuedAt")]
+    pub issued_at: Option<String>,
+    #[serde(rename = "approvedAt")]
+    pub approved_at: Option<String>,
+    #[serde(rename = "validUntil")]
+    pub valid_until: Option<String>,
+    #[serde(rename = "items")]
+    pub items: Vec<SaludTotalAuthorizationItemsItem>,
+    #[serde(rename = "observedAt")]
+    pub observed_at: String,
+    #[serde(rename = "document")]
+    pub document: SaludTotalAuthorizationDocument,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationDocumentUnavailableFailureCode {
+    #[serde(rename = "AUTHORIZATION_DOCUMENT_UNAVAILABLE")]
+    AUTHORIZATIONDOCUMENTUNAVAILABLE,
+}
+
+/// The provider did not offer a PDF that can be obtained without a clinical action.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationDocumentUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: SaludTotalAuthorizationDocumentUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// This authorization is not available in the selected connection.
+    #[serde(rename = "error")]
+    pub error: SaludTotalAuthorizationNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationNotFoundFailureCode {
+    #[serde(rename = "AUTHORIZATION_NOT_FOUND")]
+    AUTHORIZATIONNOTFOUND,
+}
+
+/// This authorization is not available in the selected connection.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationNotFoundFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: SaludTotalAuthorizationNotFoundFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationPageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationPageSource {
+    #[serde(rename = "provider")]
+    Provider,
+    #[serde(rename = "stored")]
+    Stored,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationPage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<SaludTotalAuthorization>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: SaludTotalAuthorizationPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+    #[serde(rename = "source")]
+    pub source: SaludTotalAuthorizationPageSource,
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "observedAt")]
+    pub observed_at: Option<String>,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationPageResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: SaludTotalAuthorizationPage,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationStoreUnavailableFailureCode {
+    #[serde(rename = "AUTHORIZATION_STORE_UNAVAILABLE")]
+    AUTHORIZATIONSTOREUNAVAILABLE,
+}
+
+/// The authorization store is unavailable.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationStoreUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: SaludTotalAuthorizationStoreUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationsListInputDirection {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationsListInput {
+    /// The connection id.
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<SaludTotalAuthorizationsListInputDirection>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+pub type SaludTotalAuthorizationsListOutput = SaludTotalAuthorizationPage;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationsLookupInputCCDocumentType {
     #[serde(rename = "CC")]
     CC,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SaludTotalAuthorizationsLookupInput {
+pub struct SaludTotalAuthorizationsLookupInputCC {
     #[serde(rename = "connectionId")]
     pub connection_id: String,
     #[serde(rename = "branchId", default, skip_serializing_if = "Option::is_none")]
@@ -42350,16 +42836,59 @@ pub struct SaludTotalAuthorizationsLookupInput {
     #[serde(rename = "choiceCursor", default, skip_serializing_if = "Option::is_none")]
     pub choice_cursor: Option<String>,
     #[serde(rename = "documentType")]
-    pub document_type: SaludTotalAuthorizationsLookupInputDocumentType,
+    pub document_type: SaludTotalAuthorizationsLookupInputCCDocumentType,
     /// Exact authorized member document. Send it only in the request body.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// One local calendar day; the request never traverses an open-ended date range.
+    /// A local calendar date in YYYY-MM-DD format.
     #[serde(rename = "day")]
     pub day: String,
 }
 
-pub type SaludTotalAuthorizationsLookupOutput = SaludTotalRecordAvailability;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalAuthorizationsLookupInputVariant2Direction {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalAuthorizationsLookupInputVariant2 {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    /// A local calendar date in YYYY-MM-DD format.
+    #[serde(rename = "from")]
+    pub from: String,
+    /// A local calendar date in YYYY-MM-DD format.
+    #[serde(rename = "to")]
+    pub to: String,
+    #[serde(rename = "branchId", default, skip_serializing_if = "Option::is_none")]
+    pub branch_id: Option<i64>,
+    #[serde(rename = "siteId", default, skip_serializing_if = "Option::is_none")]
+    pub site_id: Option<i64>,
+    /// Continuation returned by a location_required result. Repeat the same lookup to get more choices.
+    #[serde(rename = "choiceCursor", default, skip_serializing_if = "Option::is_none")]
+    pub choice_cursor: Option<String>,
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<SaludTotalAuthorizationsLookupInputVariant2Direction>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalAuthorizationsLookupInput {
+    CC(SaludTotalAuthorizationsLookupInputCC),
+    Variant2(SaludTotalAuthorizationsLookupInputVariant2),
+}
+
+pub type SaludTotalAuthorizationsLookupOutput = SaludTotalLookupAuthorizationsResult;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SaludTotalConnectionUnavailableFailureCode {
@@ -42401,6 +42930,7 @@ pub struct SaludTotalCountNoticesConflictError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SaludTotalCountNoticesConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
     SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
     SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
     SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
@@ -42469,6 +42999,7 @@ pub struct SaludTotalCountNoticesServiceUnavailableError {
 #[serde(untagged)]
 pub enum SaludTotalCountNoticesServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
     SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
@@ -42518,6 +43049,105 @@ pub struct SaludTotalCredentialsRejectedFailure {
     pub data: Empty,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalDownloadAuthorizationDocumentBody {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalDownloadAuthorizationDocumentConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalDownloadAuthorizationDocumentConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalDownloadAuthorizationDocumentConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
+    SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
+    SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
+    SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
+    SaludTotalCredentialsRejectedFailure(SaludTotalCredentialsRejectedFailure),
+    SaludTotalIpsIdentityMismatchFailure(SaludTotalIpsIdentityMismatchFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalDownloadAuthorizationDocumentForbiddenError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalDownloadAuthorizationDocumentForbiddenFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalDownloadAuthorizationDocumentForbiddenFailure {
+    ForbiddenFailure(ForbiddenFailure),
+    SaludTotalPortalAccessUnverifiedFailure(SaludTotalPortalAccessUnverifiedFailure),
+    SaludTotalModuleForbiddenFailure(SaludTotalModuleForbiddenFailure),
+    SaludTotalSiteUnavailableFailure(SaludTotalSiteUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalDownloadAuthorizationDocumentServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalDownloadAuthorizationDocumentServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalDownloadAuthorizationDocumentServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
+    SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
+    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalDownloadAuthorizationDocumentTooManyRequestsError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalDownloadAuthorizationDocumentTooManyRequestsFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalDownloadAuthorizationDocumentTooManyRequestsFailure {
+    RateLimitedFailure(RateLimitedFailure),
+    SaludTotalLoginCoolingDownFailure(SaludTotalLoginCoolingDownFailure),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SaludTotalFilingsLookupInputDocumentType {
     #[serde(rename = "CC")]
@@ -42540,7 +43170,7 @@ pub struct SaludTotalFilingsLookupInput {
     /// Exact authorized member document. Send it only in the request body.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// One local calendar day; the request never traverses an open-ended date range.
+    /// A local calendar date in YYYY-MM-DD format.
     #[serde(rename = "day")]
     pub day: String,
 }
@@ -42664,6 +43294,99 @@ pub struct SaludTotalIpsIdentityMismatchFailure {
     pub data: Empty,
 }
 
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalListAuthorizationsConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalListAuthorizationsConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalListAuthorizationsConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
+    SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
+    SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
+    SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
+    SaludTotalCredentialsRejectedFailure(SaludTotalCredentialsRejectedFailure),
+    SaludTotalIpsIdentityMismatchFailure(SaludTotalIpsIdentityMismatchFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalListAuthorizationsForbiddenError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalListAuthorizationsForbiddenFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalListAuthorizationsForbiddenFailure {
+    ForbiddenFailure(ForbiddenFailure),
+    SaludTotalPortalAccessUnverifiedFailure(SaludTotalPortalAccessUnverifiedFailure),
+    SaludTotalModuleForbiddenFailure(SaludTotalModuleForbiddenFailure),
+    SaludTotalSiteUnavailableFailure(SaludTotalSiteUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalListAuthorizationsServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalListAuthorizationsServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalListAuthorizationsServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
+    SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
+    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalListAuthorizationsTooManyRequestsError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: SaludTotalListAuthorizationsTooManyRequestsFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalListAuthorizationsTooManyRequestsFailure {
+    RateLimitedFailure(RateLimitedFailure),
+    SaludTotalLoginCoolingDownFailure(SaludTotalLoginCoolingDownFailure),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SaludTotalLoginCoolingDownFailureCode {
     #[serde(rename = "LOGIN_COOLING_DOWN")]
@@ -42721,6 +43444,7 @@ pub struct SaludTotalLookupAffiliationConflictError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SaludTotalLookupAffiliationConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
     SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
     SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
     SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
@@ -42769,6 +43493,7 @@ pub struct SaludTotalLookupAffiliationServiceUnavailableError {
 #[serde(untagged)]
 pub enum SaludTotalLookupAffiliationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
     SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
@@ -42795,6 +43520,76 @@ pub enum SaludTotalLookupAffiliationTooManyRequestsFailure {
     SaludTotalLoginCoolingDownFailure(SaludTotalLoginCoolingDownFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsBodyCCDocumentType {
+    #[serde(rename = "CC")]
+    CC,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsBodyCC {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "branchId", default, skip_serializing_if = "Option::is_none")]
+    pub branch_id: Option<i64>,
+    #[serde(rename = "siteId", default, skip_serializing_if = "Option::is_none")]
+    pub site_id: Option<i64>,
+    /// Continuation returned by a location_required result. Repeat the same lookup to get more choices.
+    #[serde(rename = "choiceCursor", default, skip_serializing_if = "Option::is_none")]
+    pub choice_cursor: Option<String>,
+    #[serde(rename = "documentType")]
+    pub document_type: SaludTotalLookupAuthorizationsBodyCCDocumentType,
+    /// Exact authorized member document. Send it only in the request body.
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+    /// A local calendar date in YYYY-MM-DD format.
+    #[serde(rename = "day")]
+    pub day: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsBodyVariant2Direction {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsBodyVariant2 {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    /// A local calendar date in YYYY-MM-DD format.
+    #[serde(rename = "from")]
+    pub from: String,
+    /// A local calendar date in YYYY-MM-DD format.
+    #[serde(rename = "to")]
+    pub to: String,
+    #[serde(rename = "branchId", default, skip_serializing_if = "Option::is_none")]
+    pub branch_id: Option<i64>,
+    #[serde(rename = "siteId", default, skip_serializing_if = "Option::is_none")]
+    pub site_id: Option<i64>,
+    /// Continuation returned by a location_required result. Repeat the same lookup to get more choices.
+    #[serde(rename = "choiceCursor", default, skip_serializing_if = "Option::is_none")]
+    pub choice_cursor: Option<String>,
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<SaludTotalLookupAuthorizationsBodyVariant2Direction>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalLookupAuthorizationsBody {
+    CC(SaludTotalLookupAuthorizationsBodyCC),
+    Variant2(SaludTotalLookupAuthorizationsBodyVariant2),
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SaludTotalLookupAuthorizationsConflictError {
@@ -42812,6 +43607,7 @@ pub struct SaludTotalLookupAuthorizationsConflictError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SaludTotalLookupAuthorizationsConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
     SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
     SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
     SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
@@ -42842,6 +43638,104 @@ pub enum SaludTotalLookupAuthorizationsForbiddenFailure {
     SaludTotalSiteUnavailableFailure(SaludTotalSiteUnavailableFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsResultLocationRequiredStatus {
+    #[serde(rename = "location_required")]
+    LocationRequired,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsResultLocationRequiredScope {
+    #[serde(rename = "institution")]
+    Institution,
+    #[serde(rename = "site")]
+    Site,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsResultLocationRequiredField {
+    #[serde(rename = "branchId")]
+    BranchId,
+    #[serde(rename = "siteId")]
+    SiteId,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsResultLocationRequiredChoicesItem {
+    #[serde(rename = "id")]
+    pub id: i64,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsResultLocationRequired {
+    #[serde(rename = "status")]
+    pub status: SaludTotalLookupAuthorizationsResultLocationRequiredStatus,
+    #[serde(rename = "recordCount")]
+    pub record_count: serde_json::Value,
+    #[serde(rename = "scope")]
+    pub scope: SaludTotalLookupAuthorizationsResultLocationRequiredScope,
+    #[serde(rename = "field")]
+    pub field: SaludTotalLookupAuthorizationsResultLocationRequiredField,
+    #[serde(rename = "choices")]
+    pub choices: Vec<SaludTotalLookupAuthorizationsResultLocationRequiredChoicesItem>,
+    #[serde(rename = "nextChoiceCursor")]
+    pub next_choice_cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsResultVariant2Status {
+    #[serde(rename = "member_no_match")]
+    MemberNoMatch,
+    #[serde(rename = "member_ambiguous")]
+    MemberAmbiguous,
+    #[serde(rename = "no_records")]
+    NoRecords,
+    #[serde(rename = "records_found")]
+    RecordsFound,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SaludTotalLookupAuthorizationsResultVariant2Scope {
+    #[serde(rename = "institution")]
+    Institution,
+    #[serde(rename = "site")]
+    Site,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsResultVariant2 {
+    #[serde(rename = "status")]
+    pub status: SaludTotalLookupAuthorizationsResultVariant2Status,
+    #[serde(rename = "recordCount")]
+    pub record_count: Option<i64>,
+    #[serde(rename = "scope")]
+    pub scope: SaludTotalLookupAuthorizationsResultVariant2Scope,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SaludTotalLookupAuthorizationsResult {
+    LocationRequired(SaludTotalLookupAuthorizationsResultLocationRequired),
+    Variant2(SaludTotalLookupAuthorizationsResultVariant2),
+    SaludTotalAuthorizationPage(SaludTotalAuthorizationPage),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SaludTotalLookupAuthorizationsResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: SaludTotalLookupAuthorizationsResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SaludTotalLookupAuthorizationsServiceUnavailableError {
@@ -42860,6 +43754,7 @@ pub struct SaludTotalLookupAuthorizationsServiceUnavailableError {
 #[serde(untagged)]
 pub enum SaludTotalLookupAuthorizationsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
     SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
@@ -42903,6 +43798,7 @@ pub struct SaludTotalLookupFilingsConflictError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SaludTotalLookupFilingsConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
     SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
     SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
     SaludTotalInteractiveVerificationRequiredFailure(SaludTotalInteractiveVerificationRequiredFailure),
@@ -42951,6 +43847,7 @@ pub struct SaludTotalLookupFilingsServiceUnavailableError {
 #[serde(untagged)]
 pub enum SaludTotalLookupFilingsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
     SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
@@ -42994,6 +43891,7 @@ pub struct SaludTotalLookupInvoiceConflictError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum SaludTotalLookupInvoiceConflictFailure {
+    SaludTotalAuthorizationDocumentUnavailableFailure(SaludTotalAuthorizationDocumentUnavailableFailure),
     SaludTotalReportingWindowClosedFailure(SaludTotalReportingWindowClosedFailure),
     SaludTotalConnectionUnavailableFailure(SaludTotalConnectionUnavailableFailure),
     SaludTotalSessionClosedFailure(SaludTotalSessionClosedFailure),
@@ -43043,6 +43941,7 @@ pub struct SaludTotalLookupInvoiceServiceUnavailableError {
 #[serde(untagged)]
 pub enum SaludTotalLookupInvoiceServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
     SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
@@ -43304,7 +44203,7 @@ pub struct SaludTotalScopedDayLookup {
     /// Exact authorized member document. Send it only in the request body.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// One local calendar day; the request never traverses an open-ended date range.
+    /// A local calendar date in YYYY-MM-DD format.
     #[serde(rename = "day")]
     pub day: String,
 }
@@ -48999,6 +49898,101 @@ pub struct VisoftAppointmentsCreateInput {
 
 pub type VisoftAppointmentsCreateOutput = VisoftBooking;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum VisoftAppointmentsListInputDirection {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAppointmentsListInput {
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<VisoftAppointmentsListInputDirection>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    /// The connection to run on. Optional when the organization has one Visoft connection; required when it has several. Another organization's connection is CONNECTION_NOT_FOUND.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// One of the clinic's cost centres, as visoft.clinic.get lists them. Optional when the clinic has a default one.
+    #[serde(rename = "agencyCode", default, skip_serializing_if = "Option::is_none")]
+    pub agency_code: Option<String>,
+    /// The appointment day in the clinic's time zone.
+    #[serde(rename = "date")]
+    pub date: String,
+    #[serde(rename = "professionalId", default, skip_serializing_if = "Option::is_none")]
+    pub professional_id: Option<String>,
+}
+
+pub type VisoftAppointmentsListOutput = VisoftAssignedAppointmentPage;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAssignedAppointment {
+    /// The assigned appointment's opaque SIIPS reference.
+    #[serde(rename = "reference")]
+    pub reference: String,
+    /// The moment, as an RFC 3339 instant written in the clinic's own offset (for example "2026-11-04T08:50:00-05:00"), so its first ten characters are the clinic's day and the next eight its hour.
+    #[serde(rename = "startsAt")]
+    pub starts_at: String,
+    #[serde(rename = "agencyCode")]
+    pub agency_code: String,
+    #[serde(rename = "professionalId")]
+    pub professional_id: String,
+    #[serde(rename = "professionalName")]
+    pub professional_name: String,
+    #[serde(rename = "specialty")]
+    pub specialty: String,
+    #[serde(rename = "patientName")]
+    pub patient_name: String,
+    /// SIIPS's contact phone text; may be empty or contain several numbers.
+    #[serde(rename = "phone")]
+    pub phone: String,
+    #[serde(rename = "service")]
+    pub service: String,
+    /// SIIPS's attendance flag, as stored.
+    #[serde(rename = "attended")]
+    pub attended: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum VisoftAssignedAppointmentPageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAssignedAppointmentPage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<VisoftAssignedAppointment>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: VisoftAssignedAppointmentPageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAssignedAppointmentPageResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: VisoftAssignedAppointmentPage,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct VisoftAvailability {
     /// The day the search started, in the clinic: YYYY-MM-DD.
@@ -50405,6 +51399,48 @@ pub struct VisoftGetServiceCatalogUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum VisoftGetServiceCatalogUnprocessableContentFailure {
+    VisoftCredentialsRejectedFailure(VisoftCredentialsRejectedFailure),
+    VisoftAgencyNotServedFailure(VisoftAgencyNotServedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftListAppointmentsBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: VisoftListAppointmentsBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum VisoftListAppointmentsBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    VisoftProviderUnavailableFailure(VisoftProviderUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftListAppointmentsUnprocessableContentError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: VisoftListAppointmentsUnprocessableContentFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum VisoftListAppointmentsUnprocessableContentFailure {
     VisoftCredentialsRejectedFailure(VisoftCredentialsRejectedFailure),
     VisoftAgencyNotServedFailure(VisoftAgencyNotServedFailure),
 }

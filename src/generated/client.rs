@@ -29,6 +29,10 @@ impl Client {
         GmedicApi(self)
     }
 
+    pub fn insights(&self) -> InsightsApi<'_> {
+        InsightsApi(self)
+    }
+
     pub fn nueva_eps(&self) -> NuevaEpsApi<'_> {
         NuevaEpsApi(self)
     }
@@ -1417,6 +1421,36 @@ impl<'a> GmedicApi<'a> {
     }
 }
 
+/// `insights.reports`
+#[derive(Debug, Clone, Copy)]
+pub struct InsightsReportsApi<'a>(&'a Client);
+
+impl<'a> InsightsReportsApi<'a> {
+    /// Read a report
+    ///
+    /// One report over a date range, for the caller's own organization. Figures refresh within 30 minutes.
+    pub async fn get(&self, input: &types::InsightsReportsGetInput) -> Result<types::InsightsReportsGetOutput, Error> {
+        self.0.call(&operations::INSIGHTS_REPORTS_GET, input).await
+    }
+
+    /// List the available reports
+    ///
+    /// The reports this organization can read, a page at a time. Pass pageInfo.nextCursor as cursor for more.
+    pub async fn list(&self, input: &types::InsightsReportsListInput) -> Result<types::InsightsReportsListOutput, Error> {
+        self.0.call(&operations::INSIGHTS_REPORTS_LIST, input).await
+    }
+}
+
+/// `insights`
+#[derive(Debug, Clone, Copy)]
+pub struct InsightsApi<'a>(&'a Client);
+
+impl<'a> InsightsApi<'a> {
+    pub fn reports(&self) -> InsightsReportsApi<'a> {
+        InsightsReportsApi(self.0)
+    }
+}
+
 /// `nueva-eps.affiliations`
 #[derive(Debug, Clone, Copy)]
 pub struct NuevaEpsAffiliationsApi<'a>(&'a Client);
@@ -2599,9 +2633,16 @@ impl<'a> SaludTotalAffiliationsApi<'a> {
 pub struct SaludTotalAuthorizationsApi<'a>(&'a Client);
 
 impl<'a> SaludTotalAuthorizationsApi<'a> {
-    /// Look up authorization records for one member, site and day
+    /// List stored authorizations
     ///
-    /// Availability of authorization records for the matched member and selected site on one calendar day. A missing row is not a denial. Returns a count or location_required with permitted choices. Start without branchId or siteId. For location_required, repeat with the chosen ID in field, or pass nextChoiceCursor as choiceCursor for more choices.
+    /// Page the authorizations already observed for an active IPS connection. Each record retains its source timestamp. This does not refresh the provider. Follow pageInfo.nextCursor for all records.
+    pub async fn list(&self, input: &types::SaludTotalAuthorizationsListInput) -> Result<types::SaludTotalAuthorizationsListOutput, Error> {
+        self.0.call(&operations::SALUD_TOTAL_AUTHORIZATIONS_LIST, input).await
+    }
+
+    /// Consult and store authorizations from the IPS report
+    ///
+    /// Pass from/to and a permitted site to query the IPS report without a member filter, store each authorization and return one page with its number, provider status, validity and document state. The source permits at most 30 days. Location choices are returned when needed. The legacy member/day input still returns a count. A provider status is preserved verbatim; a filing number is not approval.
     pub async fn lookup(&self, input: &types::SaludTotalAuthorizationsLookupInput) -> Result<types::SaludTotalAuthorizationsLookupOutput, Error> {
         self.0.call(&operations::SALUD_TOTAL_AUTHORIZATIONS_LOOKUP, input).await
     }
@@ -2997,6 +3038,13 @@ impl<'a> VisoftAppointmentsApi<'a> {
     /// Book one free slot visoft.availability.lookup answered, by its reference and the contract and service of that search, for the patient with that document. APPOINTMENT_REQUEST_EXISTS: the patient already has a requested appointment for the service. BOOKING_REFUSED: SIIPS refused it (data.message says why). Nothing is booked in either case. A booking whose outcome is unknown answers OUTCOME_UNKNOWN: read the patient's agenda before anything else, never book it again blindly.
     pub async fn create(&self, input: &types::VisoftAppointmentsCreateInput) -> Result<types::VisoftAppointmentsCreateOutput, Error> {
         self.0.call(&operations::VISOFT_APPOINTMENTS_CREATE, input).await
+    }
+
+    /// List assigned appointments
+    ///
+    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the contact phone SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
+    pub async fn list(&self, input: &types::VisoftAppointmentsListInput) -> Result<types::VisoftAppointmentsListOutput, Error> {
+        self.0.call(&operations::VISOFT_APPOINTMENTS_LIST, input).await
     }
 }
 

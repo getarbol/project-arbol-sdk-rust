@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261105.212004";
+pub const RELEASE: &str = "1.20261106.171439";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1159,6 +1159,28 @@ pub const GMEDIC_SESSION_PACKAGES_LIST: Operation = Operation {
     max_output_bytes: 262144,
 };
 
+/// `insights.reports.get`: Read a report
+pub const INSIGHTS_REPORTS_GET: Operation = Operation {
+    name: "insights.reports.get",
+    method: "GET",
+    path: "/v1/insights/reports/{reportId}",
+    path_field: Some("reportId"),
+    query: Some(&[("from", QueryKind::String), ("to", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `insights.reports.list`: List the available reports
+pub const INSIGHTS_REPORTS_LIST: Operation = Operation {
+    name: "insights.reports.list",
+    method: "GET",
+    path: "/v1/insights/reports",
+    path_field: None,
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
 /// `nueva-eps.affiliations.lookup`: Look up member affiliation
 pub const NUEVA_EPS_AFFILIATIONS_LOOKUP: Operation = Operation {
     name: "nueva-eps.affiliations.lookup",
@@ -2270,7 +2292,18 @@ pub const SALUD_TOTAL_AFFILIATIONS_LOOKUP: Operation = Operation {
     max_output_bytes: 262144,
 };
 
-/// `salud-total.authorizations.lookup`: Look up authorization records for one member, site and day
+/// `salud-total.authorizations.list`: List stored authorizations
+pub const SALUD_TOTAL_AUTHORIZATIONS_LIST: Operation = Operation {
+    name: "salud-total.authorizations.list",
+    method: "GET",
+    path: "/v1/salud-total/authorizations",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `salud-total.authorizations.lookup`: Consult and store authorizations from the IPS report
 pub const SALUD_TOTAL_AUTHORIZATIONS_LOOKUP: Operation = Operation {
     name: "salud-total.authorizations.lookup",
     method: "POST",
@@ -2553,6 +2586,17 @@ pub const VISOFT_APPOINTMENTS_CREATE: Operation = Operation {
     path_field: None,
     query: None,
     effect: Effect::Write,
+    max_output_bytes: 1048576,
+};
+
+/// `visoft.appointments.list`: List assigned appointments
+pub const VISOFT_APPOINTMENTS_LIST: Operation = Operation {
+    name: "visoft.appointments.list",
+    method: "GET",
+    path: "/v1/visoft/appointments",
+    path_field: None,
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("connectionId", QueryKind::String), ("agencyCode", QueryKind::String), ("date", QueryKind::String), ("professionalId", QueryKind::String)]),
+    effect: Effect::Read,
     max_output_bytes: 1048576,
 };
 
