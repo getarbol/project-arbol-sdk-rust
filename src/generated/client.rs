@@ -2046,7 +2046,7 @@ impl<'a> RaizCampaignsApi<'a> {
 
     /// Get a campaign
     ///
-    /// Read one campaign: Agent, schedule, contact hours, retries, progress and, in `errorCode`, why it cannot reach anyone now. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call or message; continue with `recipientsCursor` (`recipientsDirection` reads the other way). `expand=readiness` says whether it can start and lists what has to be fixed first, without reaching anyone. Read it before `update_campaign` and send `expectedVersion`.
+    /// Read one campaign: Agent, schedule, contact hours, retries, progress and, in `errorCode`, why it cannot reach anyone now. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call or message; continue with `recipientsCursor` (`recipientsDirection` reads the other way). `expand=readiness` says whether it can start and lists what has to be fixed first, without reaching anyone. `expand=results` counts what people answered, by the Agent's data definitions with options; each recipient also says their own. Read it before `update_campaign` and send `expectedVersion`.
     pub async fn get(&self, input: &types::RaizCampaignsGetInput) -> Result<types::RaizCampaignsGetOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_GET, input).await
     }

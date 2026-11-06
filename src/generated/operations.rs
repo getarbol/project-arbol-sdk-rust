@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261106.171439";
+pub const RELEASE: &str = "1.20261106.175459";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1671,7 +1671,7 @@ pub const RAIZ_CAMPAIGNS_GET: Operation = Operation {
     method: "GET",
     path: "/v1/raiz/campaigns/{campaignId}",
     path_field: Some("campaignId"),
-    query: Some(&[("expand", QueryKind::String), ("recipientsCursor", QueryKind::String), ("recipientsDirection", QueryKind::String), ("recipientsLimit", QueryKind::Integer), ("recipientsQ", QueryKind::String), ("recipientsStatus", QueryKind::String)]),
+    query: Some(&[("expand", QueryKind::String), ("recipientsCursor", QueryKind::String), ("recipientsDirection", QueryKind::String), ("recipientsLimit", QueryKind::Integer), ("recipientsQ", QueryKind::String), ("recipientsResult", QueryKind::String), ("recipientsStatus", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 1048576,
 };

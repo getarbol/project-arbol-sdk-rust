@@ -31914,6 +31914,9 @@ pub struct RaizCampaign {
     /// The campaign's recipients in the order they were added, each with its latest attempt. Present only when expanded.
     #[serde(rename = "recipients", default, skip_serializing_if = "Option::is_none")]
     pub recipients: Option<RaizCampaignRecipientPage>,
+    /// What people answered, for each data definition with options their Agent collects that has an answer yet. Answers arrive when a conversation closes and is analyzed, so they can keep arriving after the campaign ends.
+    #[serde(rename = "results", default, skip_serializing_if = "Option::is_none")]
+    pub results: Option<Vec<RaizCampaignResult>>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -32008,9 +32011,18 @@ pub struct RaizCampaignRecipientInput {
     pub given_name: Option<Option<String>>,
     #[serde(rename = "instructions", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub instructions: Option<Option<String>>,
-    /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
+    /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. A reference means the variable that is the same word, whatever its accents and case: `{{País}}` reads `pais`, and an exact name wins. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
     #[serde(rename = "variables", default, skip_serializing_if = "Option::is_none")]
     pub variables: Option<std::collections::BTreeMap<String, serde_json::Value>>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignRecipientPageDataItemContact {
+    /// Contact id.
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -32045,6 +32057,19 @@ pub struct RaizCampaignRecipientPageDataItemLastAttempt {
     pub status: RaizCampaignRecipientPageDataItemLastAttemptStatus,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignRecipientPageDataItemResultsItem {
+    /// The key of the data definition that read it.
+    #[serde(rename = "definitionKey")]
+    pub definition_key: String,
+    /// The answer, as people read it.
+    #[serde(rename = "label")]
+    pub label: String,
+    /// The key of the answer's option.
+    #[serde(rename = "value")]
+    pub value: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizCampaignRecipientPageDataItemStatus {
     #[serde(rename = "pending")]
@@ -32065,6 +32090,8 @@ pub struct RaizCampaignRecipientPageDataItem {
     pub address: String,
     #[serde(rename = "attemptCount")]
     pub attempt_count: i64,
+    #[serde(rename = "contact")]
+    pub contact: Option<RaizCampaignRecipientPageDataItemContact>,
     #[serde(rename = "contactId")]
     pub contact_id: Option<String>,
     /// An instant in RFC 3339 format, in UTC.
@@ -32093,13 +32120,16 @@ pub struct RaizCampaignRecipientPageDataItem {
     pub read_at: Option<String>,
     #[serde(rename = "repliedAt")]
     pub replied_at: Option<String>,
+    /// What this person answered, from their conversations: the latest for each data definition with options their Agent collects. Empty until a conversation they answered closes and is analyzed.
+    #[serde(rename = "results")]
+    pub results: Vec<RaizCampaignRecipientPageDataItemResultsItem>,
     /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: an attempt succeeded; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
     #[serde(rename = "status")]
     pub status: RaizCampaignRecipientPageDataItemStatus,
     /// An instant in RFC 3339 format, in UTC.
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
-    /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
+    /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. A reference means the variable that is the same word, whatever its accents and case: `{{País}}` reads `pais`, and an exact name wins. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
     #[serde(rename = "variables")]
     pub variables: std::collections::BTreeMap<String, serde_json::Value>,
 }
@@ -32121,6 +32151,35 @@ pub struct RaizCampaignRecipientPage {
     /// Opaque navigation cursors for this page’s stable keyset order.
     #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignResultDefinition {
+    #[serde(rename = "key")]
+    pub key: String,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignResultValuesItem {
+    /// The key of the answer's option.
+    #[serde(rename = "key")]
+    pub key: String,
+    /// The answer, as people read it.
+    #[serde(rename = "label")]
+    pub label: String,
+    /// How many recipients it is the latest answer of. Each counts once, however many conversations they had.
+    #[serde(rename = "people")]
+    pub people: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignResult {
+    #[serde(rename = "definition")]
+    pub definition: RaizCampaignResultDefinition,
+    #[serde(rename = "values")]
+    pub values: Vec<RaizCampaignResultValuesItem>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -32298,7 +32357,7 @@ pub struct RaizCampaignsGetInput {
     /// Campaign id.
     #[serde(rename = "campaignId")]
     pub campaign_id: String,
-    /// Related data to include, comma-separated: `recipients`, `readiness`.
+    /// Related data to include, comma-separated: `recipients`, `readiness`, `results`.
     #[serde(rename = "expand", default, skip_serializing_if = "Option::is_none")]
     pub expand: Option<String>,
     /// Opaque cursor the `recipients` expansion's pageInfo returned; omit it for its first page.
@@ -32313,6 +32372,9 @@ pub struct RaizCampaignsGetInput {
     /// With `expand=recipients`: only those whose number contains these digits or whose name contains this text.
     #[serde(rename = "recipientsQ", default, skip_serializing_if = "Option::is_none")]
     pub recipients_q: Option<String>,
+    /// With `expand=recipients`: `definitionKey=optionKey`, only those whose latest answer is that option; `definitionKey=`, only those with no answer yet.
+    #[serde(rename = "recipientsResult", default, skip_serializing_if = "Option::is_none")]
+    pub recipients_result: Option<String>,
     /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: an attempt succeeded; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
     #[serde(rename = "recipientsStatus", default, skip_serializing_if = "Option::is_none")]
     pub recipients_status: Option<RaizCampaignsGetInputRecipientsStatus>,
