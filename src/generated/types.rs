@@ -33652,6 +33652,33 @@ pub enum RaizConversationTitleAuthor {
     Provider,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationOutcomeReviewOutcome {
+    #[serde(rename = "success")]
+    Success,
+    #[serde(rename = "failure")]
+    Failure,
+    #[serde(rename = "unknown")]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationOutcomeReview {
+    #[serde(rename = "confirmationMessageId")]
+    pub confirmation_message_id: Option<String>,
+    #[serde(rename = "evidence")]
+    pub evidence: String,
+    #[serde(rename = "outcome")]
+    pub outcome: RaizConversationOutcomeReviewOutcome,
+    #[serde(rename = "reason")]
+    pub reason: String,
+    /// An instant in RFC 3339 format, in UTC.
+    #[serde(rename = "reviewedAt")]
+    pub reviewed_at: String,
+    #[serde(rename = "reviewedBy")]
+    pub reviewed_by: String,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversation {
     #[serde(rename = "agentId")]
@@ -33759,6 +33786,8 @@ pub struct RaizConversation {
     pub workers: Vec<RaizConversationWorker>,
     #[serde(rename = "toolCalls")]
     pub tool_calls: RaizConversationToolCalls,
+    #[serde(rename = "outcomeReview", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub outcome_review: Option<Option<RaizConversationOutcomeReview>>,
     #[serde(rename = "analysisErrorCode")]
     pub analysis_error_code: Option<String>,
     /// The current value of each definition for this subject (the newest assertion that was not rejected).
@@ -34129,7 +34158,7 @@ pub struct RaizConversationViewFilters {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationViewFiltersAssessment>,
-    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: evaluated failures or unresolved escalations. A success explicitly resolved by the team leaves this queue without erasing its escalation history. `false`: the others.
     #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
     pub to_review: Option<bool>,
     /// At least this many messages.
@@ -34395,7 +34424,7 @@ pub struct RaizConversationsCountInput {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationsCountInputAssessment>,
-    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: evaluated failures or unresolved escalations. A success explicitly resolved by the team leaves this queue without erasing its escalation history. `false`: the others.
     #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
     pub to_review: Option<bool>,
     /// At least this many messages.
@@ -34621,7 +34650,7 @@ pub struct RaizConversationsListInput {
     /// The conversation's yes/no assessments: `failed`, at least one answered no; `passed`, at least one answered and every answered one yes.
     #[serde(rename = "assessment", default, skip_serializing_if = "Option::is_none")]
     pub assessment: Option<RaizConversationsListInputAssessment>,
-    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: the analysis says the request was not resolved, or the AI handed the conversation to the team. `false`: the others.
+    /// `true`: conversations to review, as `get_report` counts them in `toReviewCount`: evaluated failures or unresolved escalations. A success explicitly resolved by the team leaves this queue without erasing its escalation history. `false`: the others.
     #[serde(rename = "toReview", default, skip_serializing_if = "Option::is_none")]
     pub to_review: Option<bool>,
     /// At least this many messages.
@@ -40066,7 +40095,7 @@ pub struct RaizReportConversationsDailyRowsItem {
     pub negative_count: i64,
     #[serde(rename = "successCount")]
     pub success_count: i64,
-    /// Conversations to review: escalated to the team or evaluated as a failure, each counted once.
+    /// Conversations to review: unresolved escalations or evaluated failures, each counted once. A successful conversation explicitly resolved by the team leaves this queue; its historical escalation remains counted.
     #[serde(rename = "toReviewCount")]
     pub to_review_count: i64,
 }
