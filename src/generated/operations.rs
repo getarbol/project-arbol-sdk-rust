@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261106.175459";
+pub const RELEASE: &str = "1.20261106.211734";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1687,6 +1687,17 @@ pub const RAIZ_CAMPAIGNS_LIST: Operation = Operation {
     max_output_bytes: 1048576,
 };
 
+/// `raiz.campaigns.start`: Start a campaign
+pub const RAIZ_CAMPAIGNS_START: Operation = Operation {
+    name: "raiz.campaigns.start",
+    method: "POST",
+    path: "/v1/raiz/campaigns/{campaignId}/start",
+    path_field: Some("campaignId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 1048576,
+};
+
 /// `raiz.campaigns.update`: Update a campaign
 pub const RAIZ_CAMPAIGNS_UPDATE: Operation = Operation {
     name: "raiz.campaigns.update",
@@ -2565,6 +2576,17 @@ pub const SURA_SERVICES_LIST: Operation = Operation {
     query: Some(&[("areaId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean), ("connectionId", QueryKind::String), ("channel", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 262144,
+};
+
+/// `visoft.appointmentReceipts.lookup`: Look up an appointment receipt
+pub const VISOFT_APPOINTMENT_RECEIPTS_LOOKUP: Operation = Operation {
+    name: "visoft.appointmentReceipts.lookup",
+    method: "POST",
+    path: "/v1/visoft/appointment-receipts/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 1048576,
 };
 
 /// `visoft.appointments.cancel`: Cancel an appointment

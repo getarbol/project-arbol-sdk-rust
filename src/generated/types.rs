@@ -32009,6 +32009,9 @@ pub struct RaizCampaignRecipientInput {
     pub first_message: Option<Option<String>>,
     #[serde(rename = "givenName", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub given_name: Option<Option<String>>,
+    /// WhatsApp only: this recipient's file for a template whose header is a document, image or video (an appointment's receipts, a ticket), shown above its text. Kept privately with the campaign and sent with this recipient's message; a number the campaign already has keeps its first file, and replacing the whole list replaces them. A request carries at most 2 MiB: send a long list with files in parts with `addRecipients`.
+    #[serde(rename = "header", default, skip_serializing_if = "Option::is_none")]
+    pub header: Option<RaizTemplateHeaderFile>,
     #[serde(rename = "instructions", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub instructions: Option<Option<String>>,
     /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. A reference means the variable that is the same word, whatever its accents and case: `{{País}}` reads `pais`, and an exact name wins. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
@@ -32187,7 +32190,7 @@ pub struct RaizCampaignTemplate {
     /// The template's language: WhatsApp's code (`es`, `es_MX`) or a BCP 47 tag (`es-MX`).
     #[serde(rename = "language")]
     pub language: String,
-    /// An approved template of the line's WhatsApp Business Account. Its body may have variables; a file in its header and button parameters cannot be used in a campaign.
+    /// An approved template of the line's WhatsApp Business Account. Its body may have variables; when its header is a document, image or video, each recipient brings its own file (`header`). Button parameters cannot be used in a campaign.
     #[serde(rename = "name")]
     pub name: String,
     /// The template's body parameters, in order. Each is a text that may reference each recipient's `variables` as `{{name}}`, for example `{{patient_name}}` or `Dr. {{doctor}}`.
@@ -32200,7 +32203,7 @@ pub struct RaizCampaignTemplateInput {
     /// The template's language: WhatsApp's code (`es`, `es_MX`) or a BCP 47 tag (`es-MX`).
     #[serde(rename = "language")]
     pub language: String,
-    /// An approved template of the line's WhatsApp Business Account. Its body may have variables; a file in its header and button parameters cannot be used in a campaign.
+    /// An approved template of the line's WhatsApp Business Account. Its body may have variables; when its header is a document, image or video, each recipient brings its own file (`header`). Button parameters cannot be used in a campaign.
     #[serde(rename = "name")]
     pub name: String,
     /// The template's body parameters, in order. Each is a text that may reference each recipient's `variables` as `{{name}}`, for example `{{patient_name}}` or `Dr. {{doctor}}`.
@@ -32437,6 +32440,15 @@ pub struct RaizCampaignsListInput {
 }
 
 pub type RaizCampaignsListOutput = RaizCampaignPage;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignsStartInput {
+    /// Campaign id.
+    #[serde(rename = "campaignId")]
+    pub campaign_id: String,
+}
+
+pub type RaizCampaignsStartOutput = RaizCampaign;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizCampaignsUpdateInputRetryOnItem {
@@ -37004,6 +37016,61 @@ pub struct RaizFailureResponseErrorPart2CAMPAIGNAGENTNOTREADY {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSINGCode {
+    #[serde(rename = "CAMPAIGN_HEADER_MISSING")]
+    CAMPAIGNHEADERMISSING,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSINGMessage {
+    #[serde(rename = "A recipient has no file that fits the template's header (a PDF for a document, JPEG or PNG for an image, MP4 for a video). Each recipient brings its own as `header`.")]
+    ARecipientHasNoFileThatFitsTheTemplateSHeaderAPDFForADocumentJPEGOrPNGForAnImageMP4ForAVideoEachRecipientBringsItsOwnAsHeader,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSING {
+    #[serde(rename = "code")]
+    pub code: RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSINGCode,
+    #[serde(rename = "message")]
+    pub message: RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSINGMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Map<String, serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDCode {
+    #[serde(rename = "CAMPAIGN_HEADER_NOT_STORED")]
+    CAMPAIGNHEADERNOTSTORED,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDMessage {
+    #[serde(rename = "The campaign and its recipients were saved, but some recipients' files were not. Send those recipients again with `addRecipients` on this campaign: their numbers are kept and their files stored. Do not create the campaign again.")]
+    TheCampaignAndItsRecipientsWereSavedButSomeRecipientsFilesWereNotSendThoseRecipientsAgainWithAddRecipientsOnThisCampaignTheirNumbersAreKeptAndTheirFilesStoredDoNotCreateTheCampaignAgain,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDData {
+    /// The campaign, saved with its recipients.
+    #[serde(rename = "campaignId")]
+    pub campaign_id: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTORED {
+    #[serde(rename = "code")]
+    pub code: RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDCode,
+    #[serde(rename = "message")]
+    pub message: RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDMessage,
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTOREDData,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizFailureResponseErrorPart2CAMPAIGNNORECIPIENTSCode {
     #[serde(rename = "CAMPAIGN_NO_RECIPIENTS")]
     CAMPAIGNNORECIPIENTS,
@@ -38802,6 +38869,8 @@ pub enum RaizFailureResponseErrorPart2 {
     TASKNOTRETRYABLE(RaizFailureResponseErrorPart2TASKNOTRETRYABLE),
     TIMEZONEUNKNOWN(RaizFailureResponseErrorPart2TIMEZONEUNKNOWN),
     CAMPAIGNAGENTNOTREADY(RaizFailureResponseErrorPart2CAMPAIGNAGENTNOTREADY),
+    CAMPAIGNHEADERMISSING(RaizFailureResponseErrorPart2CAMPAIGNHEADERMISSING),
+    CAMPAIGNHEADERNOTSTORED(RaizFailureResponseErrorPart2CAMPAIGNHEADERNOTSTORED),
     CAMPAIGNNORECIPIENTS(RaizFailureResponseErrorPart2CAMPAIGNNORECIPIENTS),
     CAMPAIGNVARIABLEMISSING(RaizFailureResponseErrorPart2CAMPAIGNVARIABLEMISSING),
     CHANNELAGENTMISMATCH(RaizFailureResponseErrorPart2CHANNELAGENTMISMATCH),
@@ -49721,6 +49790,9 @@ pub struct VisoftAppointment {
     /// SIIPS's attendance mark.
     #[serde(rename = "attended")]
     pub attended: String,
+    /// SIIPS's state of the appointment (its agenda's Estado), as stored: `S` for one requested.
+    #[serde(rename = "status")]
+    pub status: String,
     /// The purpose SIIPS records.
     #[serde(rename = "purpose")]
     pub purpose: String,
@@ -49766,6 +49838,81 @@ pub struct VisoftAppointmentNotCancellableFailure {
     #[serde(rename = "data")]
     pub data: Empty,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum VisoftAppointmentReceiptMediaType {
+    #[serde(rename = "application/pdf")]
+    ApplicationPdf,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAppointmentReceipt {
+    /// The reference the receipt was printed for.
+    #[serde(rename = "reference")]
+    pub reference: String,
+    /// A file name made of the appointment's day and hour; never the patient's.
+    #[serde(rename = "fileName")]
+    pub file_name: String,
+    #[serde(rename = "mediaType")]
+    pub media_type: VisoftAppointmentReceiptMediaType,
+    #[serde(rename = "sizeBytes")]
+    pub size_bytes: i64,
+    /// The SHA-256 of the bytes, hexadecimal.
+    #[serde(rename = "sha256")]
+    pub sha256: String,
+    /// The PDF, unchanged, base64.
+    #[serde(rename = "data")]
+    pub data: String,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAppointmentReceiptResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: VisoftAppointmentReceipt,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum VisoftAppointmentReceiptUnavailableFailureCode {
+    #[serde(rename = "APPOINTMENT_RECEIPT_UNAVAILABLE")]
+    APPOINTMENTRECEIPTUNAVAILABLE,
+}
+
+/// SIIPS printed no receipt naming this appointment's day, hour and patient. Read the day's appointments again for a current reference.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAppointmentReceiptUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: VisoftAppointmentReceiptUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftAppointmentReceiptsLookupInput {
+    /// The connection to run on. Optional when the organization has one Visoft connection; required when it has several. Another organization's connection is CONNECTION_NOT_FOUND.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// The appointment's opaque reference, as visoft.appointments.list answered it.
+    #[serde(rename = "reference")]
+    pub reference: String,
+}
+
+pub type VisoftAppointmentReceiptsLookupOutput = VisoftAppointmentReceipt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum VisoftAppointmentReferenceInvalidFailureCode {
@@ -50017,6 +50164,9 @@ pub struct VisoftAssignedAppointment {
     pub phone: String,
     #[serde(rename = "service")]
     pub service: String,
+    /// SIIPS's state of the appointment (its agenda's Estado), as stored: `S` for one requested and still to be attended.
+    #[serde(rename = "status")]
+    pub status: String,
     /// SIIPS's attendance flag, as stored.
     #[serde(rename = "attended")]
     pub attended: String,
@@ -51650,6 +51800,79 @@ pub struct VisoftListServicesUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum VisoftListServicesUnprocessableContentFailure {
+    VisoftCredentialsRejectedFailure(VisoftCredentialsRejectedFailure),
+    VisoftAgencyNotServedFailure(VisoftAgencyNotServedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftLookupAppointmentReceiptBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: VisoftLookupAppointmentReceiptBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum VisoftLookupAppointmentReceiptBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    VisoftProviderUnavailableFailure(VisoftProviderUnavailableFailure),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftLookupAppointmentReceiptBody {
+    /// The connection to run on. Optional when the organization has one Visoft connection; required when it has several. Another organization's connection is CONNECTION_NOT_FOUND.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// The appointment's opaque reference, as visoft.appointments.list answered it.
+    #[serde(rename = "reference")]
+    pub reference: String,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftLookupAppointmentReceiptNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: VisoftLookupAppointmentReceiptNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum VisoftLookupAppointmentReceiptNotFoundFailure {
+    ConnectionNotFoundFailure(ConnectionNotFoundFailure),
+    VisoftAppointmentReceiptUnavailableFailure(VisoftAppointmentReceiptUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct VisoftLookupAppointmentReceiptUnprocessableContentError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: VisoftLookupAppointmentReceiptUnprocessableContentFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum VisoftLookupAppointmentReceiptUnprocessableContentFailure {
     VisoftCredentialsRejectedFailure(VisoftCredentialsRejectedFailure),
     VisoftAgencyNotServedFailure(VisoftAgencyNotServedFailure),
 }

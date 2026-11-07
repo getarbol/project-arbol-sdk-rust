@@ -2039,7 +2039,7 @@ pub struct RaizCampaignsApi<'a>(&'a Client);
 impl<'a> RaizCampaignsApi<'a> {
     /// Create a campaign
     ///
-    /// Prepare a campaign with up to 10000 recipients, each a phone `address` with an optional `contactId` and `variables`. A call campaign (the default) has a voice Agent call each one. With `channelType: whatsapp` and an approved `template`, each one is sent the template, its `parameters` filled from their `variables` (`{{name}}`), and its text Agent answers whoever replies. Nobody is reached until it is started. A list adds nobody to the organization's contacts: a recipient becomes the contact it names, or the owner of its number (created when none exists), when the campaign first reaches them. A longer list continues with `updateCampaign` and `addRecipients`. Nothing happens outside `contactHours` (in `timeZone`, the organization's by default) or outside `scheduledStartAt` and `scheduledEndAt`; each recipient gets up to `maxAttempts` attempts, `retryAfterMinutes` apart, after the results in `retryOn`. Read it with `expand=readiness` to see whether it can start. Starting it (REST `POST /v1/campaigns/{campaignId}/start`) is not an AI tool. Read the `run-a-campaign` skill.
+    /// Prepare a campaign with up to 10000 recipients, each a phone `address` with an optional `contactId` and `variables`. A call campaign (the default) has a voice Agent call each one. With `channelType: whatsapp` and an approved `template`, each one is sent the template, its `parameters` filled from their `variables` (`{{name}}`) and, when its header is a document, image or video, their own `header` file; its text Agent answers whoever replies. Nobody is reached until it is started. A list adds nobody to the organization's contacts: a recipient becomes the contact it names, or the owner of its number (created when none exists), when the campaign first reaches them. A longer list continues with `updateCampaign` and `addRecipients`. Nothing happens outside `contactHours` (in `timeZone`, the organization's by default) or outside `scheduledStartAt` and `scheduledEndAt`; each recipient gets up to `maxAttempts` attempts, `retryAfterMinutes` apart, after the results in `retryOn`. Read it with `expand=readiness` to see whether it can start. Starting it (REST `POST /v1/campaigns/{campaignId}/start`) is not an AI tool. Read the `run-a-campaign` skill.
     pub async fn create(&self, input: &types::RaizCampaignsCreateInput) -> Result<types::RaizCampaignsCreateOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_CREATE, input).await
     }
@@ -2058,9 +2058,16 @@ impl<'a> RaizCampaignsApi<'a> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_LIST, input).await
     }
 
+    /// Start a campaign
+    ///
+    /// Start reaching people: from now on the campaign's due recipients are called, at most `settings.channels.maxConcurrentOutboundCalls` (five by default) at once across the organization, or sent their message, one after another, about 30 a minute. A call campaign needs an active, published voice Agent (VOICE_AGENT_NOT_READY). A WhatsApp campaign needs an active text Agent (CAMPAIGN_AGENT_NOT_READY), a line that can send (CHANNEL_NOT_READY), an approved template whose parameters fit (a `TEMPLATE_*` code), a value for every variable (CAMPAIGN_VARIABLE_MISSING) and, when the template's header is a document, image or video, the first pending recipient's own `header` file (CAMPAIGN_HEADER_MISSING). A recipient must be pending (CAMPAIGN_NO_RECIPIENTS). `get_campaign` with `expand=readiness` lists all of this beforehand. A campaign starts once: starting a running one changes nothing, and a paused one resumes with `update_campaign` and `paused: false`. Not an AI tool: it reaches real people.
+    pub async fn start(&self, input: &types::RaizCampaignsStartInput) -> Result<types::RaizCampaignsStartOutput, Error> {
+        self.0.call(&operations::RAIZ_CAMPAIGNS_START, input).await
+    }
+
     /// Update a campaign
     ///
-    /// Change a campaign. Omitted fields stay. `paused: true` pauses a started campaign (no new call or message starts; those in progress finish) and `paused: false` resumes it, with the same checks as starting. Before the start, `recipients` is the complete set, replacing whoever was there; once started it only adds. `addRecipients` adds at any moment, which is how a list longer than one request arrives: a number the campaign already has is skipped, so repeating a part reaches nobody twice. The Agent changes only before the start, and a completed campaign accepts only its name and metadata. A change lifts the wait of a campaign held by `errorCode`: fixing a template and sending it here tries again at once.
+    /// Change a campaign. Omitted fields stay. `paused: true` pauses a started campaign (no new call or message starts; those in progress finish) and `paused: false` resumes it, with the same checks as starting. Before the start, `recipients` is the complete set, replacing whoever was there; once started it only adds. `addRecipients` adds at any moment, which is how a list longer than one request arrives: a number the campaign already has is skipped, so repeating a part reaches nobody twice, and a recipient's `header` file is stored only when its row has none (CAMPAIGN_HEADER_NOT_STORED says some were not: send those recipients again). The Agent changes only before the start, and a completed campaign accepts only its name and metadata. A change lifts the wait of a campaign held by `errorCode`: fixing a template and sending it here tries again at once.
     pub async fn update(&self, input: &types::RaizCampaignsUpdateInput) -> Result<types::RaizCampaignsUpdateOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_UPDATE, input).await
     }
@@ -3021,6 +3028,19 @@ impl<'a> SuraApi<'a> {
     }
 }
 
+/// `visoft.appointmentReceipts`
+#[derive(Debug, Clone, Copy)]
+pub struct VisoftAppointmentReceiptsApi<'a>(&'a Client);
+
+impl<'a> VisoftAppointmentReceiptsApi<'a> {
+    /// Look up an appointment receipt
+    ///
+    /// SIIPS's own printed receipt (ticket) of one assigned appointment, by the reference visoft.appointments.list answered: the PDF SIIPS's print action serves, unchanged, base64. It is answered only when its text names the appointment's day, hour and patient; otherwise APPOINTMENT_RECEIPT_UNAVAILABLE. Never cached. Printing changes no appointment and sends nothing to the patient.
+    pub async fn lookup(&self, input: &types::VisoftAppointmentReceiptsLookupInput) -> Result<types::VisoftAppointmentReceiptsLookupOutput, Error> {
+        self.0.call(&operations::VISOFT_APPOINTMENT_RECEIPTS_LOOKUP, input).await
+    }
+}
+
 /// `visoft.appointments`
 #[derive(Debug, Clone, Copy)]
 pub struct VisoftAppointmentsApi<'a>(&'a Client);
@@ -3042,7 +3062,7 @@ impl<'a> VisoftAppointmentsApi<'a> {
 
     /// List assigned appointments
     ///
-    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the contact phone SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
+    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the contact phone and the state (`status`) SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
     pub async fn list(&self, input: &types::VisoftAppointmentsListInput) -> Result<types::VisoftAppointmentsListOutput, Error> {
         self.0.call(&operations::VISOFT_APPOINTMENTS_LIST, input).await
     }
@@ -3205,6 +3225,10 @@ impl<'a> VisoftServicesApi<'a> {
 pub struct VisoftApi<'a>(&'a Client);
 
 impl<'a> VisoftApi<'a> {
+    pub fn appointment_receipts(&self) -> VisoftAppointmentReceiptsApi<'a> {
+        VisoftAppointmentReceiptsApi(self.0)
+    }
+
     pub fn appointments(&self) -> VisoftAppointmentsApi<'a> {
         VisoftAppointmentsApi(self.0)
     }
