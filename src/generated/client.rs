@@ -104,39 +104,6 @@ impl<'a> AccountApiKeysApi<'a> {
     }
 }
 
-/// `account.billing`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountBillingApi<'a>(&'a Client);
-
-impl<'a> AccountBillingApi<'a> {
-    /// Get the billing overview
-    ///
-    /// The organization's billing status, balance, active plans, allowances and what it spent this month.
-    pub async fn get(&self, input: &types::AccountBillingGetInput) -> Result<types::AccountBillingGetOutput, Error> {
-        self.0.call(&operations::ACCOUNT_BILLING_GET, input).await
-    }
-}
-
-/// `account.billingProfiles`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountBillingProfilesApi<'a>(&'a Client);
-
-impl<'a> AccountBillingProfilesApi<'a> {
-    /// Get the billing profile
-    ///
-    /// The legal data invoices carry: legal name, tax id, billing email and billing day.
-    pub async fn get(&self, input: &types::AccountBillingProfilesGetInput) -> Result<types::AccountBillingProfilesGetOutput, Error> {
-        self.0.call(&operations::ACCOUNT_BILLING_PROFILES_GET, input).await
-    }
-
-    /// Update the billing profile
-    ///
-    /// Changes the legal data invoices carry. A field left out keeps its value.
-    pub async fn update(&self, input: &types::AccountBillingProfilesUpdateInput) -> Result<types::AccountBillingProfilesUpdateOutput, Error> {
-        self.0.call(&operations::ACCOUNT_BILLING_PROFILES_UPDATE, input).await
-    }
-}
-
 /// `account.colombianRecords`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountColombianRecordsApi<'a>(&'a Client);
@@ -187,39 +154,6 @@ impl<'a> AccountInvitationsApi<'a> {
     /// The organization's pending invitations, newest first, and whether the caller may revoke each.
     pub async fn list(&self, input: &types::AccountInvitationsListInput) -> Result<types::AccountInvitationsListOutput, Error> {
         self.0.call(&operations::ACCOUNT_INVITATIONS_LIST, input).await
-    }
-}
-
-/// `account.invoiceDocuments`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountInvoiceDocumentsApi<'a>(&'a Client);
-
-impl<'a> AccountInvoiceDocumentsApi<'a> {
-    /// Download an invoice's PDF
-    ///
-    /// The legal invoice document, as base64.
-    pub async fn get(&self, input: &types::AccountInvoiceDocumentsGetInput) -> Result<types::AccountInvoiceDocumentsGetOutput, Error> {
-        self.0.call(&operations::ACCOUNT_INVOICE_DOCUMENTS_GET, input).await
-    }
-}
-
-/// `account.invoices`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountInvoicesApi<'a>(&'a Client);
-
-impl<'a> AccountInvoicesApi<'a> {
-    /// Get an invoice
-    ///
-    /// One invoice with its lines and how to pay it.
-    pub async fn get(&self, input: &types::AccountInvoicesGetInput) -> Result<types::AccountInvoicesGetOutput, Error> {
-        self.0.call(&operations::ACCOUNT_INVOICES_GET, input).await
-    }
-
-    /// List invoices
-    ///
-    /// The organization's latest 100 invoices, newest first.
-    pub async fn list(&self, input: &types::AccountInvoicesListInput) -> Result<types::AccountInvoicesListOutput, Error> {
-        self.0.call(&operations::ACCOUNT_INVOICES_LIST, input).await
     }
 }
 
@@ -290,19 +224,6 @@ impl<'a> AccountOrganizationsApi<'a> {
     }
 }
 
-/// `account.payments`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountPaymentsApi<'a>(&'a Client);
-
-impl<'a> AccountPaymentsApi<'a> {
-    /// List payments
-    ///
-    /// The organization's latest 100 payments.
-    pub async fn list(&self, input: &types::AccountPaymentsListInput) -> Result<types::AccountPaymentsListOutput, Error> {
-        self.0.call(&operations::ACCOUNT_PAYMENTS_LIST, input).await
-    }
-}
-
 /// `account.permissions`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountPermissionsApi<'a>(&'a Client);
@@ -342,45 +263,6 @@ impl<'a> AccountRolesApi<'a> {
     }
 }
 
-/// `account.usage`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountUsageApi<'a>(&'a Client);
-
-impl<'a> AccountUsageApi<'a> {
-    /// Break usage down
-    ///
-    /// Usage and charges in a window of at most 93 days, by meter, agent, model or channel: one row per meter, agent, model or channel, by key.
-    pub async fn list(&self, input: &types::AccountUsageListInput) -> Result<types::AccountUsageListOutput, Error> {
-        self.0.call(&operations::ACCOUNT_USAGE_LIST, input).await
-    }
-}
-
-/// `account.usageSummary`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountUsageSummaryApi<'a>(&'a Client);
-
-impl<'a> AccountUsageSummaryApi<'a> {
-    /// Get the usage of a month
-    ///
-    /// What the organization used and was charged in one calendar month (UTC), by meter.
-    pub async fn get(&self, input: &types::AccountUsageSummaryGetInput) -> Result<types::AccountUsageSummaryGetOutput, Error> {
-        self.0.call(&operations::ACCOUNT_USAGE_SUMMARY_GET, input).await
-    }
-}
-
-/// `account.walletTransactions`
-#[derive(Debug, Clone, Copy)]
-pub struct AccountWalletTransactionsApi<'a>(&'a Client);
-
-impl<'a> AccountWalletTransactionsApi<'a> {
-    /// List balance movements
-    ///
-    /// The latest 100 movements of the organization's balance, newest first.
-    pub async fn list(&self, input: &types::AccountWalletTransactionsListInput) -> Result<types::AccountWalletTransactionsListOutput, Error> {
-        self.0.call(&operations::ACCOUNT_WALLET_TRANSACTIONS_LIST, input).await
-    }
-}
-
 /// `account`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountApi<'a>(&'a Client);
@@ -388,14 +270,6 @@ pub struct AccountApi<'a>(&'a Client);
 impl<'a> AccountApi<'a> {
     pub fn api_keys(&self) -> AccountApiKeysApi<'a> {
         AccountApiKeysApi(self.0)
-    }
-
-    pub fn billing(&self) -> AccountBillingApi<'a> {
-        AccountBillingApi(self.0)
-    }
-
-    pub fn billing_profiles(&self) -> AccountBillingProfilesApi<'a> {
-        AccountBillingProfilesApi(self.0)
     }
 
     pub fn colombian_records(&self) -> AccountColombianRecordsApi<'a> {
@@ -410,14 +284,6 @@ impl<'a> AccountApi<'a> {
         AccountInvitationsApi(self.0)
     }
 
-    pub fn invoice_documents(&self) -> AccountInvoiceDocumentsApi<'a> {
-        AccountInvoiceDocumentsApi(self.0)
-    }
-
-    pub fn invoices(&self) -> AccountInvoicesApi<'a> {
-        AccountInvoicesApi(self.0)
-    }
-
     pub fn members(&self) -> AccountMembersApi<'a> {
         AccountMembersApi(self.0)
     }
@@ -430,10 +296,6 @@ impl<'a> AccountApi<'a> {
         AccountOrganizationsApi(self.0)
     }
 
-    pub fn payments(&self) -> AccountPaymentsApi<'a> {
-        AccountPaymentsApi(self.0)
-    }
-
     pub fn permissions(&self) -> AccountPermissionsApi<'a> {
         AccountPermissionsApi(self.0)
     }
@@ -444,18 +306,6 @@ impl<'a> AccountApi<'a> {
 
     pub fn roles(&self) -> AccountRolesApi<'a> {
         AccountRolesApi(self.0)
-    }
-
-    pub fn usage(&self) -> AccountUsageApi<'a> {
-        AccountUsageApi(self.0)
-    }
-
-    pub fn usage_summary(&self) -> AccountUsageSummaryApi<'a> {
-        AccountUsageSummaryApi(self.0)
-    }
-
-    pub fn wallet_transactions(&self) -> AccountWalletTransactionsApi<'a> {
-        AccountWalletTransactionsApi(self.0)
     }
 }
 

@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261107.195512";
+pub const RELEASE: &str = "1.20261108.215556";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -43,39 +43,6 @@ pub const ACCOUNT_API_KEYS_ROTATE: Operation = Operation {
     method: "POST",
     path: "/v1/account/api-keys/{apiKeyId}/rotate",
     path_field: Some("apiKeyId"),
-    query: None,
-    effect: Effect::Write,
-    max_output_bytes: 262144,
-};
-
-/// `account.billing.get`: Get the billing overview
-pub const ACCOUNT_BILLING_GET: Operation = Operation {
-    name: "account.billing.get",
-    method: "GET",
-    path: "/v1/account/billing",
-    path_field: None,
-    query: Some(&[]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.billingProfiles.get`: Get the billing profile
-pub const ACCOUNT_BILLING_PROFILES_GET: Operation = Operation {
-    name: "account.billingProfiles.get",
-    method: "GET",
-    path: "/v1/account/billing-profiles/{billingProfileId}",
-    path_field: Some("billingProfileId"),
-    query: Some(&[]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.billingProfiles.update`: Update the billing profile
-pub const ACCOUNT_BILLING_PROFILES_UPDATE: Operation = Operation {
-    name: "account.billingProfiles.update",
-    method: "PATCH",
-    path: "/v1/account/billing-profiles/{billingProfileId}",
-    path_field: Some("billingProfileId"),
     query: None,
     effect: Effect::Write,
     max_output_bytes: 262144,
@@ -130,39 +97,6 @@ pub const ACCOUNT_INVITATIONS_LIST: Operation = Operation {
     name: "account.invitations.list",
     method: "GET",
     path: "/v1/account/invitations",
-    path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.invoiceDocuments.get`: Download an invoice's PDF
-pub const ACCOUNT_INVOICE_DOCUMENTS_GET: Operation = Operation {
-    name: "account.invoiceDocuments.get",
-    method: "GET",
-    path: "/v1/account/invoice-documents/{invoiceId}",
-    path_field: Some("invoiceId"),
-    query: Some(&[]),
-    effect: Effect::Read,
-    max_output_bytes: 16777216,
-};
-
-/// `account.invoices.get`: Get an invoice
-pub const ACCOUNT_INVOICES_GET: Operation = Operation {
-    name: "account.invoices.get",
-    method: "GET",
-    path: "/v1/account/invoices/{invoiceId}",
-    path_field: Some("invoiceId"),
-    query: Some(&[]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.invoices.list`: List invoices
-pub const ACCOUNT_INVOICES_LIST: Operation = Operation {
-    name: "account.invoices.list",
-    method: "GET",
-    path: "/v1/account/invoices",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
@@ -246,17 +180,6 @@ pub const ACCOUNT_ORGANIZATIONS_LIST: Operation = Operation {
     max_output_bytes: 262144,
 };
 
-/// `account.payments.list`: List payments
-pub const ACCOUNT_PAYMENTS_LIST: Operation = Operation {
-    name: "account.payments.list",
-    method: "GET",
-    path: "/v1/account/payments",
-    path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
 /// `account.permissions.list`: List the platform permissions
 pub const ACCOUNT_PERMISSIONS_LIST: Operation = Operation {
     name: "account.permissions.list",
@@ -284,39 +207,6 @@ pub const ACCOUNT_ROLES_LIST: Operation = Operation {
     name: "account.roles.list",
     method: "GET",
     path: "/v1/account/roles",
-    path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.usage.list`: Break usage down
-pub const ACCOUNT_USAGE_LIST: Operation = Operation {
-    name: "account.usage.list",
-    method: "GET",
-    path: "/v1/account/usage",
-    path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("groupBy", QueryKind::String), ("from", QueryKind::String), ("to", QueryKind::String)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.usageSummary.get`: Get the usage of a month
-pub const ACCOUNT_USAGE_SUMMARY_GET: Operation = Operation {
-    name: "account.usageSummary.get",
-    method: "GET",
-    path: "/v1/account/usage-summary",
-    path_field: None,
-    query: Some(&[("period", QueryKind::String)]),
-    effect: Effect::Read,
-    max_output_bytes: 262144,
-};
-
-/// `account.walletTransactions.list`: List balance movements
-pub const ACCOUNT_WALLET_TRANSACTIONS_LIST: Operation = Operation {
-    name: "account.walletTransactions.list",
-    method: "GET",
-    path: "/v1/account/wallet-transactions",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
