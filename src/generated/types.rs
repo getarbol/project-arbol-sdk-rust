@@ -65283,6 +65283,9 @@ pub struct RaizAgent {
     pub procedures: Vec<RaizAgentProcedure>,
     #[serde(rename = "settings")]
     pub settings: RaizAgentSettings,
+    /// The conversation graph the Agent follows beside its instructions and procedures, or null for none.
+    #[serde(rename = "workflow")]
+    pub workflow: Option<RaizAgentWorkflow>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -67544,6 +67547,200 @@ pub struct RaizAgentVoiceSettings {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemConverseEdgesItemConditionSemanticType {
+    #[serde(rename = "semantic")]
+    Semantic,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemConverseEdgesItemConditionSemantic {
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemConverseEdgesItemConditionSemanticType,
+    /// A condition the Agent judges from the conversation, such as: The contact says the order already shipped.
+    #[serde(rename = "when")]
+    pub when: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemConverseEdgesItemConditionUnconditionalType {
+    #[serde(rename = "unconditional")]
+    Unconditional,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemConverseEdgesItemConditionUnconditional {
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemConverseEdgesItemConditionUnconditionalType,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizAgentWorkflowNodesItemConverseEdgesItemCondition {
+    Semantic(RaizAgentWorkflowNodesItemConverseEdgesItemConditionSemantic),
+    Unconditional(RaizAgentWorkflowNodesItemConverseEdgesItemConditionUnconditional),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemConverseEdgesItem {
+    #[serde(rename = "condition")]
+    pub condition: RaizAgentWorkflowNodesItemConverseEdgesItemCondition,
+    /// The node this edge leads to.
+    #[serde(rename = "to")]
+    pub to: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemConverseType {
+    #[serde(rename = "converse")]
+    Converse,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemConverse {
+    /// Where the conversation goes next, tried in order: the first edge whose condition holds is followed. Each leads to a different node, and the last must be unconditional.
+    #[serde(rename = "edges")]
+    pub edges: Vec<RaizAgentWorkflowNodesItemConverseEdgesItem>,
+    /// The node's id within this workflow, chosen by its author. Keep it across edits: a conversation's progress refers to it.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// What the Agent does at this step of the conversation.
+    #[serde(rename = "instructions")]
+    pub instructions: String,
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemConverseType,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemToolEdgesItemConditionOutcome {
+    #[serde(rename = "success")]
+    Success,
+    #[serde(rename = "failure")]
+    Failure,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemToolEdgesItemConditionType {
+    #[serde(rename = "result")]
+    Result,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemToolEdgesItemCondition {
+    /// How the node's tool call ended. A result that reports a failure and a write whose effect is unknown both count as `failure`.
+    #[serde(rename = "outcome")]
+    pub outcome: RaizAgentWorkflowNodesItemToolEdgesItemConditionOutcome,
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemToolEdgesItemConditionType,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemToolEdgesItem {
+    #[serde(rename = "condition")]
+    pub condition: RaizAgentWorkflowNodesItemToolEdgesItemCondition,
+    /// The node this edge leads to.
+    #[serde(rename = "to")]
+    pub to: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemToolType {
+    #[serde(rename = "tool")]
+    Tool,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemTool {
+    /// Every parameter the call sends, by name, as constant JSON sent exactly as written: the model chooses none of them, and text such as `{{contact_name}}` is not filled in.
+    #[serde(rename = "arguments")]
+    pub arguments: std::collections::BTreeMap<String, serde_json::Value>,
+    /// Where the conversation goes after the call: one edge for success and one for failure, to different nodes.
+    #[serde(rename = "edges")]
+    pub edges: Vec<RaizAgentWorkflowNodesItemToolEdgesItem>,
+    /// The node's id within this workflow, chosen by its author. Keep it across edits: a conversation's progress refers to it.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// One of the Agent's assigned tools, by its tool name.
+    #[serde(rename = "tool")]
+    pub tool: String,
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemToolType,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowNodesItemEndType {
+    #[serde(rename = "end")]
+    End,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowNodesItemEnd {
+    /// The node's id within this workflow, chosen by its author. Keep it across edits: a conversation's progress refers to it.
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "type")]
+    pub r#type: RaizAgentWorkflowNodesItemEndType,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizAgentWorkflowNodesItem {
+    Converse(RaizAgentWorkflowNodesItemConverse),
+    Tool(RaizAgentWorkflowNodesItemTool),
+    End(RaizAgentWorkflowNodesItemEnd),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflow {
+    /// The format of this document.
+    #[serde(rename = "formatVersion")]
+    pub format_version: serde_json::Value,
+    /// The steps. Every node must be reachable from the start, the graph has no cycles, and every path finishes at an end node.
+    #[serde(rename = "nodes")]
+    pub nodes: Vec<RaizAgentWorkflowNodesItem>,
+    /// The node the conversation starts at.
+    #[serde(rename = "startNodeId")]
+    pub start_node_id: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentWorkflowInvalidFailureCode {
+    #[serde(rename = "AGENT_WORKFLOW_INVALID")]
+    AGENTWORKFLOWINVALID,
+}
+
+/// The workflow breaks the graph rules, leaves a step without a way forward, or uses a tool this Agent cannot run there. `issues` says where.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowInvalidFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizAgentWorkflowInvalidFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: RaizAgentWorkflowInvalidFailureData,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowInvalidFailureDataIssuesItem {
+    /// Why, as a label: missing_fallback, missing_result_edge, unknown_node, unknown_start_node, unreachable_node, cycle, duplicate_edge, unknown_tool, ambiguous_tool, write_tool_not_supported, unknown_parameter, missing_required_parameter…
+    #[serde(rename = "code")]
+    pub code: String,
+    /// RFC 6901 pointer to the refused field, such as `/workflow/nodes/2/edges/0/to`.
+    #[serde(rename = "path")]
+    pub path: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentWorkflowInvalidFailureData {
+    #[serde(rename = "issues")]
+    pub issues: Vec<RaizAgentWorkflowInvalidFailureDataIssuesItem>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentsCreateInputStatus {
     #[serde(rename = "active")]
     Active,
@@ -67590,6 +67787,9 @@ pub struct RaizAgentsCreateInput {
     pub status: Option<RaizAgentsCreateInputStatus>,
     #[serde(rename = "timeZone", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub time_zone: Option<Option<String>>,
+    /// The conversation graph the Agent follows beside its instructions and procedures: conversation steps, tool steps and endings, with no loops and a way forward from every step. A tool step needs one of the Agent's integration tools that only reads and that exactly one connection holds. It runs by itself, with the step's constant arguments and without the model choosing them, and follows its success or failure edge; on a call, a step that cannot run follows its failure edge. Checked against the Agent as it will be once saved (AGENT_WORKFLOW_INVALID says where one is wrong), also when an update changes the Agent's tools. In an update, omit it to keep the current one and send `null` to remove it.
+    #[serde(rename = "workflow", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub workflow: Option<Option<RaizAgentWorkflow>>,
     /// `voice`: phone calls. `text`: WhatsApp and web chat.
     #[serde(rename = "modality")]
     pub modality: RaizAgentsCreateInputModality,
@@ -67703,6 +67903,9 @@ pub struct RaizAgentsUpdateInput {
     pub status: Option<RaizAgentsUpdateInputStatus>,
     #[serde(rename = "timeZone", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub time_zone: Option<Option<String>>,
+    /// The conversation graph the Agent follows beside its instructions and procedures: conversation steps, tool steps and endings, with no loops and a way forward from every step. A tool step needs one of the Agent's integration tools that only reads and that exactly one connection holds. It runs by itself, with the step's constant arguments and without the model choosing them, and follows its success or failure edge; on a call, a step that cannot run follows its failure edge. Checked against the Agent as it will be once saved (AGENT_WORKFLOW_INVALID says where one is wrong), also when an update changes the Agent's tools. In an update, omit it to keep the current one and send `null` to remove it.
+    #[serde(rename = "workflow", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub workflow: Option<Option<RaizAgentWorkflow>>,
     /// With the Agent's `settings.evalGate`: the completed evaluation run (`createEvalRun`) of exactly the content this update leaves the model reading, in which every case passed.
     #[serde(rename = "evalRunId", default, skip_serializing_if = "Option::is_none")]
     pub eval_run_id: Option<String>,
@@ -72169,6 +72372,9 @@ pub struct RaizCreateAgentBody {
     pub status: Option<RaizCreateAgentBodyStatus>,
     #[serde(rename = "timeZone", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub time_zone: Option<Option<String>>,
+    /// The conversation graph the Agent follows beside its instructions and procedures: conversation steps, tool steps and endings, with no loops and a way forward from every step. A tool step needs one of the Agent's integration tools that only reads and that exactly one connection holds. It runs by itself, with the step's constant arguments and without the model choosing them, and follows its success or failure edge; on a call, a step that cannot run follows its failure edge. Checked against the Agent as it will be once saved (AGENT_WORKFLOW_INVALID says where one is wrong), also when an update changes the Agent's tools. In an update, omit it to keep the current one and send `null` to remove it.
+    #[serde(rename = "workflow", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub workflow: Option<Option<RaizAgentWorkflow>>,
     /// `voice`: phone calls. `text`: WhatsApp and web chat.
     #[serde(rename = "modality")]
     pub modality: RaizCreateAgentBodyModality,
@@ -72238,6 +72444,7 @@ pub struct RaizCreateAgentUnprocessableContentError {
 #[serde(untagged)]
 pub enum RaizCreateAgentUnprocessableContentFailure {
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
     RaizIntegrationToolUnavailableFailure(RaizIntegrationToolUnavailableFailure),
@@ -72943,6 +73150,7 @@ pub enum RaizCreateChannelUnprocessableContentFailure {
     RaizVoiceNotAvailableFailure(RaizVoiceNotAvailableFailure),
     RaizVoiceNumberNotOwnedFailure(RaizVoiceNumberNotOwnedFailure),
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizBulletinPeriodInvalidFailure(RaizBulletinPeriodInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
@@ -73540,6 +73748,7 @@ pub enum RaizCreateConversationUnprocessableContentFailure {
     RaizVoiceNotAvailableFailure(RaizVoiceNotAvailableFailure),
     RaizVoiceNumberNotOwnedFailure(RaizVoiceNumberNotOwnedFailure),
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizBulletinPeriodInvalidFailure(RaizBulletinPeriodInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
@@ -75613,6 +75822,7 @@ pub enum RaizDeleteChannelUnprocessableContentFailure {
     RaizVoiceNotAvailableFailure(RaizVoiceNotAvailableFailure),
     RaizVoiceNumberNotOwnedFailure(RaizVoiceNumberNotOwnedFailure),
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizBulletinPeriodInvalidFailure(RaizBulletinPeriodInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
@@ -82260,6 +82470,9 @@ pub struct RaizUpdateAgentBody {
     pub status: Option<RaizUpdateAgentBodyStatus>,
     #[serde(rename = "timeZone", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub time_zone: Option<Option<String>>,
+    /// The conversation graph the Agent follows beside its instructions and procedures: conversation steps, tool steps and endings, with no loops and a way forward from every step. A tool step needs one of the Agent's integration tools that only reads and that exactly one connection holds. It runs by itself, with the step's constant arguments and without the model choosing them, and follows its success or failure edge; on a call, a step that cannot run follows its failure edge. Checked against the Agent as it will be once saved (AGENT_WORKFLOW_INVALID says where one is wrong), also when an update changes the Agent's tools. In an update, omit it to keep the current one and send `null` to remove it.
+    #[serde(rename = "workflow", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub workflow: Option<Option<RaizAgentWorkflow>>,
     /// With the Agent's `settings.evalGate`: the completed evaluation run (`createEvalRun`) of exactly the content this update leaves the model reading, in which every case passed.
     #[serde(rename = "evalRunId", default, skip_serializing_if = "Option::is_none")]
     pub eval_run_id: Option<String>,
@@ -82336,6 +82549,7 @@ pub struct RaizUpdateAgentUnprocessableContentError {
 #[serde(untagged)]
 pub enum RaizUpdateAgentUnprocessableContentFailure {
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
     RaizIntegrationToolUnavailableFailure(RaizIntegrationToolUnavailableFailure),
@@ -82929,6 +83143,7 @@ pub enum RaizUpdateChannelUnprocessableContentFailure {
     RaizVoiceNotAvailableFailure(RaizVoiceNotAvailableFailure),
     RaizVoiceNumberNotOwnedFailure(RaizVoiceNumberNotOwnedFailure),
     RaizAgentProceduresInvalidFailure(RaizAgentProceduresInvalidFailure),
+    RaizAgentWorkflowInvalidFailure(RaizAgentWorkflowInvalidFailure),
     RaizAgentSettingsInvalidFailure(RaizAgentSettingsInvalidFailure),
     RaizBulletinPeriodInvalidFailure(RaizBulletinPeriodInvalidFailure),
     RaizIntegrationProcedureUnavailableFailure(RaizIntegrationProcedureUnavailableFailure),
