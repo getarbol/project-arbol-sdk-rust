@@ -1910,7 +1910,7 @@ impl<'a> RaizCampaignsApi<'a> {
 
     /// Start a campaign
     ///
-    /// Start reaching people: from now on the campaign's due recipients are called, at most `settings.channels.maxConcurrentOutboundCalls` (five by default) at once across the organization, or sent their message, one after another, about 30 a minute. A call campaign needs an active, published voice Agent (VOICE_AGENT_NOT_READY). A WhatsApp campaign needs an active text Agent (CAMPAIGN_AGENT_NOT_READY), a line that can send (CHANNEL_NOT_READY), an approved template whose parameters fit (a `TEMPLATE_*` code), a value for every variable (CAMPAIGN_VARIABLE_MISSING) and, when the template's header is a document, image or video, the first pending recipient's own `header` file (CAMPAIGN_HEADER_MISSING). A recipient must be pending (CAMPAIGN_NO_RECIPIENTS). `get_campaign` with `expand=readiness` lists all of this beforehand. A campaign starts once: starting a running one changes nothing, and a paused one resumes with `update_campaign` and `paused: false`. Not an AI tool: it reaches real people.
+    /// Start reaching people: from now on the campaign's due recipients are called, at most `settings.channels.maxConcurrentOutboundCalls` (five by default) at once across the organization, or sent their message, a few a second. A call campaign needs an active, published voice Agent (VOICE_AGENT_NOT_READY). A WhatsApp campaign needs an active text Agent (CAMPAIGN_AGENT_NOT_READY), a line that can send (CHANNEL_NOT_READY), an approved template whose parameters fit (a `TEMPLATE_*` code), a value for every variable (CAMPAIGN_VARIABLE_MISSING) and, when the template's header is a document, image or video, the first pending recipient's own `header` file (CAMPAIGN_HEADER_MISSING). A recipient must be pending (CAMPAIGN_NO_RECIPIENTS). `get_campaign` with `expand=readiness` lists all of this beforehand. A campaign starts once: starting a running one changes nothing, and a paused one resumes with `update_campaign` and `paused: false`. Not an AI tool: it reaches real people.
     pub async fn start(&self, input: &types::RaizCampaignsStartInput) -> Result<types::RaizCampaignsStartOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_START, input).await
     }
@@ -2912,7 +2912,7 @@ impl<'a> VisoftAppointmentsApi<'a> {
 
     /// List assigned appointments
     ///
-    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the contact phone and the state (`status`) SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
+    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the patient's document number, the contact phone and the state (`status`) SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
     pub async fn list(&self, input: &types::VisoftAppointmentsListInput) -> Result<types::VisoftAppointmentsListOutput, Error> {
         self.0.call(&operations::VISOFT_APPOINTMENTS_LIST, input).await
     }

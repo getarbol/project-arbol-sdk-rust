@@ -376,6 +376,10 @@ pub enum AccountConnectionToolsItemRuntimeInputsItem {
     Channel,
     #[serde(rename = "conversationUrl")]
     ConversationUrl,
+    #[serde(rename = "verifiedContact")]
+    VerifiedContact,
+    #[serde(rename = "outboundRecipient")]
+    OutboundRecipient,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -501,6 +505,29 @@ pub struct AccountConnectionLoginsItem {
     pub verified_at: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionRemindersMode {
+    #[serde(rename = "off")]
+    Off,
+    #[serde(rename = "review")]
+    Review,
+    #[serde(rename = "automatic")]
+    Automatic,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionReminders {
+    /// off: nothing is prepared or sent. review: each day the list is prepared as a campaign that has not started, for a person to review and start. automatic: each day the list is prepared and sent by itself at sendAt.
+    #[serde(rename = "mode")]
+    pub mode: AccountConnectionRemindersMode,
+    /// When the day's reminders go out: HH:MM, 24-hour, in the clinic's local time, every 15 minutes from 06:00 to 20:00. Every day, weekends and holidays included.
+    #[serde(rename = "sendAt")]
+    pub send_at: String,
+    /// On a given day, the appointments this many days ahead are reminded: 1 is the day before.
+    #[serde(rename = "daysBefore")]
+    pub days_before: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountConnection {
     /// A connection's id: con_ and 26 characters, stable and unique across the platform.
@@ -550,6 +577,9 @@ pub struct AccountConnection {
     /// Staff only; empty for other callers.
     #[serde(rename = "logins")]
     pub logins: Vec<AccountConnectionLoginsItem>,
+    /// Its WhatsApp appointment reminders, or null when its integration cannot feed them. Until someone changes them they are off, at 09:00, the day before.
+    #[serde(rename = "reminders")]
+    pub reminders: Option<AccountConnectionReminders>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -1929,6 +1959,8 @@ pub enum AccountPermissionGroup {
     Oficlinic,
     #[serde(rename = "sanitas")]
     Sanitas,
+    #[serde(rename = "gmedic")]
+    Gmedic,
     #[serde(rename = "account")]
     Account,
 }
@@ -49804,18 +49836,6 @@ pub struct GmedicAppointmentsPageDataItemRejectReason {
     pub value: Option<Option<String>>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum GmedicAppointmentsPageDataItemModality {
-    #[serde(rename = "FACE_TO_FACE")]
-    FACETOFACE,
-    #[serde(rename = "VIRTUAL")]
-    VIRTUAL,
-    #[serde(rename = "HOME_VISIT")]
-    HOMEVISIT,
-    #[serde(rename = "NOT_APPLICABLE")]
-    NOTAPPLICABLE,
-}
-
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicAppointmentsPageDataItem {
     #[serde(rename = "id")]
@@ -49880,7 +49900,7 @@ pub struct GmedicAppointmentsPageDataItem {
     #[serde(rename = "rejectReason", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub reject_reason: Option<Option<GmedicAppointmentsPageDataItemRejectReason>>,
     #[serde(rename = "modality", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub modality: Option<Option<GmedicAppointmentsPageDataItemModality>>,
+    pub modality: Option<Option<String>>,
     #[serde(rename = "videocallProvider", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub videocall_provider: Option<Option<String>>,
     #[serde(rename = "meetURL", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -50706,18 +50726,6 @@ pub struct GmedicCreateAppointmentResultRejectReason {
     pub value: Option<Option<String>>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum GmedicCreateAppointmentResultModality {
-    #[serde(rename = "FACE_TO_FACE")]
-    FACETOFACE,
-    #[serde(rename = "VIRTUAL")]
-    VIRTUAL,
-    #[serde(rename = "HOME_VISIT")]
-    HOMEVISIT,
-    #[serde(rename = "NOT_APPLICABLE")]
-    NOTAPPLICABLE,
-}
-
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicCreateAppointmentResult {
     #[serde(rename = "id")]
@@ -50782,7 +50790,7 @@ pub struct GmedicCreateAppointmentResult {
     #[serde(rename = "rejectReason", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub reject_reason: Option<Option<GmedicCreateAppointmentResultRejectReason>>,
     #[serde(rename = "modality", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub modality: Option<Option<GmedicCreateAppointmentResultModality>>,
+    pub modality: Option<Option<String>>,
     #[serde(rename = "videocallProvider", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub videocall_provider: Option<Option<String>>,
     #[serde(rename = "meetURL", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -55208,18 +55216,6 @@ pub struct GmedicUpdateAppointmentResultRejectReason {
     pub value: Option<Option<String>>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum GmedicUpdateAppointmentResultModality {
-    #[serde(rename = "FACE_TO_FACE")]
-    FACETOFACE,
-    #[serde(rename = "VIRTUAL")]
-    VIRTUAL,
-    #[serde(rename = "HOME_VISIT")]
-    HOMEVISIT,
-    #[serde(rename = "NOT_APPLICABLE")]
-    NOTAPPLICABLE,
-}
-
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicUpdateAppointmentResult {
     #[serde(rename = "id")]
@@ -55284,7 +55280,7 @@ pub struct GmedicUpdateAppointmentResult {
     #[serde(rename = "rejectReason", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub reject_reason: Option<Option<GmedicUpdateAppointmentResultRejectReason>>,
     #[serde(rename = "modality", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub modality: Option<Option<GmedicUpdateAppointmentResultModality>>,
+    pub modality: Option<Option<String>>,
     #[serde(rename = "videocallProvider", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub videocall_provider: Option<Option<String>>,
     #[serde(rename = "meetURL", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -68529,10 +68525,23 @@ pub struct RaizCampaignPageResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignProgressButtonsItem {
+    /// How many recipients have it as their last press.
+    #[serde(rename = "recipients")]
+    pub recipients: i64,
+    /// The button's text, as the template shows it.
+    #[serde(rename = "text")]
+    pub text: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizCampaignProgress {
     /// Calls: recipients whose latest call someone answered and its analysis judged.
     #[serde(rename = "answered")]
     pub answered: i64,
+    /// WhatsApp: the template's quick-reply buttons people pressed, most pressed first, each with how many recipients pressed it last. A recipient counts once, under their latest press. A button nobody pressed is not listed. Read from the reply itself: a written answer is not a button.
+    #[serde(rename = "buttons")]
+    pub buttons: Vec<RaizCampaignProgressButtonsItem>,
     #[serde(rename = "completed")]
     pub completed: i64,
     /// WhatsApp: recipients who received a message.
@@ -68545,6 +68554,12 @@ pub struct RaizCampaignProgress {
     /// Calls: recipients who failed because their calls ran out without anyone answering. A voicemail counts here.
     #[serde(rename = "noAnswer")]
     pub no_answer: i64,
+    /// WhatsApp: recipients a message reached (`deliveredAt`) who pressed none of its buttons, whether or not they wrote. People still pending, or whose message never arrived, are not counted.
+    #[serde(rename = "noButton")]
+    pub no_button: i64,
+    /// WhatsApp: recipients a message reached who neither pressed a button nor wrote: `noButton` less those who answered in writing.
+    #[serde(rename = "noReply")]
+    pub no_reply: i64,
     #[serde(rename = "pending")]
     pub pending: i64,
     /// WhatsApp: recipients who read a message.
@@ -68594,6 +68609,16 @@ pub struct RaizCampaignRecipientInput {
     /// Values for the `{{name}}` variables a WhatsApp template's parameters, or the Agent's instructions, first message or this campaign's texts on a call, reference. A reference means the variable that is the same word, whatever its accents and case: `{{País}}` reads `pais`, and an exact name wins. Raíz always provides `contact_name`, `contact_given_name` and `contact_phone`, and on a call also `contact_id`, `conversation_id` and `bulletins` (the business bulletins in force); a recipient's values never replace them.
     #[serde(rename = "variables", default, skip_serializing_if = "Option::is_none")]
     pub variables: Option<std::collections::BTreeMap<String, String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignRecipientPageDataItemButton {
+    /// An instant in RFC 3339 format, in UTC.
+    #[serde(rename = "pressedAt")]
+    pub pressed_at: String,
+    /// The button's text, as the template shows it.
+    #[serde(rename = "text")]
+    pub text: String,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -68670,6 +68695,8 @@ pub struct RaizCampaignRecipientPageDataItem {
     pub address: String,
     #[serde(rename = "attemptCount")]
     pub attempt_count: i64,
+    #[serde(rename = "button")]
+    pub button: Option<RaizCampaignRecipientPageDataItemButton>,
     #[serde(rename = "contact")]
     pub contact: Option<RaizCampaignRecipientPageDataItemContact>,
     #[serde(rename = "contactId")]
@@ -68965,6 +68992,16 @@ pub enum RaizCampaignsGetInputRecipientsDirection {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizCampaignsGetInputRecipientsReply {
+    #[serde(rename = "button")]
+    Button,
+    #[serde(rename = "written")]
+    Written,
+    #[serde(rename = "none")]
+    None,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizCampaignsGetInputRecipientsStatus {
     #[serde(rename = "pending")]
     Pending,
@@ -69001,6 +69038,12 @@ pub struct RaizCampaignsGetInput {
     /// With `expand=recipients`: `definitionKey=optionKey`, only those whose latest answer is that option; `definitionKey=`, only those with no answer yet.
     #[serde(rename = "recipientsResult", default, skip_serializing_if = "Option::is_none")]
     pub recipients_result: Option<String>,
+    /// With `expand=recipients`: only those whose last pressed button is this one, by its exact text.
+    #[serde(rename = "recipientsButton", default, skip_serializing_if = "Option::is_none")]
+    pub recipients_button: Option<String>,
+    /// With `expand=recipients`, WhatsApp: how the people a message reached answered it. `button`: they pressed one of its buttons. `written`: they wrote and pressed none. `none`: they did neither (`progress.noReply`).
+    #[serde(rename = "recipientsReply", default, skip_serializing_if = "Option::is_none")]
+    pub recipients_reply: Option<RaizCampaignsGetInputRecipientsReply>,
     /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: an attempt succeeded; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
     #[serde(rename = "recipientsStatus", default, skip_serializing_if = "Option::is_none")]
     pub recipients_status: Option<RaizCampaignsGetInputRecipientsStatus>,
@@ -71074,10 +71117,10 @@ pub struct RaizConversation {
     /// Your own keys and labels for this resource (up to 50 keys of 40 characters; values up to 500 characters). Raíz never interprets them.
     #[serde(rename = "metadata")]
     pub metadata: std::collections::BTreeMap<String, String>,
-    /// A person of the organization wrote to the contact, in Raíz or in the WhatsApp Business app.
+    /// The organization's team wrote to the contact, in Raíz or in the WhatsApp Business app. The message a campaign or a machine client opens a conversation with is not the team's (a message's `origin`).
     #[serde(rename = "operatorReplied")]
     pub operator_replied: bool,
-    /// How it started: the contact reached out (`inbound`), a person of the organization started it (`manual`: in the Dashboard, or on WhatsApp in the WhatsApp Business app), a client through the API (`api`), a campaign, an import or a person-owned WhatsApp Agent trial (`test`).
+    /// How it started: the contact reached out (`inbound`), a person of the organization started it (`manual`: in the Dashboard, or on WhatsApp in the WhatsApp Business app), a client through the API (`api`), a campaign, an import or a person-owned WhatsApp Agent trial (`test`). On WhatsApp, `campaign` and `api` with `direction: inbound` are the contact answering such a message after its conversation closed, which continues it.
     #[serde(rename = "origin")]
     pub origin: RaizConversationOrigin,
     #[serde(rename = "outcome")]
@@ -71110,7 +71153,7 @@ pub struct RaizConversation {
     pub updated_at: String,
     #[serde(rename = "version")]
     pub version: i64,
-    /// Who works the conversation for the organization, in the order each first wrote something the contact saw (those who have not yet, last): each Agent and the team that wrote in it and, while it is open or when nobody answered it, whoever has it (the assigned Agent while the AI handles it, the team otherwise). `agentId` is the Agent assigned now.
+    /// Who works the conversation for the organization, in the order each first wrote something the contact saw (those who have not yet, last): each Agent and the team that wrote in it and, while it is open or when nobody answered it, whoever has it (the assigned Agent while the AI handles it, the team otherwise). A campaign's message and a machine client's opening make nobody a worker: read who sent them from the message's `origin`. `agentId` is the Agent assigned now.
     #[serde(rename = "workers")]
     pub workers: Vec<RaizConversationWorker>,
     #[serde(rename = "toolCalls")]
@@ -71785,7 +71828,7 @@ pub struct RaizConversationWorkerTeam {
     pub answering: bool,
     #[serde(rename = "kind")]
     pub kind: RaizConversationWorkerTeamKind,
-    /// The people Raíz knows wrote, in the order they first did. What the WhatsApp Business app sends counts for the team without naming anyone.
+    /// The people Raíz knows wrote, in the order they first did. What the WhatsApp Business app sends counts for the team without naming anyone; what a campaign or a machine client's opening sends does not count for the team.
     #[serde(rename = "members")]
     pub members: Vec<RaizConversationWorkerTeamMembersItem>,
     #[serde(rename = "firstMessageAt")]
@@ -72992,6 +73035,7 @@ pub enum RaizCreateChannelForbiddenFailure {
     ForbiddenFailure(ForbiddenFailure),
     RaizChannelCreationInAppFailure(RaizChannelCreationInAppFailure),
     RaizConversationViewAuthorOnlyFailure(RaizConversationViewAuthorOnlyFailure),
+    RaizOutboundChannelRefusedFailure(RaizOutboundChannelRefusedFailure),
     RaizWhatsappChannelRefusedFailure(RaizWhatsappChannelRefusedFailure),
     RaizWidgetRefusedFailure(RaizWidgetRefusedFailure),
 }
@@ -73035,6 +73079,7 @@ pub struct RaizCreateChannelInternalServerErrorError {
 #[serde(untagged)]
 pub enum RaizCreateChannelInternalServerErrorFailure {
     InternalFailure(InternalFailure),
+    RaizOutboundChannelInternalFailure(RaizOutboundChannelInternalFailure),
     RaizWhatsappChannelInternalFailure(RaizWhatsappChannelInternalFailure),
     RaizWhatsappNotSentFailure(RaizWhatsappNotSentFailure),
     RaizWidgetInternalFailure(RaizWidgetInternalFailure),
@@ -73411,6 +73456,9 @@ pub struct RaizCreateConversationBodyWhatsapp {
     pub channel_id: String,
     #[serde(rename = "channelType")]
     pub channel_type: RaizCreateConversationBodyWhatsappChannelType,
+    /// What the Agent should know and do if the person replies (what the message is about, what each answer means, how to speak), as a campaign recipient's `instructions`. Kept with the conversation and never sent to the person.
+    #[serde(rename = "instructions", default, skip_serializing_if = "Option::is_none")]
+    pub instructions: Option<String>,
     /// Your own keys for this conversation, such as your reference for the request (`reference`), to recognize it in the changed feed or find it with `metadataReference`. Raíz keeps no idempotency key: after a timeout, look for your reference before asking again.
     #[serde(rename = "metadata", default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::BTreeMap<String, String>>,
@@ -73420,6 +73468,9 @@ pub struct RaizCreateConversationBodyWhatsapp {
     /// Free text; WhatsApp accepts it only inside the 24-hour window.
     #[serde(rename = "text", default, skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
+    /// What the business knows about this person, by name (an appointment's date and its reference, say), as a campaign recipient's `variables`. Kept with the conversation and never sent to the person: the Agent reads them when the person replies, and does not ask for them again. They fill nothing in the message; its template's values are `template.parameters`.
+    #[serde(rename = "variables", default, skip_serializing_if = "Option::is_none")]
+    pub variables: Option<std::collections::BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -73460,6 +73511,9 @@ pub struct RaizCreateConversationBodyVariant4 {
     /// Destination number in E.164. Omit it to use the contact's preferred phone; WhatsApp can also reuse a messaging identity received from that contact on the selected channel when no phone is stored.
     #[serde(rename = "to", default, skip_serializing_if = "Option::is_none")]
     pub to: Option<String>,
+    /// On WhatsApp, what the Agent should know and do if the person replies, as a campaign recipient's `instructions`: kept with the conversation and never sent to the person. On a call, added after the profile's instructions, for that call only.
+    #[serde(rename = "instructions", default, skip_serializing_if = "Option::is_none")]
+    pub instructions: Option<String>,
     /// Your own keys for this conversation, such as your reference for the request (`reference`), to recognize it in the changed feed or find it with `metadataReference`. Raíz keeps no idempotency key: after a timeout, look for your reference before asking again.
     #[serde(rename = "metadata", default, skip_serializing_if = "Option::is_none")]
     pub metadata: Option<std::collections::BTreeMap<String, String>>,
@@ -73469,7 +73523,7 @@ pub struct RaizCreateConversationBodyVariant4 {
     /// WhatsApp profiles whose template has a document, image or video header: the file shown in it, different on every send (an appointment's receipt). Refused by any other profile.
     #[serde(rename = "templateHeader", default, skip_serializing_if = "Option::is_none")]
     pub template_header: Option<RaizTemplateHeaderFile>,
-    /// Values for the `{{name}}` variables of the profile's template parameters (WhatsApp) or of the Agent's and the profile's texts (calls).
+    /// Values for the `{{name}}` variables of the profile's template parameters (WhatsApp) or of the Agent's and the profile's texts (calls). On WhatsApp they are also kept with the conversation, never sent as such, for the Agent to read when the person replies, as a campaign recipient's `variables`.
     #[serde(rename = "variables", default, skip_serializing_if = "Option::is_none")]
     pub variables: Option<std::collections::BTreeMap<String, String>>,
 }
@@ -73590,6 +73644,7 @@ pub enum RaizCreateConversationForbiddenFailure {
     ForbiddenFailure(ForbiddenFailure),
     RaizChannelCreationInAppFailure(RaizChannelCreationInAppFailure),
     RaizConversationViewAuthorOnlyFailure(RaizConversationViewAuthorOnlyFailure),
+    RaizOutboundChannelRefusedFailure(RaizOutboundChannelRefusedFailure),
     RaizWhatsappChannelRefusedFailure(RaizWhatsappChannelRefusedFailure),
     RaizWidgetRefusedFailure(RaizWidgetRefusedFailure),
 }
@@ -73633,6 +73688,7 @@ pub struct RaizCreateConversationInternalServerErrorError {
 #[serde(untagged)]
 pub enum RaizCreateConversationInternalServerErrorFailure {
     InternalFailure(InternalFailure),
+    RaizOutboundChannelInternalFailure(RaizOutboundChannelInternalFailure),
     RaizWhatsappChannelInternalFailure(RaizWhatsappChannelInternalFailure),
     RaizWhatsappNotSentFailure(RaizWhatsappNotSentFailure),
     RaizWidgetInternalFailure(RaizWidgetInternalFailure),
@@ -75664,6 +75720,7 @@ pub enum RaizDeleteChannelForbiddenFailure {
     ForbiddenFailure(ForbiddenFailure),
     RaizChannelCreationInAppFailure(RaizChannelCreationInAppFailure),
     RaizConversationViewAuthorOnlyFailure(RaizConversationViewAuthorOnlyFailure),
+    RaizOutboundChannelRefusedFailure(RaizOutboundChannelRefusedFailure),
     RaizWhatsappChannelRefusedFailure(RaizWhatsappChannelRefusedFailure),
     RaizWidgetRefusedFailure(RaizWidgetRefusedFailure),
 }
@@ -75707,6 +75764,7 @@ pub struct RaizDeleteChannelInternalServerErrorError {
 #[serde(untagged)]
 pub enum RaizDeleteChannelInternalServerErrorFailure {
     InternalFailure(InternalFailure),
+    RaizOutboundChannelInternalFailure(RaizOutboundChannelInternalFailure),
     RaizWhatsappChannelInternalFailure(RaizWhatsappChannelInternalFailure),
     RaizWhatsappNotSentFailure(RaizWhatsappNotSentFailure),
     RaizWidgetInternalFailure(RaizWidgetInternalFailure),
@@ -78857,6 +78915,10 @@ pub struct RaizMessageGeneration {
 pub enum RaizMessageOrigin {
     #[serde(rename = "business_app")]
     BusinessApp,
+    #[serde(rename = "campaign")]
+    Campaign,
+    #[serde(rename = "api")]
+    Api,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -79601,6 +79663,52 @@ pub struct RaizOrganizationUpdateInput {
 }
 
 pub type RaizOrganizationUpdateOutput = RaizOrganization;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOutboundChannelInternalFailureCode {
+    #[serde(rename = "OUTBOUND_CHANNEL_INTERNAL")]
+    OUTBOUNDCHANNELINTERNAL,
+}
+
+/// What became of the send could not be read back. Asking again never reaches the person twice.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizOutboundChannelInternalFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizOutboundChannelInternalFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizOutboundChannelRefusedFailureCode {
+    #[serde(rename = "OUTBOUND_CHANNEL_REFUSED")]
+    OUTBOUNDCHANNELREFUSED,
+}
+
+/// Only the Campaigns Worker sends through this service, and only for a recipient of a campaign of that organization.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizOutboundChannelRefusedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizOutboundChannelRefusedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizOutsideContactHoursFailureCode {
@@ -82985,6 +83093,7 @@ pub enum RaizUpdateChannelForbiddenFailure {
     ForbiddenFailure(ForbiddenFailure),
     RaizChannelCreationInAppFailure(RaizChannelCreationInAppFailure),
     RaizConversationViewAuthorOnlyFailure(RaizConversationViewAuthorOnlyFailure),
+    RaizOutboundChannelRefusedFailure(RaizOutboundChannelRefusedFailure),
     RaizWhatsappChannelRefusedFailure(RaizWhatsappChannelRefusedFailure),
     RaizWidgetRefusedFailure(RaizWidgetRefusedFailure),
 }
@@ -83028,6 +83137,7 @@ pub struct RaizUpdateChannelInternalServerErrorError {
 #[serde(untagged)]
 pub enum RaizUpdateChannelInternalServerErrorFailure {
     InternalFailure(InternalFailure),
+    RaizOutboundChannelInternalFailure(RaizOutboundChannelInternalFailure),
     RaizWhatsappChannelInternalFailure(RaizWhatsappChannelInternalFailure),
     RaizWhatsappNotSentFailure(RaizWhatsappNotSentFailure),
     RaizWidgetInternalFailure(RaizWidgetInternalFailure),
@@ -93189,6 +93299,9 @@ pub struct VisoftAssignedAppointment {
     pub specialty: String,
     #[serde(rename = "patientName")]
     pub patient_name: String,
+    /// The patient's document number, as SIIPS's agenda stores it: letters and digits only. Empty when the agenda shows none, or when its row and its reference name different documents.
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
     /// SIIPS's contact phone text; may be empty or contain several numbers.
     #[serde(rename = "phone")]
     pub phone: String,
