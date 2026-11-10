@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261110.74117";
+pub const RELEASE: &str = "1.20261110.193119";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1805,6 +1805,17 @@ pub const RAIZ_CONVERSATIONS_LIST: Operation = Operation {
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentId", QueryKind::String), ("campaignId", QueryKind::String), ("channelId", QueryKind::String), ("channelType", QueryKind::String), ("contactId", QueryKind::String), ("conversationDirection", QueryKind::String), ("handling", QueryKind::String), ("worker", QueryKind::String), ("origin", QueryKind::String), ("outcome", QueryKind::String), ("metadataReference", QueryKind::String), ("profileId", QueryKind::String), ("q", QueryKind::String), ("requestedBy", QueryKind::String), ("startedAfter", QueryKind::String), ("startedBefore", QueryKind::String), ("status", QueryKind::String), ("period", QueryKind::String), ("sentiment", QueryKind::String), ("toolName", QueryKind::String), ("toolStatus", QueryKind::String), ("factDefinition", QueryKind::String), ("factValue", QueryKind::String), ("assessment", QueryKind::String), ("toReview", QueryKind::Boolean), ("messagesMin", QueryKind::Integer), ("messagesMax", QueryKind::Integer), ("durationMin", QueryKind::Integer), ("durationMax", QueryKind::Integer), ("sort", QueryKind::String)]),
     effect: Effect::Read,
+    max_output_bytes: 1048576,
+};
+
+/// `raiz.conversations.send`: Send a message
+pub const RAIZ_CONVERSATIONS_SEND: Operation = Operation {
+    name: "raiz.conversations.send",
+    method: "POST",
+    path: "/v1/raiz/conversations/{conversationId}/send",
+    path_field: Some("conversationId"),
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 1048576,
 };
 

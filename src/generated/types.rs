@@ -14064,6 +14064,14 @@ pub enum AgendaGetAppointmentNotificationsResultDataItemObject {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaGetAppointmentNotificationsResultDataItemReason {
+    #[serde(rename = "phone_missing")]
+    PhoneMissing,
+    #[serde(rename = "phone_invalid")]
+    PhoneInvalid,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaGetAppointmentNotificationsResultDataItemState {
     #[serde(rename = "pending")]
     Pending,
@@ -14099,6 +14107,9 @@ pub struct AgendaGetAppointmentNotificationsResultDataItem {
     /// Discriminator for an appointment outbox entry.
     #[serde(rename = "object")]
     pub object: AgendaGetAppointmentNotificationsResultDataItemObject,
+    /// Why a failed call or WhatsApp entry that never reached the provider cannot be sent, read from the appointment's phone as it is now: none recorded, or not a valid phone number (one without a country code is read as Colombian). Absent when that phone is usable or the entry did not fail this way.
+    #[serde(rename = "reason", default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<AgendaGetAppointmentNotificationsResultDataItemReason>,
     /// Outbox state; sent means provider acceptance, while sending and uncertain are never retried blindly.
     #[serde(rename = "state")]
     pub state: AgendaGetAppointmentNotificationsResultDataItemState,
@@ -39450,6 +39461,14 @@ pub enum AgendaSendAppointmentReminderResultDataItemObject {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaSendAppointmentReminderResultDataItemReason {
+    #[serde(rename = "phone_missing")]
+    PhoneMissing,
+    #[serde(rename = "phone_invalid")]
+    PhoneInvalid,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AgendaSendAppointmentReminderResultDataItemState {
     #[serde(rename = "pending")]
     Pending,
@@ -39485,6 +39504,9 @@ pub struct AgendaSendAppointmentReminderResultDataItem {
     /// Discriminator for an appointment outbox entry.
     #[serde(rename = "object")]
     pub object: AgendaSendAppointmentReminderResultDataItemObject,
+    /// Why a failed call or WhatsApp entry that never reached the provider cannot be sent, read from the appointment's phone as it is now: none recorded, or not a valid phone number (one without a country code is read as Colombian). Absent when that phone is usable or the entry did not fail this way.
+    #[serde(rename = "reason", default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<AgendaSendAppointmentReminderResultDataItemReason>,
     /// Outbox state; sent means provider acceptance, while sending and uncertain are never retried blindly.
     #[serde(rename = "state")]
     pub state: AgendaSendAppointmentReminderResultDataItemState,
@@ -67234,6 +67256,8 @@ pub struct RaizAgentSettings {
     pub greeting: Option<RaizAgentGreeting>,
     #[serde(rename = "handoffMessage")]
     pub handoff_message: Option<String>,
+    #[serde(rename = "handoffReturnMinutes")]
+    pub handoff_return_minutes: Option<i64>,
     #[serde(rename = "humanReplyTimeoutMinutes")]
     pub human_reply_timeout_minutes: Option<i64>,
     #[serde(rename = "investigationsEnabled")]
@@ -67371,6 +67395,8 @@ pub struct RaizAgentSettingsInput {
     pub greeting: Option<Option<RaizAgentGreeting>>,
     #[serde(rename = "handoffMessage", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub handoff_message: Option<Option<String>>,
+    #[serde(rename = "handoffReturnMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub handoff_return_minutes: Option<Option<i64>>,
     #[serde(rename = "humanReplyTimeoutMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub human_reply_timeout_minutes: Option<Option<i64>>,
     #[serde(rename = "investigationsEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -70838,6 +70864,20 @@ pub enum RaizContinueConversationBadRequestFailure {
     RaizInvalidCursorFailure(RaizInvalidCursorFailure),
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizContinueConversationBodyTemplate {
+    /// The file shown above the text of a template whose header is a document, image or video, different on every send (an appointment's receipt, a ticket). Required by such a template, refused by any other.
+    #[serde(rename = "header", default, skip_serializing_if = "Option::is_none")]
+    pub header: Option<RaizTemplateHeaderFile>,
+    #[serde(rename = "language")]
+    pub language: String,
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Body parameters, in order.
+    #[serde(rename = "parameters", default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizContinueConversationBody {
     /// The `version` you read. When present, the change applies only if nobody changed the resource since; otherwise it fails with VERSION_CONFLICT.
@@ -70849,6 +70889,9 @@ pub struct RaizContinueConversationBody {
     /// A short internal note about the resolved blocker, authoritative evidence, confirmed appointments and any remaining request. A note does not establish coverage, clinical equivalence, consent or a booking. Preserve explicit human requests and unresolved clinical decisions, identity conflicts or uncertain writes with the team.
     #[serde(rename = "note", default, skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
+    /// An approved template of the conversation's channel that Raíz sends in this conversation now, from the team. With it the Agent does not write now: it answers when the person replies, reading `note`, so the conversation can be given back outside WhatsApp's 24-hour window. Without it the Agent continues at once, and the person must have written in the last 24 hours (WHATSAPP_WINDOW_CLOSED). Follow the template's `deliveryStatus` in the transcript.
+    #[serde(rename = "template", default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<RaizContinueConversationBodyTemplate>,
 }
 
 /// A failed answer.
@@ -70873,8 +70916,31 @@ pub enum RaizContinueConversationConflictFailure {
     RaizHandoffAlreadyContinuedFailure(RaizHandoffAlreadyContinuedFailure),
     RaizChannelNotReadyFailure(RaizChannelNotReadyFailure),
     RaizChannelTypeMismatchFailure(RaizChannelTypeMismatchFailure),
+    RaizTemplateNotApprovedFailure(RaizTemplateNotApprovedFailure),
     RaizWhatsappWindowClosedFailure(RaizWhatsappWindowClosedFailure),
+    RaizContactSuppressedFailure(RaizContactSuppressedFailure),
     RaizVersionConflictFailure(RaizVersionConflictFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizContinueConversationNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: RaizContinueConversationNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizContinueConversationNotFoundFailure {
+    RaizTemplateNotFoundFailure(RaizTemplateNotFoundFailure),
+    RaizResourceNotFoundFailure(RaizResourceNotFoundFailure),
 }
 
 /// A failed answer.
@@ -70896,6 +70962,30 @@ pub struct RaizContinueConversationServiceUnavailableError {
 pub enum RaizContinueConversationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     RaizIntegrationsUnavailableFailure(RaizIntegrationsUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizContinueConversationUnprocessableContentError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: RaizContinueConversationUnprocessableContentFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizContinueConversationUnprocessableContentFailure {
+    RaizTemplateHeaderMismatchFailure(RaizTemplateHeaderMismatchFailure),
+    RaizTemplateHeaderRequiredFailure(RaizTemplateHeaderRequiredFailure),
+    RaizTemplateParametersMismatchFailure(RaizTemplateParametersMismatchFailure),
+    RaizTemplateUnsupportedFailure(RaizTemplateUnsupportedFailure),
+    RaizWhatsappMessageUnsupportedFailure(RaizWhatsappMessageUnsupportedFailure),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -71848,6 +71938,20 @@ pub enum RaizConversationWorker {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationsContinueInputTemplate {
+    /// The file shown above the text of a template whose header is a document, image or video, different on every send (an appointment's receipt, a ticket). Required by such a template, refused by any other.
+    #[serde(rename = "header", default, skip_serializing_if = "Option::is_none")]
+    pub header: Option<RaizTemplateHeaderFile>,
+    #[serde(rename = "language")]
+    pub language: String,
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Body parameters, in order.
+    #[serde(rename = "parameters", default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizConversationsContinueInput {
     /// The `version` you read. When present, the change applies only if nobody changed the resource since; otherwise it fails with VERSION_CONFLICT.
     #[serde(rename = "expectedVersion", default, skip_serializing_if = "Option::is_none")]
@@ -71858,6 +71962,9 @@ pub struct RaizConversationsContinueInput {
     /// A short internal note about the resolved blocker, authoritative evidence, confirmed appointments and any remaining request. A note does not establish coverage, clinical equivalence, consent or a booking. Preserve explicit human requests and unresolved clinical decisions, identity conflicts or uncertain writes with the team.
     #[serde(rename = "note", default, skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
+    /// An approved template of the conversation's channel that Raíz sends in this conversation now, from the team. With it the Agent does not write now: it answers when the person replies, reading `note`, so the conversation can be given back outside WhatsApp's 24-hour window. Without it the Agent continues at once, and the person must have written in the last 24 hours (WHATSAPP_WINDOW_CLOSED). Follow the template's `deliveryStatus` in the transcript.
+    #[serde(rename = "template", default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<RaizConversationsContinueInputTemplate>,
     /// Conversation id.
     #[serde(rename = "conversationId")]
     pub conversation_id: String,
@@ -72253,6 +72360,114 @@ pub struct RaizConversationsListInput {
 }
 
 pub type RaizConversationsListOutput = RaizConversationPage;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsSendInputPartsItemTextFormat {
+    #[serde(rename = "plain")]
+    Plain,
+    #[serde(rename = "markdown")]
+    Markdown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsSendInputPartsItemTextType {
+    #[serde(rename = "text")]
+    Text,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationsSendInputPartsItemText {
+    #[serde(rename = "format", default, skip_serializing_if = "Option::is_none")]
+    pub format: Option<RaizConversationsSendInputPartsItemTextFormat>,
+    #[serde(rename = "text")]
+    pub text: String,
+    #[serde(rename = "type")]
+    pub r#type: RaizConversationsSendInputPartsItemTextType,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsSendInputPartsItemFileMediaType {
+    #[serde(rename = "image/jpeg")]
+    ImageJpeg,
+    #[serde(rename = "image/png")]
+    ImagePng,
+    #[serde(rename = "application/pdf")]
+    ApplicationPdf,
+    #[serde(rename = "text/plain")]
+    TextPlain,
+    #[serde(rename = "application/msword")]
+    ApplicationMsword,
+    #[serde(rename = "application/vnd.openxmlformats-officedocument.wordprocessingml.document")]
+    ApplicationVndOpenxmlformatsOfficedocumentWordprocessingmlDocument,
+    #[serde(rename = "application/vnd.ms-excel")]
+    ApplicationVndMsExcel,
+    #[serde(rename = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+    ApplicationVndOpenxmlformatsOfficedocumentSpreadsheetmlSheet,
+    #[serde(rename = "application/vnd.ms-powerpoint")]
+    ApplicationVndMsPowerpoint,
+    #[serde(rename = "application/vnd.openxmlformats-officedocument.presentationml.presentation")]
+    ApplicationVndOpenxmlformatsOfficedocumentPresentationmlPresentation,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsSendInputPartsItemFileType {
+    #[serde(rename = "file")]
+    File,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationsSendInputPartsItemFile {
+    /// The file's bytes in base64, at most 5242880 bytes decoded.
+    #[serde(rename = "data")]
+    pub data: String,
+    /// The name the contact sees for a document.
+    #[serde(rename = "fileName", default, skip_serializing_if = "Option::is_none")]
+    pub file_name: Option<String>,
+    /// JPEG and PNG are sent as an image; the others as a document.
+    #[serde(rename = "mediaType")]
+    pub media_type: RaizConversationsSendInputPartsItemFileMediaType,
+    #[serde(rename = "type")]
+    pub r#type: RaizConversationsSendInputPartsItemFileType,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizConversationsSendInputPartsItem {
+    Text(RaizConversationsSendInputPartsItemText),
+    File(RaizConversationsSendInputPartsItemFile),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationsSendInputTemplate {
+    /// The file shown above the text of a template whose header is a document, image or video, different on every send (an appointment's receipt, a ticket). Required by such a template, refused by any other.
+    #[serde(rename = "header", default, skip_serializing_if = "Option::is_none")]
+    pub header: Option<RaizTemplateHeaderFile>,
+    #[serde(rename = "language")]
+    pub language: String,
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Body parameters, in order.
+    #[serde(rename = "parameters", default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationsSendInput {
+    /// The message's parts: text and, on WhatsApp, at most one file, whose caption is the text. Give `parts` or `template`.
+    #[serde(rename = "parts", default, skip_serializing_if = "Option::is_none")]
+    pub parts: Option<Vec<RaizConversationsSendInputPartsItem>>,
+    /// WhatsApp only: send an approved template of the conversation's channel instead of `parts`, the one message WhatsApp delivers when the person has not written in the last 24 hours. Like any message of the team, it pauses the Agent for this person; to have the Agent answer their reply, give the conversation back with `continueConversation` and its `template` instead.
+    #[serde(rename = "template", default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<RaizConversationsSendInputTemplate>,
+    /// A message of the same conversation to quote.
+    #[serde(rename = "replyToMessageId", default, skip_serializing_if = "Option::is_none")]
+    pub reply_to_message_id: Option<String>,
+    /// Conversation id.
+    #[serde(rename = "conversationId")]
+    pub conversation_id: String,
+}
+
+pub type RaizConversationsSendOutput = RaizMessage;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationsUpdateInputStatus {
@@ -81257,10 +81472,27 @@ pub enum RaizSendMessageBodyPartsItem {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizSendMessageBodyTemplate {
+    /// The file shown above the text of a template whose header is a document, image or video, different on every send (an appointment's receipt, a ticket). Required by such a template, refused by any other.
+    #[serde(rename = "header", default, skip_serializing_if = "Option::is_none")]
+    pub header: Option<RaizTemplateHeaderFile>,
+    #[serde(rename = "language")]
+    pub language: String,
+    #[serde(rename = "name")]
+    pub name: String,
+    /// Body parameters, in order.
+    #[serde(rename = "parameters", default, skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<String>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizSendMessageBody {
-    /// The message's parts: text and, on WhatsApp, at most one file, whose caption is the text.
-    #[serde(rename = "parts")]
-    pub parts: Vec<RaizSendMessageBodyPartsItem>,
+    /// The message's parts: text and, on WhatsApp, at most one file, whose caption is the text. Give `parts` or `template`.
+    #[serde(rename = "parts", default, skip_serializing_if = "Option::is_none")]
+    pub parts: Option<Vec<RaizSendMessageBodyPartsItem>>,
+    /// WhatsApp only: send an approved template of the conversation's channel instead of `parts`, the one message WhatsApp delivers when the person has not written in the last 24 hours. Like any message of the team, it pauses the Agent for this person; to have the Agent answer their reply, give the conversation back with `continueConversation` and its `template` instead.
+    #[serde(rename = "template", default, skip_serializing_if = "Option::is_none")]
+    pub template: Option<RaizSendMessageBodyTemplate>,
     /// A message of the same conversation to quote.
     #[serde(rename = "replyToMessageId", default, skip_serializing_if = "Option::is_none")]
     pub reply_to_message_id: Option<String>,
@@ -81353,7 +81585,10 @@ pub struct RaizSendMessageUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizSendMessageUnprocessableContentFailure {
+    RaizTemplateHeaderMismatchFailure(RaizTemplateHeaderMismatchFailure),
+    RaizTemplateHeaderRequiredFailure(RaizTemplateHeaderRequiredFailure),
     RaizTemplateParametersMismatchFailure(RaizTemplateParametersMismatchFailure),
+    RaizTemplateUnsupportedFailure(RaizTemplateUnsupportedFailure),
     RaizWhatsappMediaRejectedFailure(RaizWhatsappMediaRejectedFailure),
     RaizWhatsappMessageUnsupportedFailure(RaizWhatsappMessageUnsupportedFailure),
     RaizWhatsappRecipientUnavailableFailure(RaizWhatsappRecipientUnavailableFailure),
