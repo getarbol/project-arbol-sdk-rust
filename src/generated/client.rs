@@ -1438,6 +1438,13 @@ impl<'a> OficlinicAffiliateTypesApi<'a> {
 pub struct OficlinicAppointmentsApi<'a>(&'a Client);
 
 impl<'a> OficlinicAppointmentsApi<'a> {
+    /// Cancel an appointment
+    ///
+    /// Cancel one upcoming assigned e-Oficlinic appointment of the patient resolved by citizenship card. Use the exact CAS (serviceNumber) from that patient's assigned appointments, one exact listed cancellation reason, and confirm true only after the patient or authorized staff confirms this specific cancellation. The same idempotency key and request return the recorded result without sending again. OUTCOME_UNKNOWN means the cancellation may have happened: look up the patient's cancelled appointments and do not dispatch it again. agentMode true answers concise Spanish text instead.
+    pub async fn cancel(&self, input: &types::OficlinicAppointmentsCancelInput) -> Result<types::OficlinicAppointmentsCancelOutput, Error> {
+        self.0.call(&operations::OFICLINIC_APPOINTMENTS_CANCEL, input).await
+    }
+
     /// Create an appointment
     ///
     /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that list_booking_slots offered in an availability flow. Requires confirm true and an idempotencyKey. Before anything is written, the patient is resolved by citizenship card; the program and attention type must be the flow's, and the source must still count exactly one unit for them; the regime, affiliate type and relationship must be listed by the provider; the payer, plan, subplan and contract must be listed by the provider for the connection; the service must be configured for the slot's professional; and a fresh read must still show the slot. The classification, billing and referral values are the clinic's own provider codes, which the caller supplies explicitly: this service never guesses them, never derives them from a program and never loads the clinic's tariff matrix. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement; this path has no live receipt yet). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the same idempotencyKey and request answers the recorded outcome. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
@@ -1506,7 +1513,7 @@ pub struct OficlinicBookingSlotsApi<'a>(&'a Client);
 impl<'a> OficlinicBookingSlotsApi<'a> {
     /// List booking slots
     ///
-    /// List the slots e-Oficlinic shows for one agenda day of the flow, for the flow's payer and its one-unit attention type, as its booking screen shows them (LISTAR_HORARIOS_AGENDAS_DISPONIBLES with the screen's display filter). The day must be one list_booking_days offered in the same flow. startsAt and endsAt come from the source's exact time range, and are null rather than guessed when it is unrecognized. Observed live for one agenda; the rows observed had no Estado, so status is usually null. Read-only: nothing is locked or reserved. Book one with create_appointment and its id as slotId. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
+    /// List the slots e-Oficlinic shows for one agenda day of the flow, for the flow's payer and its one-unit attention type, as its booking screen shows them (LISTAR_HORARIOS_AGENDAS_DISPONIBLES with the screen's display filter). The day must be one list_booking_days offered in the same flow. startsAt and endsAt come from the source's exact time range, and are null rather than guessed when it is unrecognized. Observed live for one agenda; the rows observed had no Estado, so status is usually null. Read-only: nothing is locked or reserved. For create_appointment or reschedule_appointment, copy the selected slot's flowId and slotId verbatim (slotId is called id in the structured result). Keep the two values together and refresh availability when the flow expires. Pass pageInfo.nextCursor with the same filters for more. agentMode true answers concise Spanish text instead.
     pub async fn list(&self, input: &types::OficlinicBookingSlotsListInput) -> Result<types::OficlinicBookingSlotsListOutput, Error> {
         self.0.call(&operations::OFICLINIC_BOOKING_SLOTS_LIST, input).await
     }
@@ -1542,6 +1549,19 @@ impl<'a> OficlinicConnectionsApi<'a> {
     /// Read an e-Oficlinic connection of the caller's organization: Account's name and status, the provider session's state and why it stopped, the selected company, site and IPS, and when it was verified and last used. It never contacts the provider and never returns credentials or cookies.
     pub async fn get(&self, input: &types::OficlinicConnectionsGetInput) -> Result<types::OficlinicConnectionsGetOutput, Error> {
         self.0.call(&operations::OFICLINIC_CONNECTIONS_GET, input).await
+    }
+}
+
+/// `oficlinic.dailyRoster`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicDailyRosterApi<'a>(&'a Client);
+
+impl<'a> OficlinicDailyRosterApi<'a> {
+    /// Get daily roster
+    ///
+    /// Read the e-Oficlinic daily patient roster for one professional and one date in Colombia. For authorized clinic staff only. Returns scheduled time, appointment number, patient display name, service and location. A vacant slot is not an appointment. Use the professional's id from list_professionals. Page through the same professional and date with pageInfo.nextCursor; results do not cover other professionals or sites.
+    pub async fn list(&self, input: &types::OficlinicDailyRosterListInput) -> Result<types::OficlinicDailyRosterListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_DAILY_ROSTER_LIST, input).await
     }
 }
 
@@ -1737,6 +1757,10 @@ impl<'a> OficlinicApi<'a> {
 
     pub fn connections(&self) -> OficlinicConnectionsApi<'a> {
         OficlinicConnectionsApi(self.0)
+    }
+
+    pub fn daily_roster(&self) -> OficlinicDailyRosterApi<'a> {
+        OficlinicDailyRosterApi(self.0)
     }
 
     pub fn patients(&self) -> OficlinicPatientsApi<'a> {
@@ -3011,6 +3035,19 @@ impl<'a> VisoftContractsApi<'a> {
     }
 }
 
+/// `visoft.patientNameEncodings`
+#[derive(Debug, Clone, Copy)]
+pub struct VisoftPatientNameEncodingsApi<'a>(&'a Client);
+
+impl<'a> VisoftPatientNameEncodingsApi<'a> {
+    /// Audit stored patient name encoding
+    ///
+    /// Read the current SIIPS records of the supplied patients and identify name fields with recognizable misdecoded Spanish accents. Returns only the affected field names and document type, without the names or document numbers. Requires the permission to correct patient records. This operation only reads records.
+    pub async fn lookup(&self, input: &types::VisoftPatientNameEncodingsLookupInput) -> Result<types::VisoftPatientNameEncodingsLookupOutput, Error> {
+        self.0.call(&operations::VISOFT_PATIENT_NAME_ENCODINGS_LOOKUP, input).await
+    }
+}
+
 /// `visoft.patients`
 #[derive(Debug, Clone, Copy)]
 pub struct VisoftPatientsApi<'a>(&'a Client);
@@ -3108,6 +3145,10 @@ impl<'a> VisoftApi<'a> {
 
     pub fn contracts(&self) -> VisoftContractsApi<'a> {
         VisoftContractsApi(self.0)
+    }
+
+    pub fn patient_name_encodings(&self) -> VisoftPatientNameEncodingsApi<'a> {
+        VisoftPatientNameEncodingsApi(self.0)
     }
 
     pub fn patients(&self) -> VisoftPatientsApi<'a> {

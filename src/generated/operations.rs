@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261111.45612";
+pub const RELEASE: &str = "1.20261111.183700";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1181,6 +1181,17 @@ pub const OFICLINIC_AFFILIATE_TYPES_LIST: Operation = Operation {
     max_output_bytes: 65536,
 };
 
+/// `oficlinic.appointments.cancel`: Cancel an appointment
+pub const OFICLINIC_APPOINTMENTS_CANCEL: Operation = Operation {
+    name: "oficlinic.appointments.cancel",
+    method: "POST",
+    path: "/v1/oficlinic/appointments/{appointmentId}/cancel",
+    path_field: Some("appointmentId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 65536,
+};
+
 /// `oficlinic.appointments.create`: Create an appointment
 pub const OFICLINIC_APPOINTMENTS_CREATE: Operation = Operation {
     name: "oficlinic.appointments.create",
@@ -1287,6 +1298,17 @@ pub const OFICLINIC_CONNECTIONS_GET: Operation = Operation {
     path: "/v1/oficlinic/connections/{connectionId}",
     path_field: Some("connectionId"),
     query: Some(&[]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.dailyRoster.list`: Get daily roster
+pub const OFICLINIC_DAILY_ROSTER_LIST: Operation = Operation {
+    name: "oficlinic.dailyRoster.list",
+    method: "GET",
+    path: "/v1/oficlinic/daily-roster",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("date", QueryKind::String), ("professionalId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
     max_output_bytes: 65536,
 };
@@ -2607,6 +2629,17 @@ pub const VISOFT_CONTRACTS_LIST: Operation = Operation {
     path: "/v1/visoft/contracts",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("connectionId", QueryKind::String), ("agencyCode", QueryKind::String), ("refresh", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 1048576,
+};
+
+/// `visoft.patientNameEncodings.lookup`: Audit stored patient name encoding
+pub const VISOFT_PATIENT_NAME_ENCODINGS_LOOKUP: Operation = Operation {
+    name: "visoft.patientNameEncodings.lookup",
+    method: "POST",
+    path: "/v1/visoft/patient-name-encodings/lookup",
+    path_field: None,
+    query: None,
     effect: Effect::Read,
     max_output_bytes: 1048576,
 };
