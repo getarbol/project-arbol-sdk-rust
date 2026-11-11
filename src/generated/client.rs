@@ -1682,6 +1682,19 @@ impl<'a> OficlinicRelationshipsApi<'a> {
     }
 }
 
+/// `oficlinic.salaryRanges`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicSalaryRangesApi<'a>(&'a Client);
+
+impl<'a> OficlinicSalaryRangesApi<'a> {
+    /// List salary ranges
+    ///
+    /// List the salary ranges that the e-Oficlinic registration form offers for one listed regime. The provider's code can identify a clinic-confirmed classification for scheduling. The catalog amount does not establish the patient's classification, service tariff or amount due. Pass pageInfo.nextCursor with the same regimeId for more. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicSalaryRangesListInput) -> Result<types::OficlinicSalaryRangesListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_SALARY_RANGES_LIST, input).await
+    }
+}
+
 /// `oficlinic.serviceCatalog`
 #[derive(Debug, Clone, Copy)]
 pub struct OficlinicServiceCatalogApi<'a>(&'a Client);
@@ -1797,6 +1810,10 @@ impl<'a> OficlinicApi<'a> {
 
     pub fn relationships(&self) -> OficlinicRelationshipsApi<'a> {
         OficlinicRelationshipsApi(self.0)
+    }
+
+    pub fn salary_ranges(&self) -> OficlinicSalaryRangesApi<'a> {
+        OficlinicSalaryRangesApi(self.0)
     }
 
     pub fn service_catalog(&self) -> OficlinicServiceCatalogApi<'a> {

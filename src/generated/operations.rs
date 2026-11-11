@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261111.183700";
+pub const RELEASE: &str = "1.20261111.193208";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1408,6 +1408,17 @@ pub const OFICLINIC_RELATIONSHIPS_LIST: Operation = Operation {
     path: "/v1/oficlinic/relationships",
     path_field: None,
     query: Some(&[("connectionId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.salaryRanges.list`: List salary ranges
+pub const OFICLINIC_SALARY_RANGES_LIST: Operation = Operation {
+    name: "oficlinic.salaryRanges.list",
+    method: "GET",
+    path: "/v1/oficlinic/salary-ranges",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("regimeId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
     effect: Effect::Read,
     max_output_bytes: 65536,
 };

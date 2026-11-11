@@ -62959,6 +62959,178 @@ pub enum OficlinicListRelationshipsUnprocessableContentFailure {
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    OficlinicSignInOutcomeUnknownFailure(OficlinicSignInOutcomeUnknownFailure),
+    ProviderProtocolChangedFailure(ProviderProtocolChangedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesBadRequestError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesBadRequestFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesBadRequestFailure {
+    InvalidInputFailure(InvalidInputFailure),
+    OficlinicInvalidCursorFailure(OficlinicInvalidCursorFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesConflictFailure {
+    OficlinicConnectionRequiredFailure(OficlinicConnectionRequiredFailure),
+    OficlinicConnectionNotActiveFailure(OficlinicConnectionNotActiveFailure),
+    OficlinicConnectionBusyFailure(OficlinicConnectionBusyFailure),
+    OficlinicReauthenticationRequiredFailure(OficlinicReauthenticationRequiredFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesNotFoundFailure {
+    OficlinicConnectionNotFoundFailure(OficlinicConnectionNotFoundFailure),
+    OficlinicBookingOptionNotFoundFailure(OficlinicBookingOptionNotFoundFailure),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesResult {
+    OficlinicSalaryRangePage(OficlinicSalaryRangePage),
+    OficlinicAgentText(OficlinicAgentText),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: OficlinicListSalaryRangesResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    ProviderUnavailableFailure(ProviderUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesTooManyRequestsError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesTooManyRequestsFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesTooManyRequestsFailure {
+    RateLimitedFailure(RateLimitedFailure),
+    OficlinicLoginCoolingDownFailure(OficlinicLoginCoolingDownFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicListSalaryRangesUnprocessableContentError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicListSalaryRangesUnprocessableContentFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicListSalaryRangesUnprocessableContentFailure {
+    CredentialsRejectedFailure(CredentialsRejectedFailure),
+    OficlinicContextNotAvailableFailure(OficlinicContextNotAvailableFailure),
+    OficlinicProviderIdentityMismatchFailure(OficlinicProviderIdentityMismatchFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicListServicesBadGatewayError {
     #[serde(rename = "success")]
     pub success: serde_json::Value,
@@ -64651,6 +64823,73 @@ pub enum OficlinicRescheduleAppointmentUnprocessableContentFailure {
     OficlinicProviderIdentityMismatchFailure(OficlinicProviderIdentityMismatchFailure),
     OficlinicProgramUnitsNotSupportedFailure(OficlinicProgramUnitsNotSupportedFailure),
 }
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSalaryRange {
+    /// The provider's salary range code (Codigo).
+    #[serde(rename = "id")]
+    pub id: String,
+    /// The range's name (Descripcion).
+    #[serde(rename = "name")]
+    pub name: String,
+    /// The regime the provider listed this range for.
+    #[serde(rename = "regimeId")]
+    pub regime_id: String,
+    /// The catalog's VlrCuotaModeradora, not the amount due for a specific patient or service.
+    #[serde(rename = "sourceModeratorFee")]
+    pub source_moderator_fee: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum OficlinicSalaryRangePageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSalaryRangePage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<OficlinicSalaryRange>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: OficlinicSalaryRangePageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum OficlinicSalaryRangesListInputDirection {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSalaryRangesListInput {
+    /// An Account connection id of the caller's organization.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// A regime id from list_regimes.
+    #[serde(rename = "regimeId")]
+    pub regime_id: String,
+    /// An opaque cursor from a previous page's pageInfo.nextCursor or pageInfo.previousCursor.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<OficlinicSalaryRangesListInputDirection>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    /// true answers { text }: concise Spanish facts for a messaging or voice agent, with the short ids and the cursor needed to continue. false, the default, answers the structured object.
+    #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
+    pub agent_mode: Option<bool>,
+}
+
+pub type OficlinicSalaryRangesListOutput = OficlinicListSalaryRangesResult;
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
