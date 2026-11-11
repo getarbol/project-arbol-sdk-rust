@@ -2584,7 +2584,7 @@ pub struct SanitasAffiliationsApi<'a>(&'a Client);
 impl<'a> SanitasAffiliationsApi<'a> {
     /// Look up affiliation
     ///
-    /// Read one matching member contract from an active Account connection. Unknown or unresolved is never inactive. Session cookies are reused; one renewal is admitted only on expiry. This does not authorize care.
+    /// Read one matching member contract from an active Account connection. Confirmed affiliation results are reused for seven days. Unknown or unresolved is never inactive. Session cookies are reused; one renewal is admitted only on expiry. This does not authorize care.
     pub async fn lookup(&self, input: &types::SanitasAffiliationsLookupInput) -> Result<types::SanitasAffiliationsLookupOutput, Error> {
         self.0.call(&operations::SANITAS_AFFILIATIONS_LOOKUP, input).await
     }

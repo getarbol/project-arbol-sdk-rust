@@ -529,6 +529,13 @@ pub struct AccountConnectionReminders {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionArbi {
+    /// true: Arbi may use this connection's tools, within what the person asking may do. false: Arbi neither sees nor uses it. Agents and API keys are not affected.
+    #[serde(rename = "enabled")]
+    pub enabled: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountConnection {
     /// A connection's id: con_ and 26 characters, stable and unique across the platform.
     #[serde(rename = "id")]
@@ -580,6 +587,9 @@ pub struct AccountConnection {
     /// Its WhatsApp appointment reminders, or null when its integration cannot feed them. Until someone changes them they are off, at 09:00, the day before.
     #[serde(rename = "reminders")]
     pub reminders: Option<AccountConnectionReminders>,
+    /// Whether Arbi, the organization's assistant, may use this connection. On until someone turns it off.
+    #[serde(rename = "arbi")]
+    pub arbi: AccountConnectionArbi,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -68756,7 +68766,7 @@ pub struct RaizCampaignRecipientPageDataItem {
     /// What this person answered, from their conversations: the latest for each data definition with options their Agent collects. Empty until a conversation they answered closes and is analyzed.
     #[serde(rename = "results")]
     pub results: Vec<RaizCampaignRecipientPageDataItemResultsItem>,
-    /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: an attempt succeeded; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
+    /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: a call succeeded or ended normally with an inconclusive analysis; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
     #[serde(rename = "status")]
     pub status: RaizCampaignRecipientPageDataItemStatus,
     /// An instant in RFC 3339 format, in UTC.
@@ -69070,7 +69080,7 @@ pub struct RaizCampaignsGetInput {
     /// With `expand=recipients`, WhatsApp: how the people a message reached answered it. `button`: they pressed one of its buttons. `written`: they wrote and pressed none. `none`: they did neither (`progress.noReply`).
     #[serde(rename = "recipientsReply", default, skip_serializing_if = "Option::is_none")]
     pub recipients_reply: Option<RaizCampaignsGetInputRecipientsReply>,
-    /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: an attempt succeeded; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
+    /// `pending`: waiting for its (next) call or message. `in_progress`: being called, or on WhatsApp waiting for a reply until a reminder is due. `completed`: a call succeeded or ended normally with an inconclusive analysis; on WhatsApp, the message arrived. `failed`: its attempts ran out, or it cannot be reached.
     #[serde(rename = "recipientsStatus", default, skip_serializing_if = "Option::is_none")]
     pub recipients_status: Option<RaizCampaignsGetInputRecipientsStatus>,
 }
@@ -73716,6 +73726,9 @@ pub struct RaizCreateConversationBodyWeb {
     /// An isolated trial: business reads run normally; business writes are recorded as denied and never reach a provider. No contact memory is loaded. Required for a voice Agent, whose model reads that its writes went through so the whole flow can be followed.
     #[serde(rename = "origin", default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<RaizCreateConversationBodyWebOrigin>,
+    /// Sample values for a voice Agent's text trial (`origin: test`). These fill the greeting and subsequent turns without contacting anyone.
+    #[serde(rename = "variables", default, skip_serializing_if = "Option::is_none")]
+    pub variables: Option<std::collections::BTreeMap<String, String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
