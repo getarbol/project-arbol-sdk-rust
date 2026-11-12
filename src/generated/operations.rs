@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261112.173149";
+pub const RELEASE: &str = "1.20261112.191820";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1269,6 +1269,17 @@ pub const OFICLINIC_BOOKING_SLOTS_LIST: Operation = Operation {
     max_output_bytes: 65536,
 };
 
+/// `oficlinic.bookingSlots.search`: Search booking slots
+pub const OFICLINIC_BOOKING_SLOTS_SEARCH: Operation = Operation {
+    name: "oficlinic.bookingSlots.search",
+    method: "POST",
+    path: "/v1/oficlinic/booking-slots/search",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
 /// `oficlinic.cancellationReasons.list`: List cancellation reasons
 pub const OFICLINIC_CANCELLATION_REASONS_LIST: Operation = Operation {
     name: "oficlinic.cancellationReasons.list",
@@ -1508,6 +1519,17 @@ pub const RAIZ_AGENTS_CREATE: Operation = Operation {
     path_field: None,
     query: None,
     effect: Effect::Write,
+    max_output_bytes: 1048576,
+};
+
+/// `raiz.agents.delete`: Delete an Agent
+pub const RAIZ_AGENTS_DELETE: Operation = Operation {
+    name: "raiz.agents.delete",
+    method: "DELETE",
+    path: "/v1/raiz/agents/{agentId}",
+    path_field: Some("agentId"),
+    query: None,
+    effect: Effect::Delete,
     max_output_bytes: 1048576,
 };
 

@@ -59148,6 +59148,41 @@ pub struct OficlinicAppointmentsRescheduleInput {
 pub type OficlinicAppointmentsRescheduleOutput = OficlinicRescheduleAppointmentResult;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingDateOfferProfessional {
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingDateOfferRoom {
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingDateOffer {
+    /// The provider's agenda id (agendaID): pass it as dayId for its slots.
+    #[serde(rename = "dayId")]
+    pub day_id: String,
+    #[serde(rename = "date")]
+    pub date: String,
+    /// The provider's Disponibles count; null when not a count.
+    #[serde(rename = "availableCount")]
+    pub available_count: Option<i64>,
+    /// Whether this search read the day's slots; its future ones are in slots.
+    #[serde(rename = "slotsListed")]
+    pub slots_listed: bool,
+    #[serde(rename = "professional")]
+    pub professional: OficlinicBookingDateOfferProfessional,
+    #[serde(rename = "room")]
+    pub room: OficlinicBookingDateOfferRoom,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicBookingDay {
     /// The provider's agenda id for the day (agendaID): pass it as dayId for its slots.
     #[serde(rename = "id")]
@@ -59441,6 +59476,51 @@ pub struct OficlinicBookingSlot {
     pub flow_id: String,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingSlotOfferProfessional {
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingSlotOfferRoom {
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingSlotOffer {
+    /// The provider's slot id (citaID): pass it as slotId to book.
+    #[serde(rename = "id")]
+    pub id: String,
+    /// The availability flow of this slot: pass it with slotId to book.
+    #[serde(rename = "flowId")]
+    pub flow_id: String,
+    /// The provider's agenda id of the slot's day.
+    #[serde(rename = "dayId")]
+    pub day_id: String,
+    /// The slot's day in Colombia.
+    #[serde(rename = "date")]
+    pub date: String,
+    /// The slot as the provider describes it (citaDescripcion), usually its time.
+    #[serde(rename = "label")]
+    pub label: Option<String>,
+    /// The slot's exact start in America/Bogota; null if unrecognized.
+    #[serde(rename = "startsAt")]
+    pub starts_at: Option<String>,
+    /// The slot's exact end; null if unrecognized.
+    #[serde(rename = "endsAt")]
+    pub ends_at: Option<String>,
+    #[serde(rename = "professional")]
+    pub professional: OficlinicBookingSlotOfferProfessional,
+    #[serde(rename = "room")]
+    pub room: OficlinicBookingSlotOfferRoom,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum OficlinicBookingSlotPageObject {
     #[serde(rename = "list")]
@@ -59458,6 +59538,31 @@ pub struct OficlinicBookingSlotPage {
     /// Opaque navigation cursors for this page’s stable keyset order.
     #[serde(rename = "pageInfo")]
     pub page_info: PageInfo,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingSlotSearch {
+    /// The availability flow id every booking list item carries (flowId). It expires 30 minutes after the first list.
+    #[serde(rename = "flowId")]
+    pub flow_id: String,
+    /// When the flow expires.
+    #[serde(rename = "flowExpiresAt")]
+    pub flow_expires_at: String,
+    /// The first day searched.
+    #[serde(rename = "from")]
+    pub from: String,
+    /// The last day searched; null when open.
+    #[serde(rename = "to")]
+    pub to: Option<String>,
+    /// false when a bound stopped the search before every matching professional, room and day was read: nearer slots may exist.
+    #[serde(rename = "complete")]
+    pub complete: bool,
+    /// The nearest future slots of each room, earliest first.
+    #[serde(rename = "slots")]
+    pub slots: Vec<OficlinicBookingSlotOffer>,
+    /// The agenda days with availability in the searched days, earliest first.
+    #[serde(rename = "dates")]
+    pub dates: Vec<OficlinicBookingDateOffer>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -59494,6 +59599,45 @@ pub struct OficlinicBookingSlotsListInput {
 }
 
 pub type OficlinicBookingSlotsListOutput = OficlinicListBookingSlotsResult;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingSlotsSearchInput {
+    /// An Account connection id of the caller's organization.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// A payer id from list_payers.
+    #[serde(rename = "payerId")]
+    pub payer_id: String,
+    /// A service id, such as one search_services answers.
+    #[serde(rename = "serviceId")]
+    pub service_id: String,
+    /// A program id from list_programs.
+    #[serde(rename = "programId")]
+    pub program_id: String,
+    /// An attention type id the program lists in list_programs, with bookable true.
+    #[serde(rename = "attentionTypeId")]
+    pub attention_type_id: String,
+    /// Only these professionals. Empty, the default, searches every professional the provider schedules for the service.
+    #[serde(rename = "professionalIds", default, skip_serializing_if = "Option::is_none")]
+    pub professional_ids: Option<Vec<String>>,
+    /// Only these rooms, such as the rooms of one site. Empty, the default, searches every room.
+    #[serde(rename = "roomIds", default, skip_serializing_if = "Option::is_none")]
+    pub room_ids: Option<Vec<String>>,
+    /// The first day to search, YYYY-MM-DD in Colombia. Today when absent or in the past.
+    #[serde(rename = "from", default, skip_serializing_if = "Option::is_none")]
+    pub from: Option<String>,
+    /// The last day to search, YYYY-MM-DD, not before from. Open when absent. The same day as from searches one day.
+    #[serde(rename = "to", default, skip_serializing_if = "Option::is_none")]
+    pub to: Option<String>,
+    /// The most slots answered for each room, nearest first.
+    #[serde(rename = "slotsPerRoom", default, skip_serializing_if = "Option::is_none")]
+    pub slots_per_room: Option<i64>,
+    /// true answers { text }: concise Spanish facts for a messaging or voice agent, with the short ids and the cursor needed to continue. false, the default, answers the structured object.
+    #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
+    pub agent_mode: Option<bool>,
+}
+
+pub type OficlinicBookingSlotsSearchOutput = OficlinicSearchBookingSlotsResult;
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -65460,6 +65604,218 @@ pub type OficlinicSalaryRangesListOutput = OficlinicListSalaryRangesResult;
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    OficlinicSignInOutcomeUnknownFailure(OficlinicSignInOutcomeUnknownFailure),
+    ProviderProtocolChangedFailure(ProviderProtocolChangedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsBadRequestError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsBadRequestFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsBadRequestFailure {
+    InvalidInputFailure(InvalidInputFailure),
+    OficlinicInvalidCursorFailure(OficlinicInvalidCursorFailure),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsBody {
+    /// An Account connection id of the caller's organization.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// A payer id from list_payers.
+    #[serde(rename = "payerId")]
+    pub payer_id: String,
+    /// A service id, such as one search_services answers.
+    #[serde(rename = "serviceId")]
+    pub service_id: String,
+    /// A program id from list_programs.
+    #[serde(rename = "programId")]
+    pub program_id: String,
+    /// An attention type id the program lists in list_programs, with bookable true.
+    #[serde(rename = "attentionTypeId")]
+    pub attention_type_id: String,
+    /// Only these professionals. Empty, the default, searches every professional the provider schedules for the service.
+    #[serde(rename = "professionalIds", default, skip_serializing_if = "Option::is_none")]
+    pub professional_ids: Option<Vec<String>>,
+    /// Only these rooms, such as the rooms of one site. Empty, the default, searches every room.
+    #[serde(rename = "roomIds", default, skip_serializing_if = "Option::is_none")]
+    pub room_ids: Option<Vec<String>>,
+    /// The first day to search, YYYY-MM-DD in Colombia. Today when absent or in the past.
+    #[serde(rename = "from", default, skip_serializing_if = "Option::is_none")]
+    pub from: Option<String>,
+    /// The last day to search, YYYY-MM-DD, not before from. Open when absent. The same day as from searches one day.
+    #[serde(rename = "to", default, skip_serializing_if = "Option::is_none")]
+    pub to: Option<String>,
+    /// The most slots answered for each room, nearest first.
+    #[serde(rename = "slotsPerRoom", default, skip_serializing_if = "Option::is_none")]
+    pub slots_per_room: Option<i64>,
+    /// true answers { text }: concise Spanish facts for a messaging or voice agent, with the short ids and the cursor needed to continue. false, the default, answers the structured object.
+    #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
+    pub agent_mode: Option<bool>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsConflictFailure {
+    OficlinicConnectionRequiredFailure(OficlinicConnectionRequiredFailure),
+    OficlinicConnectionNotActiveFailure(OficlinicConnectionNotActiveFailure),
+    OficlinicConnectionBusyFailure(OficlinicConnectionBusyFailure),
+    OficlinicReauthenticationRequiredFailure(OficlinicReauthenticationRequiredFailure),
+    OficlinicSelectionNotAvailableFailure(OficlinicSelectionNotAvailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsNotFoundFailure {
+    OficlinicConnectionNotFoundFailure(OficlinicConnectionNotFoundFailure),
+    OficlinicPayerNotFoundFailure(OficlinicPayerNotFoundFailure),
+    OficlinicBookingOptionNotFoundFailure(OficlinicBookingOptionNotFoundFailure),
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsResult {
+    OficlinicBookingSlotSearch(OficlinicBookingSlotSearch),
+    OficlinicAgentText(OficlinicAgentText),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: OficlinicSearchBookingSlotsResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    ProviderUnavailableFailure(ProviderUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsTooManyRequestsError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsTooManyRequestsFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsTooManyRequestsFailure {
+    RateLimitedFailure(RateLimitedFailure),
+    OficlinicLoginCoolingDownFailure(OficlinicLoginCoolingDownFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicSearchBookingSlotsUnprocessableContentError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: OficlinicSearchBookingSlotsUnprocessableContentFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum OficlinicSearchBookingSlotsUnprocessableContentFailure {
+    CredentialsRejectedFailure(CredentialsRejectedFailure),
+    OficlinicContextNotAvailableFailure(OficlinicContextNotAvailableFailure),
+    OficlinicProviderIdentityMismatchFailure(OficlinicProviderIdentityMismatchFailure),
+    OficlinicProgramUnitsNotSupportedFailure(OficlinicProgramUnitsNotSupportedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicSearchServicesBadGatewayError {
     #[serde(rename = "success")]
     pub success: serde_json::Value,
@@ -69159,6 +69515,15 @@ pub struct RaizAgentsCreateInput {
 }
 
 pub type RaizAgentsCreateOutput = RaizAgent;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentsDeleteInput {
+    /// Agent id.
+    #[serde(rename = "agentId")]
+    pub agent_id: String,
+}
+
+pub type RaizAgentsDeleteOutput = DeletedObject;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizAgentsGetInput {
@@ -81209,6 +81574,7 @@ pub struct RaizOrganizationUpdateInput {
     /// BCP 47 language tag.
     #[serde(rename = "language", default, skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
+    /// Legacy field for clients that echo the existing name. Edit the organization name in Arbol Account.
     #[serde(rename = "name", default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Settings to change. An omitted setting stays as it is; `null` returns it to its default.
@@ -85511,6 +85877,7 @@ pub struct RaizUpdateOrganizationBody {
     /// BCP 47 language tag.
     #[serde(rename = "language", default, skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
+    /// Legacy field for clients that echo the existing name. Edit the organization name in Arbol Account.
     #[serde(rename = "name", default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     /// Settings to change. An omitted setting stays as it is; `null` returns it to its default.

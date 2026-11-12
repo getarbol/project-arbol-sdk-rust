@@ -1517,6 +1517,13 @@ impl<'a> OficlinicBookingSlotsApi<'a> {
     pub async fn list(&self, input: &types::OficlinicBookingSlotsListInput) -> Result<types::OficlinicBookingSlotsListOutput, Error> {
         self.0.call(&operations::OFICLINIC_BOOKING_SLOTS_LIST, input).await
     }
+
+    /// Search booking slots
+    ///
+    /// Find the nearest real slots e-Oficlinic offers for one payer, service, program and attention type, in one call: it opens an availability flow, reads the professionals the provider schedules for the service, their rooms and each combination's agenda days, then the slots of the earliest days, and answers up to slotsPerRoom future slots for each room with the professional, the room, the day and the flowId and slotId that book it. Use it instead of walking list_booking_professionals, list_booking_rooms, list_booking_days and list_booking_slots. Without from it starts today in Colombia; for one requested day pass that day as both from and to. professionalIds keeps a named professional; roomIds keeps the rooms of one site, since a room is the place of care and this provider names the site only in the room's name. dates lists every agenda day with availability found in those days, at most 60, so another date can be offered and searched next. Slots already past are left out. complete false means a bound stopped the search early (at most 40 professionals, 60 professional and room combinations, 16 agenda days read for slots, and 8 seconds): narrow the filters, and never present the result as the nearest. An empty slots list concerns this payer, service and filters only. The payer must be one list_payers answers, or PAYER_NOT_FOUND; the program and attention type come from list_programs, or BOOKING_OPTION_NOT_FOUND, and an attention type that is not exactly one unit answers PROGRAM_UNITS_NOT_SUPPORTED. Read-only: nothing is locked or reserved. The flow expires 30 minutes after the search; for create_appointment or reschedule_appointment, copy the selected slot's flowId and slotId verbatim. agentMode true answers concise Spanish text instead.
+    pub async fn search(&self, input: &types::OficlinicBookingSlotsSearchInput) -> Result<types::OficlinicBookingSlotsSearchOutput, Error> {
+        self.0.call(&operations::OFICLINIC_BOOKING_SLOTS_SEARCH, input).await
+    }
 }
 
 /// `oficlinic.cancellationReasons`
@@ -1882,6 +1889,13 @@ impl<'a> RaizAgentsApi<'a> {
     /// Create an Agent that talks to the organization's contacts. Choose `modality` (`voice`: phone calls; `text`: WhatsApp and web chat) and a `name`; then give it `instructions` (role, goal, limits), and optionally a `firstMessage`, `language`, `timeZone`, `settings`, Knowledge (`knowledgeDocumentIds` of ready documents from `list_knowledge_documents`) and `integrationTools` (connection + tool pairs of the organization's connections in Account, checked live: INTEGRATION_TOOL_UNAVAILABLE), `procedures` (each a trigger plus free-form Markdown or structured steps, with inline references to the Agent's tools, Knowledge and other procedures: AGENT_PROCEDURES_INVALID says where one is wrong), `workflow` (a conversation graph of steps and edges: AGENT_WORKFLOW_INVALID says where one is wrong), and for a text Agent `integrationProcedures` (connection + procedure pairs a connection publishes, checked live: INTEGRATION_PROCEDURE_UNAVAILABLE). Next: assign it to a channel with `update_channel`; a voice Agent is published in the background, so check `synced` with `get_agent`. Read the `create-agent` skill (`get_skill`) first.
     pub async fn create(&self, input: &types::RaizAgentsCreateInput) -> Result<types::RaizAgentsCreateOutput, Error> {
         self.0.call(&operations::RAIZ_AGENTS_CREATE, input).await
+    }
+
+    /// Delete an Agent
+    ///
+    /// Delete an Agent for good; its conversations remain. Refused with AGENT_IN_USE while a channel or an active campaign uses it: unassign its channels (`update_channel` with `agentId: null`) or finish the campaign first. Not an AI tool; to stop an Agent without deleting it, pause it with `update_agent` (`status: paused`).
+    pub async fn delete(&self, input: &types::RaizAgentsDeleteInput) -> Result<types::RaizAgentsDeleteOutput, Error> {
+        self.0.call(&operations::RAIZ_AGENTS_DELETE, input).await
     }
 
     /// Get an Agent
@@ -2322,7 +2336,7 @@ impl<'a> RaizOrganizationApi<'a> {
 
     /// Update the organization
     ///
-    /// Change the organization's name, default language, time zone or settings. Settings merge: an omitted setting stays and `null` returns it to its default; `notifications.recipients` is replaced as a whole. Fails with TIME_ZONE_UNKNOWN when the time zone is not a valid IANA zone (for example `America/Bogota`).
+    /// Change the organization's default language, time zone or settings. Edit the organization's name in Arbol Account. Settings merge: an omitted setting stays and `null` returns it to its default; `notifications.recipients` is replaced as a whole. Fails with TIME_ZONE_UNKNOWN when the time zone is not a valid IANA zone (for example `America/Bogota`).
     pub async fn update(&self, input: &types::RaizOrganizationUpdateInput) -> Result<types::RaizOrganizationUpdateOutput, Error> {
         self.0.call(&operations::RAIZ_ORGANIZATION_UPDATE, input).await
     }
