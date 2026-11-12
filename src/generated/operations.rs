@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261111.205940";
+pub const RELEASE: &str = "1.20261112.173149";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -2475,6 +2475,28 @@ pub const SURA_COPAYS_LOOKUP: Operation = Operation {
     path: "/v1/sura/copays/lookup",
     path_field: None,
     query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `sura.operationTasks.cancel`: Cancel a task
+pub const SURA_OPERATION_TASKS_CANCEL: Operation = Operation {
+    name: "sura.operationTasks.cancel",
+    method: "POST",
+    path: "/v1/sura/operation-tasks/{taskId}/cancel",
+    path_field: Some("taskId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 262144,
+};
+
+/// `sura.operationTasks.get`: Read a task
+pub const SURA_OPERATION_TASKS_GET: Operation = Operation {
+    name: "sura.operationTasks.get",
+    method: "GET",
+    path: "/v1/sura/operation-tasks/{taskId}",
+    path_field: Some("taskId"),
+    query: Some(&[]),
     effect: Effect::Read,
     max_output_bytes: 262144,
 };

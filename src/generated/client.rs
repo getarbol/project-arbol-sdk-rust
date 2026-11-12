@@ -2712,7 +2712,7 @@ pub struct SuraAffiliationsApi<'a>(&'a Client);
 impl<'a> SuraAffiliationsApi<'a> {
     /// Look up eligibility
     ///
-    /// Look up affiliate rights by exact document. Eligible coverage does not authorize a procedure or determine patient charges. A noContract outcome is distinct from inactive or unavailable.
+    /// Look up affiliate rights by exact document. Verified results for the same document and connection are reused for seven days. Eligible coverage does not authorize a procedure or determine patient charges. A noContract outcome is distinct from inactive or unavailable.
     pub async fn lookup(&self, input: &types::SuraAffiliationsLookupInput) -> Result<types::SuraAffiliationsLookupOutput, Error> {
         self.0.call(&operations::SURA_AFFILIATIONS_LOOKUP, input).await
     }
@@ -2831,6 +2831,26 @@ impl<'a> SuraCopaysApi<'a> {
     }
 }
 
+/// `sura.operationTasks`
+#[derive(Debug, Clone, Copy)]
+pub struct SuraOperationTasksApi<'a>(&'a Client);
+
+impl<'a> SuraOperationTasksApi<'a> {
+    /// Cancel a task
+    ///
+    /// Cancel a task you started that has not started running; one that has runs to its end.
+    pub async fn cancel(&self, input: &types::SuraOperationTasksCancelInput) -> Result<types::SuraOperationTasksCancelOutput, Error> {
+        self.0.call(&operations::SURA_OPERATION_TASKS_CANCEL, input).await
+    }
+
+    /// Read a task
+    ///
+    /// Read a task you started: whether it still works, then the operation's value or failure.
+    pub async fn get(&self, input: &types::SuraOperationTasksGetInput) -> Result<types::SuraOperationTasksGetOutput, Error> {
+        self.0.call(&operations::SURA_OPERATION_TASKS_GET, input).await
+    }
+}
+
 /// `sura.operations`
 #[derive(Debug, Clone, Copy)]
 pub struct SuraOperationsApi<'a>(&'a Client);
@@ -2927,6 +2947,10 @@ impl<'a> SuraApi<'a> {
 
     pub fn copays(&self) -> SuraCopaysApi<'a> {
         SuraCopaysApi(self.0)
+    }
+
+    pub fn operation_tasks(&self) -> SuraOperationTasksApi<'a> {
+        SuraOperationTasksApi(self.0)
     }
 
     pub fn operations(&self) -> SuraOperationsApi<'a> {

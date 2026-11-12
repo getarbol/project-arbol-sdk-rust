@@ -90167,9 +90167,9 @@ pub struct SuraAffiliationsLookupInput {
     /// Exact document number.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// Document type. Defaults to CC. CE, RC and TI are read through the same form.
-    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub document_type: Option<Option<SuraAffiliationsLookupInputDocumentType>>,
+    /// The patient's document type. Send CC (cédula de ciudadanía) when the person gives only a number; send CE (cédula de extranjería), RC (registro civil) or TI (tarjeta de identidad) when the person or the document names it.
+    #[serde(rename = "documentType")]
+    pub document_type: SuraAffiliationsLookupInputDocumentType,
     /// Set agentMode=true when calling this tool for an AI agent. The answer is concise Spanish text instead of JSON. Omit it for structured machine data. This changes presentation only, never authorization, consent or idempotency.
     #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
     pub agent_mode: Option<bool>,
@@ -90552,7 +90552,7 @@ pub enum SuraAuthorizationFeesCurrency {
 pub struct SuraAuthorizationFees {
     #[serde(rename = "affiliateReportedPaidAmount")]
     pub affiliate_reported_paid_amount: Option<f64>,
-    /// COPAGO, CUOTA MODERADORA or COTIZANTE EXENTO.
+    /// COPAGO, CUOTA MODERADORA, COTIZANTE EXENTO or NO VERIFICADO.
     #[serde(rename = "chargeType")]
     pub charge_type: String,
     #[serde(rename = "copayMaximumAmount")]
@@ -90634,7 +90634,7 @@ pub struct SuraAuthorization {
     pub procedures: Option<Vec<SuraAuthorizationProceduresItem>>,
     #[serde(rename = "providerCode")]
     pub provider_code: String,
-    /// ENTREGADA, POR CONVENIO or ANULADA. An ANULADA authorization no longer serves.
+    /// ENTREGADA, POR CONVENIO, ANULADA or PAGADA. An ANULADA authorization no longer serves.
     #[serde(rename = "providerStatus")]
     pub provider_status: String,
     #[serde(rename = "receivingProvider")]
@@ -90671,9 +90671,9 @@ pub struct SuraAuthorizationsLookupInput {
     /// Exact patient document number.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// Document type. Defaults to CC. CE, RC and TI are read through the same form.
-    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub document_type: Option<Option<SuraAuthorizationsLookupInputDocumentType>>,
+    /// The patient's document type. Send CC (cédula de ciudadanía) when the person gives only a number; send CE (cédula de extranjería), RC (registro civil) or TI (tarjeta de identidad) when the person or the document names it.
+    #[serde(rename = "documentType")]
+    pub document_type: SuraAuthorizationsLookupInputDocumentType,
     /// Issuer code before the hyphen in the authorization identifier.
     #[serde(rename = "issuerCode")]
     pub issuer_code: String,
@@ -91756,6 +91756,22 @@ pub struct SuraDeleteConnectionBody {
     pub agent_mode: Option<bool>,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SuraFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: String,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: bool,
+    /// Diagnostics the code declares; empty for most codes.
+    #[serde(rename = "data")]
+    pub data: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SuraFindAvailabilityBadGatewayError {
@@ -92332,9 +92348,9 @@ pub struct SuraLookupAuthorizationBody {
     /// Exact patient document number.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// Document type. Defaults to CC. CE, RC and TI are read through the same form.
-    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub document_type: Option<Option<SuraLookupAuthorizationBodyDocumentType>>,
+    /// The patient's document type. Send CC (cédula de ciudadanía) when the person gives only a number; send CE (cédula de extranjería), RC (registro civil) or TI (tarjeta de identidad) when the person or the document names it.
+    #[serde(rename = "documentType")]
+    pub document_type: SuraLookupAuthorizationBodyDocumentType,
     /// Issuer code before the hyphen in the authorization identifier.
     #[serde(rename = "issuerCode")]
     pub issuer_code: String,
@@ -92545,9 +92561,9 @@ pub struct SuraLookupEligibilityBody {
     /// Exact document number.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// Document type. Defaults to CC. CE, RC and TI are read through the same form.
-    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
-    pub document_type: Option<Option<SuraLookupEligibilityBodyDocumentType>>,
+    /// The patient's document type. Send CC (cédula de ciudadanía) when the person gives only a number; send CE (cédula de extranjería), RC (registro civil) or TI (tarjeta de identidad) when the person or the document names it.
+    #[serde(rename = "documentType")]
+    pub document_type: SuraLookupEligibilityBodyDocumentType,
     /// Set agentMode=true when calling this tool for an AI agent. The answer is concise Spanish text instead of JSON. Omit it for structured machine data. This changes presentation only, never authorization, consent or idempotency.
     #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
     pub agent_mode: Option<bool>,
@@ -92939,6 +92955,73 @@ pub struct SuraOpening {
     #[serde(rename = "professional")]
     pub professional: String,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraOperationTaskStatus {
+    #[serde(rename = "working")]
+    Working,
+    #[serde(rename = "completed")]
+    Completed,
+    #[serde(rename = "failed")]
+    Failed,
+    #[serde(rename = "cancelled")]
+    Cancelled,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SuraOperationTask {
+    #[serde(rename = "taskId")]
+    pub task_id: String,
+    #[serde(rename = "status")]
+    pub status: SuraOperationTaskStatus,
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    #[serde(rename = "lastUpdatedAt")]
+    pub last_updated_at: String,
+    #[serde(rename = "ttlMs")]
+    pub ttl_ms: i64,
+    #[serde(rename = "pollIntervalMs")]
+    pub poll_interval_ms: i64,
+    /// The operation's value, once completed.
+    #[serde(rename = "result", default, skip_serializing_if = "Option::is_none")]
+    pub result: Option<serde_json::Value>,
+    /// The operation's failure, once failed.
+    #[serde(rename = "error", default, skip_serializing_if = "Option::is_none")]
+    pub error: Option<SuraFailure>,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SuraOperationTaskResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    /// A call that goes on after it was answered.
+    #[serde(rename = "data")]
+    pub data: SuraOperationTask,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SuraOperationTasksCancelInput {
+    #[serde(rename = "taskId")]
+    pub task_id: String,
+}
+
+/// A call that goes on after it was answered.
+pub type SuraOperationTasksCancelOutput = SuraOperationTask;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SuraOperationTasksGetInput {
+    #[serde(rename = "taskId")]
+    pub task_id: String,
+}
+
+/// A call that goes on after it was answered.
+pub type SuraOperationTasksGetOutput = SuraOperationTask;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraOperationsGetInputChannel {
