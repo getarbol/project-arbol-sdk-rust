@@ -1447,14 +1447,14 @@ impl<'a> OficlinicAppointmentsApi<'a> {
 
     /// Create an appointment
     ///
-    /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that list_booking_slots offered in an availability flow. Requires confirm true and an idempotencyKey. Before anything is written, the patient is resolved by citizenship card; the program and attention type must be the flow's, and the source must still count exactly one unit for them; the regime, affiliate type and relationship must be listed by the provider; the payer, plan, subplan and contract must be listed by the provider for the connection; the service must be configured for the slot's professional; and a fresh read must still show the slot. The classification, billing and referral values are the clinic's own provider codes, which the caller supplies explicitly: this service never guesses them, never derives them from a program and never loads the clinic's tariff matrix. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement; this path has no live receipt yet). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the same idempotencyKey and request answers the recorded outcome. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
+    /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that list_booking_slots offered in an availability flow. Requires confirm true and an idempotencyKey. Before anything is written, the patient is resolved by citizenship card; the program and attention type must be the flow's, and the source must still count exactly one unit for them; the regime, affiliate type and relationship must be listed by the provider; the payer, plan, subplan and contract must be listed by the provider for the connection; the service must be configured for the slot's professional; and a fresh read must still show the slot. The classification, billing and referral values are the clinic's own provider codes, which the caller supplies explicitly: this service never guesses them, never derives them from a program and never loads the clinic's tariff matrix. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the same idempotencyKey and request answers the recorded outcome. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
     pub async fn create(&self, input: &types::OficlinicAppointmentsCreateInput) -> Result<types::OficlinicAppointmentsCreateOutput, Error> {
         self.0.call(&operations::OFICLINIC_APPOINTMENTS_CREATE, input).await
     }
 
     /// Lookup appointments
     ///
-    /// Look up one patient's e-Oficlinic appointment history by status: assigned, cancelled, absence (no-show) or legalized (attendance registered). The patient is resolved by citizenship card number first, sent in the body; PATIENT_NOT_FOUND answers only the provider explicit negative, and every row must name the resolved patient. Staff usernames and free-text observations are never returned. serviceNumber is the appointment's CAS, which reschedule_appointment takes for an assigned appointment. Mapped from the provider's source: a live positive answer has not been verified yet. Read-only. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
+    /// Look up one patient's e-Oficlinic appointment history by status: assigned, cancelled, absence (no-show) or legalized (attendance registered). The patient is resolved by citizenship card number first, sent in the body; PATIENT_NOT_FOUND answers only the provider explicit negative, and every row must name the resolved patient. Staff usernames and free-text observations are never returned. serviceNumber is the appointment's CAS, which reschedule_appointment takes for an assigned appointment. Read-only. Pass pageInfo.nextCursor as cursor for more. agentMode true answers concise Spanish text instead.
     pub async fn lookup(&self, input: &types::OficlinicAppointmentsLookupInput) -> Result<types::OficlinicAppointmentsLookupOutput, Error> {
         self.0.call(&operations::OFICLINIC_APPOINTMENTS_LOOKUP, input).await
     }
@@ -1565,11 +1565,31 @@ impl<'a> OficlinicDailyRosterApi<'a> {
     }
 }
 
+/// `oficlinic.patientRegistrationOptions`
+#[derive(Debug, Clone, Copy)]
+pub struct OficlinicPatientRegistrationOptionsApi<'a>(&'a Client);
+
+impl<'a> OficlinicPatientRegistrationOptionsApi<'a> {
+    /// List patient registration options
+    ///
+    /// Find the source codes for a patient's confirmed gender, residence zone or municipality before creating their clinic record. q filters the current provider catalog by name without accents, or exact code; use it for municipalities to keep the result short. A choice is not a fact about the patient: ask for missing profile details and never invent them. For regime, affiliate type and salary range use their dedicated lists. Pass pageInfo.nextCursor with the same kind and q for more. Read-only. agentMode true answers concise Spanish text instead.
+    pub async fn list(&self, input: &types::OficlinicPatientRegistrationOptionsListInput) -> Result<types::OficlinicPatientRegistrationOptionsListOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PATIENT_REGISTRATION_OPTIONS_LIST, input).await
+    }
+}
+
 /// `oficlinic.patients`
 #[derive(Debug, Clone, Copy)]
 pub struct OficlinicPatientsApi<'a>(&'a Client);
 
 impl<'a> OficlinicPatientsApi<'a> {
+    /// Create a patient
+    ///
+    /// Create one new patient in e-Oficlinic using the clinic-confirmed legal identity, contact and classification fields. Use only with verified authority to register this person and explicit confirmation of their details. Requires confirm true and one idempotency key for this intent. An existing patient is never changed. An uncertain result must be checked with lookup_patient and must not be sent again. The result contains no patient data. Verify the saved patient with lookup_patient before attempting a booking. The submission follows the live-verified Cardiología scheduling form. agentMode true answers concise Spanish text instead.
+    pub async fn create(&self, input: &types::OficlinicPatientsCreateInput) -> Result<types::OficlinicPatientsCreateOutput, Error> {
+        self.0.call(&operations::OFICLINIC_PATIENTS_CREATE, input).await
+    }
+
     /// Look up a patient by document
     ///
     /// Look up one patient in e-Oficlinic by citizenship card (CC) number, sent in the body and never in a URL. found answers a deliberately projected record (provider id, names, birth date, sex, address, phones, email, municipality) only when the provider returned a record with the requested document; not_found answers only the provider explicit negative. Any failure is not evidence that the patient is absent. This does not verify payer rights or the identity of the person presenting the document. agentMode true answers concise Spanish text instead.
@@ -1774,6 +1794,10 @@ impl<'a> OficlinicApi<'a> {
 
     pub fn daily_roster(&self) -> OficlinicDailyRosterApi<'a> {
         OficlinicDailyRosterApi(self.0)
+    }
+
+    pub fn patient_registration_options(&self) -> OficlinicPatientRegistrationOptionsApi<'a> {
+        OficlinicPatientRegistrationOptionsApi(self.0)
     }
 
     pub fn patients(&self) -> OficlinicPatientsApi<'a> {

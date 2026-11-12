@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261111.193208";
+pub const RELEASE: &str = "1.20261111.205940";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -1310,6 +1310,28 @@ pub const OFICLINIC_DAILY_ROSTER_LIST: Operation = Operation {
     path_field: None,
     query: Some(&[("connectionId", QueryKind::String), ("date", QueryKind::String), ("professionalId", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.patientRegistrationOptions.list`: List patient registration options
+pub const OFICLINIC_PATIENT_REGISTRATION_OPTIONS_LIST: Operation = Operation {
+    name: "oficlinic.patientRegistrationOptions.list",
+    method: "GET",
+    path: "/v1/oficlinic/patient-registration-options",
+    path_field: None,
+    query: Some(&[("connectionId", QueryKind::String), ("kind", QueryKind::String), ("q", QueryKind::String), ("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agentMode", QueryKind::Boolean)]),
+    effect: Effect::Read,
+    max_output_bytes: 65536,
+};
+
+/// `oficlinic.patients.create`: Create a patient
+pub const OFICLINIC_PATIENTS_CREATE: Operation = Operation {
+    name: "oficlinic.patients.create",
+    method: "POST",
+    path: "/v1/oficlinic/patients",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 65536,
 };
 
