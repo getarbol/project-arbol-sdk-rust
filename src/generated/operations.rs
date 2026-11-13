@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261113.63907";
+pub const RELEASE: &str = "1.20261113.150152";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -813,7 +813,7 @@ pub const GMEDIC_AVAILABILITY_LIST: Operation = Operation {
     method: "GET",
     path: "/v1/gmedic/availability",
     path_field: None,
-    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("agendaId", QueryKind::String), ("from", QueryKind::String), ("to", QueryKind::String), ("connectionId", QueryKind::String), ("startDate", QueryKind::String), ("endDate", QueryKind::String)]),
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("bookingRoute", QueryKind::String), ("agendaId", QueryKind::String), ("from", QueryKind::String), ("to", QueryKind::String), ("connectionId", QueryKind::String), ("startDate", QueryKind::String), ("endDate", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 262144,
 };

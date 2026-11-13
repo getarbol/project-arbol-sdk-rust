@@ -49760,10 +49760,27 @@ pub struct GmedicAppointmentsCreateInputData {
     pub via_entry_id: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicAppointmentsCreateInputBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicAppointmentsCreateInput {
     #[serde(rename = "data")]
     pub data: GmedicAppointmentsCreateInputData,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicAppointmentsCreateInputBookingRoute>,
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
 }
@@ -50057,6 +50074,20 @@ pub struct GmedicAppointmentsPageResponse {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicAppointmentsUpdateInputBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum GmedicAppointmentsUpdateInputColor {
     #[serde(rename = "BLUE")]
     BLUE,
@@ -50124,6 +50155,9 @@ pub enum GmedicAppointmentsUpdateInputStatus {
 pub struct GmedicAppointmentsUpdateInput {
     #[serde(rename = "appointmentId")]
     pub appointment_id: String,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicAppointmentsUpdateInputBookingRoute>,
     #[serde(rename = "color", default, skip_serializing_if = "Option::is_none")]
     pub color: Option<GmedicAppointmentsUpdateInputColor>,
     #[serde(rename = "startsAt", default, skip_serializing_if = "Option::is_none")]
@@ -50154,6 +50188,20 @@ pub enum GmedicAvailabilityListInputDirection {
     Backward,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicAvailabilityListInputBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicAvailabilityListInput {
     /// Omit on the first lookup. For continuation, copy only a nextCursor returned by this exact query. Never supply an empty string, quotes, braces, a page number or an invented token.
@@ -50165,6 +50213,9 @@ pub struct GmedicAvailabilityListInput {
     /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
     #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicAvailabilityListInputBookingRoute>,
     #[serde(rename = "agendaId")]
     pub agenda_id: String,
     /// First day, YYYYMMDD.
@@ -50320,6 +50371,52 @@ pub struct GmedicAvailableDaysPageResponse {
     /// What every answer carries besides its data or error.
     #[serde(rename = "metadata")]
     pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicBookingColorRequiredFailureCode {
+    #[serde(rename = "BOOKING_COLOR_REQUIRED")]
+    BOOKINGCOLORREQUIRED,
+}
+
+/// This booking requires a verified free interval in the clinic’s correct blue or gray window. Check availability with the required booking color or refer the request to reception.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicBookingColorRequiredFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: GmedicBookingColorRequiredFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicBookingInProgressFailureCode {
+    #[serde(rename = "BOOKING_IN_PROGRESS")]
+    BOOKINGINPROGRESS,
+}
+
+/// Another appointment change is in progress. Check the agenda again before trying to book.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicBookingInProgressFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: GmedicBookingInProgressFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -50669,12 +50766,51 @@ pub struct GmedicCreateAppointmentBodyData {
     pub via_entry_id: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicCreateAppointmentBodyBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicCreateAppointmentBody {
     #[serde(rename = "data")]
     pub data: GmedicCreateAppointmentBodyData,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicCreateAppointmentBodyBookingRoute>,
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicCreateAppointmentConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: GmedicCreateAppointmentConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum GmedicCreateAppointmentConflictFailure {
+    GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
+    GmedicBookingColorRequiredFailure(GmedicBookingColorRequiredFailure),
+    GmedicBookingInProgressFailure(GmedicBookingInProgressFailure),
 }
 
 /// A failed answer.
@@ -52384,6 +52520,27 @@ pub enum GmedicListAvailabilityBadGatewayFailure {
     OutcomeUnknownFailure(OutcomeUnknownFailure),
     GmedicProviderAccessRejectedFailure(GmedicProviderAccessRejectedFailure),
     GmedicProviderResponseInvalidFailure(GmedicProviderResponseInvalidFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicListAvailabilityConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: GmedicListAvailabilityConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum GmedicListAvailabilityConflictFailure {
+    GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
+    GmedicBookingColorRequiredFailure(GmedicBookingColorRequiredFailure),
 }
 
 /// A failed answer.
@@ -55081,6 +55238,20 @@ pub enum GmedicUpdateAppointmentBadGatewayFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicUpdateAppointmentBodyBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum GmedicUpdateAppointmentBodyColor {
     #[serde(rename = "BLUE")]
     BLUE,
@@ -55146,6 +55317,9 @@ pub enum GmedicUpdateAppointmentBodyStatus {
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct GmedicUpdateAppointmentBody {
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicUpdateAppointmentBodyBookingRoute>,
     #[serde(rename = "color", default, skip_serializing_if = "Option::is_none")]
     pub color: Option<GmedicUpdateAppointmentBodyColor>,
     #[serde(rename = "startsAt", default, skip_serializing_if = "Option::is_none")]
@@ -55164,6 +55338,28 @@ pub struct GmedicUpdateAppointmentBody {
     pub status: Option<GmedicUpdateAppointmentBodyStatus>,
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicUpdateAppointmentConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: GmedicUpdateAppointmentConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum GmedicUpdateAppointmentConflictFailure {
+    GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
+    GmedicBookingColorRequiredFailure(GmedicBookingColorRequiredFailure),
+    GmedicBookingInProgressFailure(GmedicBookingInProgressFailure),
 }
 
 /// A failed answer.
@@ -58790,9 +58986,9 @@ pub struct OficlinicAppointmentsCancelInput {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// The patient or authorized staff explicitly confirmed cancellation of this appointment.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
@@ -58822,29 +59018,29 @@ pub struct OficlinicAppointmentsCreateInputClassification {
     /// Sent as pTipoAfiliado (the screen's regime, strRegimen). Required: one list_regimes answers.
     #[serde(rename = "regime")]
     pub regime: String,
-    /// Sent as pParentesco (strParentesco); empty when null. Otherwise one list_relationships answers.
+    /// Sent as pParentesco (strParentesco); empty when null. One list_relationships answers. The screen disables it for the affiliate types C and N; for any other affiliate type it requires one, so leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "relationship", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub relationship: Option<Option<String>>,
-    /// Sent as pRangoSalarial (strRango); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pRangoSalarial (strRango); empty when null. One list_salary_ranges answers for the regime, or BOOKING_VALUE_UNRESOLVED. Required when billing is left out: its row supplies the copayment values.
     #[serde(rename = "salaryRange", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub salary_range: Option<Option<String>>,
-    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked. The screen requires one only when the payer uses an attention list (usesAttentionList in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "listStatus", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub list_status: Option<Option<String>>,
-    /// Sent as pPrograma (sysPrograma). Required: the program the availability flow was opened for, from list_programs.
-    #[serde(rename = "programId")]
-    pub program_id: String,
-    /// The one-unit attention type the availability flow was opened for, from list_programs. The source's request has no field for it: it decides the slot list's unit count, and it is part of this write's recorded request.
-    #[serde(rename = "attentionTypeId")]
-    pub attention_type_id: String,
-    /// Sent as pFinalidad (sysFinalidad). Required. The screen's source of it is a hidden control, so no catalog proves it here, and a program's sourcePurpose is never applied in its place.
-    #[serde(rename = "purposeId")]
-    pub purpose_id: String,
+    /// Sent as pPrograma (sysPrograma). Left out: the program the availability flow was opened for. When given it must be that program.
+    #[serde(rename = "programId", default, skip_serializing_if = "Option::is_none")]
+    pub program_id: Option<String>,
+    /// The one-unit attention type the availability flow was opened for. Left out: that one. When given it must be that one. The source's request has no field for it: it decides the slot list's unit count.
+    #[serde(rename = "attentionTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub attention_type_id: Option<String>,
+    /// Sent as pFinalidad (sysFinalidad). Left out: 10, the default of the screen's hidden control. No catalog proves it here, and a program's sourcePurpose is never applied in its place.
+    #[serde(rename = "purposeId", default, skip_serializing_if = "Option::is_none")]
+    pub purpose_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicAppointmentsCreateInputBilling {
-    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required.
+    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required when billing is given.
     #[serde(rename = "tariff")]
     pub tariff: String,
     /// Sent as pFacturarParticular.
@@ -58881,7 +59077,7 @@ pub struct OficlinicAppointmentsCreateInputReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number, when the payer requires one; empty when null.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -58894,16 +59090,16 @@ pub struct OficlinicAppointmentsCreateInput {
     /// An Account connection id of the caller's organization.
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// Must be true: the patient or staff confirmed this exact booking. Without it nothing is written.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
     /// The availability flow id every booking list item carries (flowId). It expires 30 minutes after the first list.
     #[serde(rename = "flowId")]
     pub flow_id: String,
-    /// A slot id from list_booking_slots in the same flow.
+    /// A slot id from search_booking_slots or list_booking_slots in the same flow.
     #[serde(rename = "slotId")]
     pub slot_id: String,
     /// Colombian citizenship card. Other document types are not verified against the provider yet.
@@ -58912,26 +59108,27 @@ pub struct OficlinicAppointmentsCreateInput {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// The flow's payer, repeated as a check.
-    #[serde(rename = "payerId")]
-    pub payer_id: String,
+    /// The payer the availability flow was opened for. Left out: that payer. When given it must be that payer.
+    #[serde(rename = "payerId", default, skip_serializing_if = "Option::is_none")]
+    pub payer_id: Option<String>,
     /// A plan of the payer, from list_payer_plans.
     #[serde(rename = "planId")]
     pub plan_id: String,
     /// A subplan of the plan, from list_payer_subplans.
     #[serde(rename = "subplanId")]
     pub subplan_id: String,
-    /// A contract of the payer from list_payer_contracts, which must not be inactive; null (the default) sends none.
+    /// A contract of the payer from list_payer_contracts, which must not be inactive. An explicit null sends none. Leaving the key out is not the same as null: the service then sends the payer's only contract when list_payer_contracts has exactly one that is not inactive and marks it active, sends none when the payer has no contract or only inactive ones, and answers BOOKING_VALUE_UNRESOLVED otherwise (several contracts, or an unrecognized active flag).
     #[serde(rename = "contractId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contract_id: Option<Option<String>>,
-    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. Never guessed: the caller supplies them.
+    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. regime and affiliateType are never guessed: the caller supplies them. The rest has the defaults each field states.
     #[serde(rename = "classification")]
     pub classification: OficlinicAppointmentsCreateInputClassification,
-    /// Billing values of the clinic's tariff matrix. Never guessed: the caller supplies them as the clinic's workflow defines them.
-    #[serde(rename = "billing")]
-    pub billing: OficlinicAppointmentsCreateInputBilling,
-    #[serde(rename = "referral")]
-    pub referral: OficlinicAppointmentsCreateInputReferral,
+    /// Billing values of the booking screen. Leave the whole object out and the service resolves them as the screen does: tariff from the payer's tariff matrix for the flow's service under the plan and subplan; billPrivately, billCopayments and enteredCopayment from the payer's row; copaymentPercentage, maxCopayment and indicatedModeratorFee from the row of classification.salaryRange; exempt 0, courtOrder 0 and markExempt false. When given, every value is sent exactly as given and nothing is resolved.
+    #[serde(rename = "billing", default, skip_serializing_if = "Option::is_none")]
+    pub billing: Option<OficlinicAppointmentsCreateInputBilling>,
+    /// Referral values of the booking screen. Left out: no requesting professional, no authorization number and requestedByUser false.
+    #[serde(rename = "referral", default, skip_serializing_if = "Option::is_none")]
+    pub referral: Option<OficlinicAppointmentsCreateInputReferral>,
     /// Observations sent as pObservaciones, accents removed and uppercased; null (the default) sends none.
     #[serde(rename = "observations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub observations: Option<Option<String>>,
@@ -59012,29 +59209,29 @@ pub struct OficlinicAppointmentsRescheduleInputClassification {
     /// Sent as pTipoAfiliado (the screen's regime, strRegimen). Required: one list_regimes answers.
     #[serde(rename = "regime")]
     pub regime: String,
-    /// Sent as pParentesco (strParentesco); empty when null. Otherwise one list_relationships answers.
+    /// Sent as pParentesco (strParentesco); empty when null. One list_relationships answers. The screen disables it for the affiliate types C and N; for any other affiliate type it requires one, so leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "relationship", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub relationship: Option<Option<String>>,
-    /// Sent as pRangoSalarial (strRango); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pRangoSalarial (strRango); empty when null. One list_salary_ranges answers for the regime, or BOOKING_VALUE_UNRESOLVED. Required when billing is left out: its row supplies the copayment values.
     #[serde(rename = "salaryRange", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub salary_range: Option<Option<String>>,
-    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked. The screen requires one only when the payer uses an attention list (usesAttentionList in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "listStatus", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub list_status: Option<Option<String>>,
-    /// Sent as pPrograma (sysPrograma). Required: the program the availability flow was opened for, from list_programs.
-    #[serde(rename = "programId")]
-    pub program_id: String,
-    /// The one-unit attention type the availability flow was opened for, from list_programs. The source's request has no field for it: it decides the slot list's unit count, and it is part of this write's recorded request.
-    #[serde(rename = "attentionTypeId")]
-    pub attention_type_id: String,
-    /// Sent as pFinalidad (sysFinalidad). Required. The screen's source of it is a hidden control, so no catalog proves it here, and a program's sourcePurpose is never applied in its place.
-    #[serde(rename = "purposeId")]
-    pub purpose_id: String,
+    /// Sent as pPrograma (sysPrograma). Left out: the program the availability flow was opened for. When given it must be that program.
+    #[serde(rename = "programId", default, skip_serializing_if = "Option::is_none")]
+    pub program_id: Option<String>,
+    /// The one-unit attention type the availability flow was opened for. Left out: that one. When given it must be that one. The source's request has no field for it: it decides the slot list's unit count.
+    #[serde(rename = "attentionTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub attention_type_id: Option<String>,
+    /// Sent as pFinalidad (sysFinalidad). Left out: 10, the default of the screen's hidden control. No catalog proves it here, and a program's sourcePurpose is never applied in its place.
+    #[serde(rename = "purposeId", default, skip_serializing_if = "Option::is_none")]
+    pub purpose_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicAppointmentsRescheduleInputBilling {
-    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required.
+    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required when billing is given.
     #[serde(rename = "tariff")]
     pub tariff: String,
     /// Sent as pFacturarParticular.
@@ -59071,7 +59268,7 @@ pub struct OficlinicAppointmentsRescheduleInputReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number, when the payer requires one; empty when null.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -59094,16 +59291,16 @@ pub struct OficlinicAppointmentsRescheduleInput {
     /// An Account connection id of the caller's organization.
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// Must be true: the patient or staff confirmed this exact booking. Without it nothing is written.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
     /// The availability flow id every booking list item carries (flowId). It expires 30 minutes after the first list.
     #[serde(rename = "flowId")]
     pub flow_id: String,
-    /// A slot id from list_booking_slots in the same flow.
+    /// A slot id from search_booking_slots or list_booking_slots in the same flow.
     #[serde(rename = "slotId")]
     pub slot_id: String,
     /// Colombian citizenship card. Other document types are not verified against the provider yet.
@@ -59112,26 +59309,27 @@ pub struct OficlinicAppointmentsRescheduleInput {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// The flow's payer, repeated as a check.
-    #[serde(rename = "payerId")]
-    pub payer_id: String,
+    /// The payer the availability flow was opened for. Left out: that payer. When given it must be that payer.
+    #[serde(rename = "payerId", default, skip_serializing_if = "Option::is_none")]
+    pub payer_id: Option<String>,
     /// A plan of the payer, from list_payer_plans.
     #[serde(rename = "planId")]
     pub plan_id: String,
     /// A subplan of the plan, from list_payer_subplans.
     #[serde(rename = "subplanId")]
     pub subplan_id: String,
-    /// A contract of the payer from list_payer_contracts, which must not be inactive; null (the default) sends none.
+    /// A contract of the payer from list_payer_contracts, which must not be inactive. An explicit null sends none. Leaving the key out is not the same as null: the service then sends the payer's only contract when list_payer_contracts has exactly one that is not inactive and marks it active, sends none when the payer has no contract or only inactive ones, and answers BOOKING_VALUE_UNRESOLVED otherwise (several contracts, or an unrecognized active flag).
     #[serde(rename = "contractId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contract_id: Option<Option<String>>,
-    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. Never guessed: the caller supplies them.
+    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. regime and affiliateType are never guessed: the caller supplies them. The rest has the defaults each field states.
     #[serde(rename = "classification")]
     pub classification: OficlinicAppointmentsRescheduleInputClassification,
-    /// Billing values of the clinic's tariff matrix. Never guessed: the caller supplies them as the clinic's workflow defines them.
-    #[serde(rename = "billing")]
-    pub billing: OficlinicAppointmentsRescheduleInputBilling,
-    #[serde(rename = "referral")]
-    pub referral: OficlinicAppointmentsRescheduleInputReferral,
+    /// Billing values of the booking screen. Leave the whole object out and the service resolves them as the screen does: tariff from the payer's tariff matrix for the flow's service under the plan and subplan; billPrivately, billCopayments and enteredCopayment from the payer's row; copaymentPercentage, maxCopayment and indicatedModeratorFee from the row of classification.salaryRange; exempt 0, courtOrder 0 and markExempt false. When given, every value is sent exactly as given and nothing is resolved.
+    #[serde(rename = "billing", default, skip_serializing_if = "Option::is_none")]
+    pub billing: Option<OficlinicAppointmentsRescheduleInputBilling>,
+    /// Referral values of the booking screen. Left out: no requesting professional, no authorization number and requestedByUser false.
+    #[serde(rename = "referral", default, skip_serializing_if = "Option::is_none")]
+    pub referral: Option<OficlinicAppointmentsRescheduleInputReferral>,
     /// Observations sent as pObservaciones, accents removed and uppercased; null (the default) sends none.
     #[serde(rename = "observations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub observations: Option<Option<String>>,
@@ -59639,6 +59837,29 @@ pub struct OficlinicBookingSlotsSearchInput {
 
 pub type OficlinicBookingSlotsSearchOutput = OficlinicSearchBookingSlotsResult;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum OficlinicBookingValueUnresolvedFailureCode {
+    #[serde(rename = "BOOKING_VALUE_UNRESOLVED")]
+    BOOKINGVALUEUNRESOLVED,
+}
+
+/// A value the booking needs could not be resolved from the provider's own data, so the caller must supply it: a contract, a relationship, a list status, an authorization number, a salary range the regime lists, or the billing values. Nothing was written.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct OficlinicBookingValueUnresolvedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: OficlinicBookingValueUnresolvedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicCancelAppointmentBadGatewayError {
@@ -59689,9 +59910,9 @@ pub struct OficlinicCancelAppointmentBody {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// The patient or authorized staff explicitly confirmed cancellation of this appointment.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
@@ -60165,29 +60386,29 @@ pub struct OficlinicCreateAppointmentBodyClassification {
     /// Sent as pTipoAfiliado (the screen's regime, strRegimen). Required: one list_regimes answers.
     #[serde(rename = "regime")]
     pub regime: String,
-    /// Sent as pParentesco (strParentesco); empty when null. Otherwise one list_relationships answers.
+    /// Sent as pParentesco (strParentesco); empty when null. One list_relationships answers. The screen disables it for the affiliate types C and N; for any other affiliate type it requires one, so leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "relationship", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub relationship: Option<Option<String>>,
-    /// Sent as pRangoSalarial (strRango); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pRangoSalarial (strRango); empty when null. One list_salary_ranges answers for the regime, or BOOKING_VALUE_UNRESOLVED. Required when billing is left out: its row supplies the copayment values.
     #[serde(rename = "salaryRange", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub salary_range: Option<Option<String>>,
-    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked. The screen requires one only when the payer uses an attention list (usesAttentionList in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "listStatus", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub list_status: Option<Option<String>>,
-    /// Sent as pPrograma (sysPrograma). Required: the program the availability flow was opened for, from list_programs.
-    #[serde(rename = "programId")]
-    pub program_id: String,
-    /// The one-unit attention type the availability flow was opened for, from list_programs. The source's request has no field for it: it decides the slot list's unit count, and it is part of this write's recorded request.
-    #[serde(rename = "attentionTypeId")]
-    pub attention_type_id: String,
-    /// Sent as pFinalidad (sysFinalidad). Required. The screen's source of it is a hidden control, so no catalog proves it here, and a program's sourcePurpose is never applied in its place.
-    #[serde(rename = "purposeId")]
-    pub purpose_id: String,
+    /// Sent as pPrograma (sysPrograma). Left out: the program the availability flow was opened for. When given it must be that program.
+    #[serde(rename = "programId", default, skip_serializing_if = "Option::is_none")]
+    pub program_id: Option<String>,
+    /// The one-unit attention type the availability flow was opened for. Left out: that one. When given it must be that one. The source's request has no field for it: it decides the slot list's unit count.
+    #[serde(rename = "attentionTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub attention_type_id: Option<String>,
+    /// Sent as pFinalidad (sysFinalidad). Left out: 10, the default of the screen's hidden control. No catalog proves it here, and a program's sourcePurpose is never applied in its place.
+    #[serde(rename = "purposeId", default, skip_serializing_if = "Option::is_none")]
+    pub purpose_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicCreateAppointmentBodyBilling {
-    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required.
+    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required when billing is given.
     #[serde(rename = "tariff")]
     pub tariff: String,
     /// Sent as pFacturarParticular.
@@ -60224,7 +60445,7 @@ pub struct OficlinicCreateAppointmentBodyReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number, when the payer requires one; empty when null.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -60237,16 +60458,16 @@ pub struct OficlinicCreateAppointmentBody {
     /// An Account connection id of the caller's organization.
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// Must be true: the patient or staff confirmed this exact booking. Without it nothing is written.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
     /// The availability flow id every booking list item carries (flowId). It expires 30 minutes after the first list.
     #[serde(rename = "flowId")]
     pub flow_id: String,
-    /// A slot id from list_booking_slots in the same flow.
+    /// A slot id from search_booking_slots or list_booking_slots in the same flow.
     #[serde(rename = "slotId")]
     pub slot_id: String,
     /// Colombian citizenship card. Other document types are not verified against the provider yet.
@@ -60255,26 +60476,27 @@ pub struct OficlinicCreateAppointmentBody {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// The flow's payer, repeated as a check.
-    #[serde(rename = "payerId")]
-    pub payer_id: String,
+    /// The payer the availability flow was opened for. Left out: that payer. When given it must be that payer.
+    #[serde(rename = "payerId", default, skip_serializing_if = "Option::is_none")]
+    pub payer_id: Option<String>,
     /// A plan of the payer, from list_payer_plans.
     #[serde(rename = "planId")]
     pub plan_id: String,
     /// A subplan of the plan, from list_payer_subplans.
     #[serde(rename = "subplanId")]
     pub subplan_id: String,
-    /// A contract of the payer from list_payer_contracts, which must not be inactive; null (the default) sends none.
+    /// A contract of the payer from list_payer_contracts, which must not be inactive. An explicit null sends none. Leaving the key out is not the same as null: the service then sends the payer's only contract when list_payer_contracts has exactly one that is not inactive and marks it active, sends none when the payer has no contract or only inactive ones, and answers BOOKING_VALUE_UNRESOLVED otherwise (several contracts, or an unrecognized active flag).
     #[serde(rename = "contractId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contract_id: Option<Option<String>>,
-    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. Never guessed: the caller supplies them.
+    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. regime and affiliateType are never guessed: the caller supplies them. The rest has the defaults each field states.
     #[serde(rename = "classification")]
     pub classification: OficlinicCreateAppointmentBodyClassification,
-    /// Billing values of the clinic's tariff matrix. Never guessed: the caller supplies them as the clinic's workflow defines them.
-    #[serde(rename = "billing")]
-    pub billing: OficlinicCreateAppointmentBodyBilling,
-    #[serde(rename = "referral")]
-    pub referral: OficlinicCreateAppointmentBodyReferral,
+    /// Billing values of the booking screen. Leave the whole object out and the service resolves them as the screen does: tariff from the payer's tariff matrix for the flow's service under the plan and subplan; billPrivately, billCopayments and enteredCopayment from the payer's row; copaymentPercentage, maxCopayment and indicatedModeratorFee from the row of classification.salaryRange; exempt 0, courtOrder 0 and markExempt false. When given, every value is sent exactly as given and nothing is resolved.
+    #[serde(rename = "billing", default, skip_serializing_if = "Option::is_none")]
+    pub billing: Option<OficlinicCreateAppointmentBodyBilling>,
+    /// Referral values of the booking screen. Left out: no requesting professional, no authorization number and requestedByUser false.
+    #[serde(rename = "referral", default, skip_serializing_if = "Option::is_none")]
+    pub referral: Option<OficlinicCreateAppointmentBodyReferral>,
     /// Observations sent as pObservaciones, accents removed and uppercased; null (the default) sends none.
     #[serde(rename = "observations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub observations: Option<Option<String>>,
@@ -60418,6 +60640,7 @@ pub enum OficlinicCreateAppointmentUnprocessableContentFailure {
     CredentialsRejectedFailure(CredentialsRejectedFailure),
     OficlinicContextNotAvailableFailure(OficlinicContextNotAvailableFailure),
     OficlinicProviderIdentityMismatchFailure(OficlinicProviderIdentityMismatchFailure),
+    OficlinicBookingValueUnresolvedFailure(OficlinicBookingValueUnresolvedFailure),
     OficlinicProgramUnitsNotSupportedFailure(OficlinicProgramUnitsNotSupportedFailure),
 }
 
@@ -60506,9 +60729,9 @@ pub struct OficlinicCreatePatientBody {
     /// The authorized person confirmed the patient's identity and the details to save.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// true answers { text }: concise Spanish facts for a messaging or voice agent, with the short ids and the cursor needed to continue. false, the default, answers the structured object.
     #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
     pub agent_mode: Option<bool>,
@@ -64446,9 +64669,9 @@ pub struct OficlinicPatientsCreateInput {
     /// The authorized person confirmed the patient's identity and the details to save.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// true answers { text }: concise Spanish facts for a messaging or voice agent, with the short ids and the cursor needed to continue. false, the default, answers the structured object.
     #[serde(rename = "agentMode", default, skip_serializing_if = "Option::is_none")]
     pub agent_mode: Option<bool>,
@@ -65265,29 +65488,29 @@ pub struct OficlinicRescheduleAppointmentBodyClassification {
     /// Sent as pTipoAfiliado (the screen's regime, strRegimen). Required: one list_regimes answers.
     #[serde(rename = "regime")]
     pub regime: String,
-    /// Sent as pParentesco (strParentesco); empty when null. Otherwise one list_relationships answers.
+    /// Sent as pParentesco (strParentesco); empty when null. One list_relationships answers. The screen disables it for the affiliate types C and N; for any other affiliate type it requires one, so leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "relationship", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub relationship: Option<Option<String>>,
-    /// Sent as pRangoSalarial (strRango); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pRangoSalarial (strRango); empty when null. One list_salary_ranges answers for the regime, or BOOKING_VALUE_UNRESOLVED. Required when billing is left out: its row supplies the copayment values.
     #[serde(rename = "salaryRange", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub salary_range: Option<Option<String>>,
-    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked.
+    /// Sent as pEstadoListado (strEstado); empty when null. No catalog of it is mapped, so it is not checked. The screen requires one only when the payer uses an attention list (usesAttentionList in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "listStatus", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub list_status: Option<Option<String>>,
-    /// Sent as pPrograma (sysPrograma). Required: the program the availability flow was opened for, from list_programs.
-    #[serde(rename = "programId")]
-    pub program_id: String,
-    /// The one-unit attention type the availability flow was opened for, from list_programs. The source's request has no field for it: it decides the slot list's unit count, and it is part of this write's recorded request.
-    #[serde(rename = "attentionTypeId")]
-    pub attention_type_id: String,
-    /// Sent as pFinalidad (sysFinalidad). Required. The screen's source of it is a hidden control, so no catalog proves it here, and a program's sourcePurpose is never applied in its place.
-    #[serde(rename = "purposeId")]
-    pub purpose_id: String,
+    /// Sent as pPrograma (sysPrograma). Left out: the program the availability flow was opened for. When given it must be that program.
+    #[serde(rename = "programId", default, skip_serializing_if = "Option::is_none")]
+    pub program_id: Option<String>,
+    /// The one-unit attention type the availability flow was opened for. Left out: that one. When given it must be that one. The source's request has no field for it: it decides the slot list's unit count.
+    #[serde(rename = "attentionTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub attention_type_id: Option<String>,
+    /// Sent as pFinalidad (sysFinalidad). Left out: 10, the default of the screen's hidden control. No catalog proves it here, and a program's sourcePurpose is never applied in its place.
+    #[serde(rename = "purposeId", default, skip_serializing_if = "Option::is_none")]
+    pub purpose_id: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct OficlinicRescheduleAppointmentBodyBilling {
-    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required.
+    /// Sent as pTarifaProced: the unit value of the clinic's tariff for the service. Required when billing is given.
     #[serde(rename = "tariff")]
     pub tariff: String,
     /// Sent as pFacturarParticular.
@@ -65324,7 +65547,7 @@ pub struct OficlinicRescheduleAppointmentBodyReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number, when the payer requires one; empty when null.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -65347,16 +65570,16 @@ pub struct OficlinicRescheduleAppointmentBody {
     /// An Account connection id of the caller's organization.
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
-    /// A key the caller chooses once per intended write, such as a UUID. Repeating it with the same request answers the recorded outcome and never writes again; another request with it answers IDEMPOTENCY_KEY_REUSED.
-    #[serde(rename = "idempotencyKey")]
-    pub idempotency_key: String,
+    /// Optional. Without it the service derives the key from the request itself, so repeating the identical request answers the recorded outcome and never writes again. A caller that retries with changed values can choose one key per intended write, such as a UUID; another request with it answers IDEMPOTENCY_KEY_REUSED.
+    #[serde(rename = "idempotencyKey", default, skip_serializing_if = "Option::is_none")]
+    pub idempotency_key: Option<String>,
     /// Must be true: the patient or staff confirmed this exact booking. Without it nothing is written.
     #[serde(rename = "confirm")]
     pub confirm: serde_json::Value,
     /// The availability flow id every booking list item carries (flowId). It expires 30 minutes after the first list.
     #[serde(rename = "flowId")]
     pub flow_id: String,
-    /// A slot id from list_booking_slots in the same flow.
+    /// A slot id from search_booking_slots or list_booking_slots in the same flow.
     #[serde(rename = "slotId")]
     pub slot_id: String,
     /// Colombian citizenship card. Other document types are not verified against the provider yet.
@@ -65365,26 +65588,27 @@ pub struct OficlinicRescheduleAppointmentBody {
     /// The document number, digits only.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
-    /// The flow's payer, repeated as a check.
-    #[serde(rename = "payerId")]
-    pub payer_id: String,
+    /// The payer the availability flow was opened for. Left out: that payer. When given it must be that payer.
+    #[serde(rename = "payerId", default, skip_serializing_if = "Option::is_none")]
+    pub payer_id: Option<String>,
     /// A plan of the payer, from list_payer_plans.
     #[serde(rename = "planId")]
     pub plan_id: String,
     /// A subplan of the plan, from list_payer_subplans.
     #[serde(rename = "subplanId")]
     pub subplan_id: String,
-    /// A contract of the payer from list_payer_contracts, which must not be inactive; null (the default) sends none.
+    /// A contract of the payer from list_payer_contracts, which must not be inactive. An explicit null sends none. Leaving the key out is not the same as null: the service then sends the payer's only contract when list_payer_contracts has exactly one that is not inactive and marks it active, sends none when the payer has no contract or only inactive ones, and answers BOOKING_VALUE_UNRESOLVED otherwise (several contracts, or an unrecognized active flag).
     #[serde(rename = "contractId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contract_id: Option<Option<String>>,
-    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. Never guessed: the caller supplies them.
+    /// Coverage and clinical classification codes, as the clinic's own provider catalogs define them. regime and affiliateType are never guessed: the caller supplies them. The rest has the defaults each field states.
     #[serde(rename = "classification")]
     pub classification: OficlinicRescheduleAppointmentBodyClassification,
-    /// Billing values of the clinic's tariff matrix. Never guessed: the caller supplies them as the clinic's workflow defines them.
-    #[serde(rename = "billing")]
-    pub billing: OficlinicRescheduleAppointmentBodyBilling,
-    #[serde(rename = "referral")]
-    pub referral: OficlinicRescheduleAppointmentBodyReferral,
+    /// Billing values of the booking screen. Leave the whole object out and the service resolves them as the screen does: tariff from the payer's tariff matrix for the flow's service under the plan and subplan; billPrivately, billCopayments and enteredCopayment from the payer's row; copaymentPercentage, maxCopayment and indicatedModeratorFee from the row of classification.salaryRange; exempt 0, courtOrder 0 and markExempt false. When given, every value is sent exactly as given and nothing is resolved.
+    #[serde(rename = "billing", default, skip_serializing_if = "Option::is_none")]
+    pub billing: Option<OficlinicRescheduleAppointmentBodyBilling>,
+    /// Referral values of the booking screen. Left out: no requesting professional, no authorization number and requestedByUser false.
+    #[serde(rename = "referral", default, skip_serializing_if = "Option::is_none")]
+    pub referral: Option<OficlinicRescheduleAppointmentBodyReferral>,
     /// Observations sent as pObservaciones, accents removed and uppercased; null (the default) sends none.
     #[serde(rename = "observations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub observations: Option<Option<String>>,
@@ -65532,6 +65756,7 @@ pub enum OficlinicRescheduleAppointmentUnprocessableContentFailure {
     CredentialsRejectedFailure(CredentialsRejectedFailure),
     OficlinicContextNotAvailableFailure(OficlinicContextNotAvailableFailure),
     OficlinicProviderIdentityMismatchFailure(OficlinicProviderIdentityMismatchFailure),
+    OficlinicBookingValueUnresolvedFailure(OficlinicBookingValueUnresolvedFailure),
     OficlinicProgramUnitsNotSupportedFailure(OficlinicProgramUnitsNotSupportedFailure),
 }
 
@@ -89692,7 +89917,7 @@ pub struct SanitasAffiliationsLookupInput {
     pub company: Option<SanitasAffiliationsLookupInputCompany>,
 }
 
-pub type SanitasAffiliationsLookupOutput = SanitasSanitasAffiliation;
+pub type SanitasAffiliationsLookupOutput = SanitasLookupAffiliationResult;
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -90024,6 +90249,27 @@ pub enum SanitasLookupAffiliationConflictFailure {
     SanitasPatientUnresolvedFailure(SanitasPatientUnresolvedFailure),
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum SanitasLookupAffiliationResult {
+    SanitasSanitasAffiliation(SanitasSanitasAffiliation),
+    SanitasSanitasNoContract(SanitasSanitasNoContract),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SanitasLookupAffiliationResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: SanitasLookupAffiliationResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SanitasLookupAffiliationServiceUnavailableError {
@@ -90073,7 +90319,7 @@ pub enum SanitasPatientUnresolvedFailureCode {
     PATIENTUNRESOLVED,
 }
 
-/// The provider did not return one matching contract. Coverage is unknown.
+/// The provider listed several contracts for this document in this company and none was chosen. Coverage is unknown.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SanitasPatientUnresolvedFailure {
     /// The failure code, stable across releases.
@@ -90273,20 +90519,6 @@ pub struct SanitasSanitasAffiliation {
     pub affiliate_type: Option<String>,
 }
 
-/// A successful answer.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SanitasSanitasAffiliationResponse {
-    #[serde(rename = "success")]
-    pub success: serde_json::Value,
-    #[serde(rename = "data")]
-    pub data: SanitasSanitasAffiliation,
-    #[serde(rename = "error")]
-    pub error: serde_json::Value,
-    /// What every answer carries besides its data or error.
-    #[serde(rename = "metadata")]
-    pub metadata: ResponseMetadata,
-}
-
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct SanitasSanitasConnectionProvidersItem {
     #[serde(rename = "id")]
@@ -90331,6 +90563,72 @@ pub struct SanitasSanitasConnectionResponse {
     /// What every answer carries besides its data or error.
     #[serde(rename = "metadata")]
     pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SanitasSanitasNoContractDocumentType {
+    #[serde(rename = "AS")]
+    AS,
+    #[serde(rename = "CC")]
+    CC,
+    #[serde(rename = "CD")]
+    CD,
+    #[serde(rename = "CE")]
+    CE,
+    #[serde(rename = "CN")]
+    CN,
+    #[serde(rename = "MS")]
+    MS,
+    #[serde(rename = "NI")]
+    NI,
+    #[serde(rename = "NU")]
+    NU,
+    #[serde(rename = "PA")]
+    PA,
+    #[serde(rename = "PD")]
+    PD,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "PT")]
+    PT,
+    #[serde(rename = "RC")]
+    RC,
+    #[serde(rename = "SC")]
+    SC,
+    #[serde(rename = "TI")]
+    TI,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SanitasSanitasNoContractCompany {
+    #[serde(rename = "sanitas")]
+    Sanitas,
+    #[serde(rename = "colsanitas")]
+    Colsanitas,
+    #[serde(rename = "medisanitas")]
+    Medisanitas,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SanitasSanitasNoContractOutcome {
+    #[serde(rename = "noContract")]
+    NoContract,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SanitasSanitasNoContract {
+    #[serde(rename = "documentType")]
+    pub document_type: SanitasSanitasNoContractDocumentType,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+    #[serde(rename = "company")]
+    pub company: SanitasSanitasNoContractCompany,
+    #[serde(rename = "checkedAt")]
+    pub checked_at: String,
+    #[serde(rename = "active")]
+    pub active: serde_json::Value,
+    #[serde(rename = "outcome")]
+    pub outcome: SanitasSanitasNoContractOutcome,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
