@@ -69178,6 +69178,92 @@ pub struct RaizAgentTurnPolicy {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentVoiceSettingsBackgroundSoundSound {
+    #[serde(rename = "office1")]
+    Office1,
+    #[serde(rename = "office2")]
+    Office2,
+    #[serde(rename = "restaurant")]
+    Restaurant,
+    #[serde(rename = "city")]
+    City,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentVoiceSettingsBackgroundSound {
+    /// The place: `office1`, `office2`, `restaurant` or `city`.
+    #[serde(rename = "sound")]
+    pub sound: RaizAgentVoiceSettingsBackgroundSoundSound,
+    /// How loud it plays next to the Agent's voice, from 1 to 100. The default, 15, is subtle.
+    #[serde(rename = "volume", default, skip_serializing_if = "Option::is_none")]
+    pub volume: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentVoiceSettingsCapacity {
+    #[serde(rename = "callsPerDay")]
+    pub calls_per_day: Option<i64>,
+    #[serde(rename = "maxHoldSeconds")]
+    pub max_hold_seconds: Option<i64>,
+    #[serde(rename = "simultaneousCalls")]
+    pub simultaneous_calls: Option<i64>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentVoiceSettingsGuardrailsBlockedTopicsItem {
+    #[serde(rename = "sexual")]
+    Sexual,
+    #[serde(rename = "violence")]
+    Violence,
+    #[serde(rename = "harassment")]
+    Harassment,
+    #[serde(rename = "selfHarm")]
+    SelfHarm,
+    #[serde(rename = "profanity")]
+    Profanity,
+    #[serde(rename = "religionOrPolitics")]
+    ReligionOrPolitics,
+    #[serde(rename = "medicalAndLegal")]
+    MedicalAndLegal,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentVoiceSettingsGuardrailsRulesItem {
+    /// What the rule blocks, in plain words: `Any diagnosis, dose or treatment recommendation`.
+    #[serde(rename = "blocks")]
+    pub blocks: String,
+    /// A short name for the rule.
+    #[serde(rename = "name")]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentVoiceSettingsGuardrails {
+    /// End a call in which the caller tries to make the Agent ignore its instructions.
+    #[serde(rename = "blockManipulation")]
+    pub block_manipulation: bool,
+    /// Subjects the Agent must not speak about; a reply that touches one ends the call. Careful with `medicalAndLegal`: it can end the calls of an Agent whose work is to talk about specialties, exams or prescriptions. For `no clinical advice`, a rule of your own says it more exactly.
+    #[serde(rename = "blockedTopics")]
+    pub blocked_topics: Vec<RaizAgentVoiceSettingsGuardrailsBlockedTopicsItem>,
+    /// The organization's own rules. Each one is checked against every reply of the Agent, and a reply that breaks one ends the call.
+    #[serde(rename = "rules")]
+    pub rules: Vec<RaizAgentVoiceSettingsGuardrailsRulesItem>,
+    /// Remind the Agent of its instructions throughout a long call, so it stays on its subject. It never ends a call.
+    #[serde(rename = "stayOnTopic")]
+    pub stay_on_topic: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentVoiceSettingsPronunciationsItem {
+    /// How to say it, written the way it sounds: `Yeison`, `ce pe a pe`.
+    #[serde(rename = "spokenAs")]
+    pub spoken_as: String,
+    /// The word or phrase as the Agent writes it: a surname, a site, a medicine. Matched as a whole word, whatever the case.
+    #[serde(rename = "term")]
+    pub term: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentVoiceSettingsReasoningEffort {
     #[serde(rename = "none")]
     None,
@@ -69196,9 +69282,35 @@ pub enum RaizAgentVoiceSettingsReasoningEffort {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentVoiceSettingsReplyTiming {
+    #[serde(rename = "patient")]
+    Patient,
+    #[serde(rename = "normal")]
+    Normal,
+    #[serde(rename = "quick")]
+    Quick,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentVoiceSettingsToolCallSound {
     #[serde(rename = "typing")]
     Typing,
+    #[serde(rename = "music1")]
+    Music1,
+    #[serde(rename = "music2")]
+    Music2,
+    #[serde(rename = "music3")]
+    Music3,
+    #[serde(rename = "music4")]
+    Music4,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAgentVoiceSettingsVoiceVersion {
+    #[serde(rename = "classic")]
+    Classic,
+    #[serde(rename = "turbo")]
+    Turbo,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -69227,11 +69339,31 @@ pub enum RaizAgentVoiceSettingsLlm {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizAgentVoiceSettings {
+    #[serde(rename = "backgroundSound", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub background_sound: Option<Option<RaizAgentVoiceSettingsBackgroundSound>>,
+    #[serde(rename = "capacity", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub capacity: Option<Option<RaizAgentVoiceSettingsCapacity>>,
+    #[serde(rename = "guardrails", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub guardrails: Option<Option<RaizAgentVoiceSettingsGuardrails>>,
+    /// Keep other people talking near the caller out of the conversation, so they neither answer for the caller nor interrupt the Agent. False turns it off. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "ignoreBackgroundVoices", default, skip_serializing_if = "Option::is_none")]
+    pub ignore_background_voices: Option<bool>,
+    /// Let callers type on their phone's keypad. What they type reaches the Agent as their message, and the Agent is told it may ask for a number that is long or easy to mishear (an identification number, a phone number) to be typed, ending with #. False ignores the keypad. On for an Agent that never set it; left out of a write, the Agent keeps its current value. Phone calls only. Applies to future calls once the Agent is published.
+    #[serde(rename = "keypadInput", default, skip_serializing_if = "Option::is_none")]
+    pub keypad_input: Option<bool>,
     /// Names and terms the transcriber should favor (people, places, products).
     #[serde(rename = "keywords")]
     pub keywords: Vec<String>,
+    #[serde(rename = "maxDurationMessage", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub max_duration_message: Option<Option<String>>,
     #[serde(rename = "maxDurationSeconds")]
     pub max_duration_seconds: Option<i64>,
+    /// Short words a caller says while listening (`ajá`, `sí`, `ok`) that must not cut the Agent off. Matched whole, whatever the case. An empty list removes them all. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "nonInterruptingWords", default, skip_serializing_if = "Option::is_none")]
+    pub non_interrupting_words: Option<Vec<String>>,
+    /// How the Agent pronounces the organization's own words: each `term` is spoken as its `spokenAs`. Terms are matched whatever their case, so a term repeated in another case keeps only its first entry. An empty list removes them all. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "pronunciations", default, skip_serializing_if = "Option::is_none")]
+    pub pronunciations: Option<Vec<RaizAgentVoiceSettingsPronunciationsItem>>,
     /// Keep the call recording (copied to Raíz after the call).
     #[serde(rename = "recordCalls")]
     pub record_calls: bool,
@@ -69240,6 +69372,9 @@ pub struct RaizAgentVoiceSettings {
     pub redact_keypad_input: Option<bool>,
     #[serde(rename = "reasoningEffort", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub reasoning_effort: Option<Option<RaizAgentVoiceSettingsReasoningEffort>>,
+    /// How soon the Agent replies once the caller pauses: `patient` waits longer, for people who think aloud or speak slowly; `normal`; `quick` replies sooner. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "replyTiming", default, skip_serializing_if = "Option::is_none")]
+    pub reply_timing: Option<RaizAgentVoiceSettingsReplyTiming>,
     /// Speak a short contextual message while preparing a slow response. False disables automatic delay messages. Omitted preserves the current runtime setting.
     #[serde(rename = "responseDelayMessages", default, skip_serializing_if = "Option::is_none")]
     pub response_delay_messages: Option<bool>,
@@ -69255,6 +69390,12 @@ pub struct RaizAgentVoiceSettings {
     pub tool_call_sound: Option<Option<RaizAgentVoiceSettingsToolCallSound>>,
     #[serde(rename = "turnTimeoutSeconds")]
     pub turn_timeout_seconds: Option<i64>,
+    /// Say the first message whole: the caller cannot cut it off. For a greeting that carries a notice the caller must hear. False lets the caller interrupt it. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "uninterruptibleGreeting", default, skip_serializing_if = "Option::is_none")]
+    pub uninterruptible_greeting: Option<bool>,
+    /// Which version of the voice speaks. `classic` (what every Agent has spoken with) or `turbo`: it answers sooner and with more expression, ignores `speed`, and a voice can sound somewhat different in it. Left out, the Agent keeps its current value; until it is first set, calls keep behaving as they did. Applies to future calls once the Agent is published.
+    #[serde(rename = "voiceVersion", default, skip_serializing_if = "Option::is_none")]
+    pub voice_version: Option<RaizAgentVoiceSettingsVoiceVersion>,
     #[serde(rename = "backupModels", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub backup_models: Option<Option<Vec<RaizAgentVoiceSettingsBackupModelsItem>>>,
     #[serde(rename = "llm")]
@@ -90702,6 +90843,12 @@ pub struct SuraAppointmentsCancelInput {
 pub type SuraAppointmentsCancelOutput = SuraCancelAppointmentResult;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraAppointmentsCreateInputCoveragePlan {
+    #[serde(rename = "POS")]
+    POS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraAppointmentsCreateInputDocumentType {
     #[serde(rename = "ASI")]
     ASI,
@@ -90764,6 +90911,9 @@ pub struct SuraAppointmentsCreateInput {
     /// The areaId list_services returned beside that service. Pass it with an exact serviceId to skip a catalog lookup; omit it whenever you are naming the service in words.
     #[serde(rename = "areaId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub area_id: Option<Option<String>>,
+    /// Exact plan printed on the reviewed SURA authorization. Send POS only when the document specifies it. Agenda must offer that plan for the same patient. Keep it when booking the returned opening.
+    #[serde(rename = "coveragePlan", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub coverage_plan: Option<Option<SuraAppointmentsCreateInputCoveragePlan>>,
     /// Complete document number of the patient receiving care, from readable original evidence or their message. Normalize separators without changing digits. Request correction only for missing, illegible or conflicting identity; never guess digits.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
@@ -91225,6 +91375,12 @@ pub enum SuraBookAppointmentBadGatewayFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraBookAppointmentBodyCoveragePlan {
+    #[serde(rename = "POS")]
+    POS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraBookAppointmentBodyDocumentType {
     #[serde(rename = "ASI")]
     ASI,
@@ -91287,6 +91443,9 @@ pub struct SuraBookAppointmentBody {
     /// The areaId list_services returned beside that service. Pass it with an exact serviceId to skip a catalog lookup; omit it whenever you are naming the service in words.
     #[serde(rename = "areaId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub area_id: Option<Option<String>>,
+    /// Exact plan printed on the reviewed SURA authorization. Send POS only when the document specifies it. Agenda must offer that plan for the same patient. Keep it when booking the returned opening.
+    #[serde(rename = "coveragePlan", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub coverage_plan: Option<Option<SuraBookAppointmentBodyCoveragePlan>>,
     /// Complete document number of the patient receiving care, from readable original evidence or their message. Normalize separators without changing digits. Request correction only for missing, illegible or conflicting identity; never guess digits.
     #[serde(rename = "documentNumber")]
     pub document_number: String,
@@ -91396,6 +91555,12 @@ pub struct SuraBookedAppointment {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraBookingOptionsLookupInputCoveragePlan {
+    #[serde(rename = "POS")]
+    POS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraBookingOptionsLookupInputDocumentType {
     #[serde(rename = "ASI")]
     ASI,
@@ -91484,6 +91649,9 @@ pub struct SuraBookingOptionsLookupInput {
     /// The areaId list_services returned beside that service. Pass it with an exact serviceId to skip a catalog lookup; omit it whenever you are naming the service in words.
     #[serde(rename = "areaId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub area_id: Option<Option<String>>,
+    /// Exact plan printed on the reviewed SURA authorization. Send POS only when the document specifies it. Agenda must offer that plan for the same patient. Keep it when booking the returned opening.
+    #[serde(rename = "coveragePlan", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub coverage_plan: Option<Option<SuraBookingOptionsLookupInputCoveragePlan>>,
     /// A day the person asked for, as YYYY-MM-DD. Its openings come first; when it has none, the openings nearest to it on either side are offered instead and requestedDateAvailable is false. Omit it for the soonest openings. Resolve relative dates like "mañana" against the clinic's own timezone before calling.
     #[serde(rename = "date", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub date: Option<Option<String>>,
@@ -93661,6 +93829,12 @@ pub struct SuraPortalUnavailableFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraPreparationAvailableBookingCoveragePlan {
+    #[serde(rename = "POS")]
+    POS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraPreparationAvailableBookingDocumentType {
     #[serde(rename = "ASI")]
     ASI,
@@ -93712,6 +93886,9 @@ pub enum SuraPreparationAvailableBookingDocumentType {
 pub struct SuraPreparationAvailableBooking {
     #[serde(rename = "areaId", default, skip_serializing_if = "Option::is_none")]
     pub area_id: Option<String>,
+    /// Exact plan printed on the reviewed SURA authorization. Send POS only when the document specifies it. Agenda must offer that plan for the same patient. Keep it when booking the returned opening.
+    #[serde(rename = "coveragePlan", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub coverage_plan: Option<Option<SuraPreparationAvailableBookingCoveragePlan>>,
     /// Deprecated: use `startsAt`. Answered until 2027-01-28.
     #[serde(rename = "date")]
     pub date: Option<String>,
@@ -93910,6 +94087,12 @@ pub enum SuraPrepareAppointmentBadGatewayFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SuraPrepareAppointmentBodyCoveragePlan {
+    #[serde(rename = "POS")]
+    POS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum SuraPrepareAppointmentBodyDocumentType {
     #[serde(rename = "ASI")]
     ASI,
@@ -93998,6 +94181,9 @@ pub struct SuraPrepareAppointmentBody {
     /// The areaId list_services returned beside that service. Pass it with an exact serviceId to skip a catalog lookup; omit it whenever you are naming the service in words.
     #[serde(rename = "areaId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub area_id: Option<Option<String>>,
+    /// Exact plan printed on the reviewed SURA authorization. Send POS only when the document specifies it. Agenda must offer that plan for the same patient. Keep it when booking the returned opening.
+    #[serde(rename = "coveragePlan", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub coverage_plan: Option<Option<SuraPrepareAppointmentBodyCoveragePlan>>,
     /// A day the person asked for, as YYYY-MM-DD. Its openings come first; when it has none, the openings nearest to it on either side are offered instead and requestedDateAvailable is false. Omit it for the soonest openings. Resolve relative dates like "mañana" against the clinic's own timezone before calling.
     #[serde(rename = "date", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub date: Option<Option<String>>,

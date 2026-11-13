@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261112.191820";
+pub const RELEASE: &str = "1.20261113.63907";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
