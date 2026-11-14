@@ -104,6 +104,32 @@ impl<'a> AccountApiKeysApi<'a> {
     }
 }
 
+/// `account.billing`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountBillingApi<'a>(&'a Client);
+
+impl<'a> AccountBillingApi<'a> {
+    /// Get billing
+    ///
+    /// The organization's wallet in credits (one credit is one US dollar): credits left, granted and spent in the current period, whether running out stops service, its plans and the card a top-up charges.
+    pub async fn get(&self, input: &types::AccountBillingGetInput) -> Result<types::AccountBillingGetOutput, Error> {
+        self.0.call(&operations::ACCOUNT_BILLING_GET, input).await
+    }
+}
+
+/// `account.billingPortalSessions`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountBillingPortalSessionsApi<'a>(&'a Client);
+
+impl<'a> AccountBillingPortalSessionsApi<'a> {
+    /// Open the card portal
+    ///
+    /// A session of Stripe's portal, where the organization's people change its saved card and download its card receipts.
+    pub async fn create(&self, input: &types::AccountBillingPortalSessionsCreateInput) -> Result<types::AccountBillingPortalSessionsCreateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_BILLING_PORTAL_SESSIONS_CREATE, input).await
+    }
+}
+
 /// `account.colombianRecords`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountColombianRecordsApi<'a>(&'a Client);
@@ -263,6 +289,45 @@ impl<'a> AccountRolesApi<'a> {
     }
 }
 
+/// `account.usageSummary`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountUsageSummaryApi<'a>(&'a Client);
+
+impl<'a> AccountUsageSummaryApi<'a> {
+    /// Get the usage summary
+    ///
+    /// What the organization used in a range, the current month by default: each metered feature in its own units (minutes, conversations, lookups…), broken down by product or channel, and the credits its wallet paid.
+    pub async fn get(&self, input: &types::AccountUsageSummaryGetInput) -> Result<types::AccountUsageSummaryGetOutput, Error> {
+        self.0.call(&operations::ACCOUNT_USAGE_SUMMARY_GET, input).await
+    }
+}
+
+/// `account.walletTopUps`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountWalletTopUpsApi<'a>(&'a Client);
+
+impl<'a> AccountWalletTopUpsApi<'a> {
+    /// Top up the wallet
+    ///
+    /// Buys credits at one US dollar each. The organization's saved card is charged at once; without one, or when the bank asks to confirm, the answer is Stripe's page to pay on. Never repeated on its own: a lost answer is OUTCOME_UNKNOWN, and the wallet's transactions say whether it was paid.
+    pub async fn create(&self, input: &types::AccountWalletTopUpsCreateInput) -> Result<types::AccountWalletTopUpsCreateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_WALLET_TOP_UPS_CREATE, input).await
+    }
+}
+
+/// `account.walletTransactions`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountWalletTransactionsApi<'a>(&'a Client);
+
+impl<'a> AccountWalletTransactionsApi<'a> {
+    /// List wallet transactions
+    ///
+    /// What moved the organization's wallet, newest first: top-ups, plan grants and renewals, adjustments Arbol made, and the credits spent, one entry per UTC day, each with the balance right after it. Listed forward only.
+    pub async fn list(&self, input: &types::AccountWalletTransactionsListInput) -> Result<types::AccountWalletTransactionsListOutput, Error> {
+        self.0.call(&operations::ACCOUNT_WALLET_TRANSACTIONS_LIST, input).await
+    }
+}
+
 /// `account`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountApi<'a>(&'a Client);
@@ -270,6 +335,14 @@ pub struct AccountApi<'a>(&'a Client);
 impl<'a> AccountApi<'a> {
     pub fn api_keys(&self) -> AccountApiKeysApi<'a> {
         AccountApiKeysApi(self.0)
+    }
+
+    pub fn billing(&self) -> AccountBillingApi<'a> {
+        AccountBillingApi(self.0)
+    }
+
+    pub fn billing_portal_sessions(&self) -> AccountBillingPortalSessionsApi<'a> {
+        AccountBillingPortalSessionsApi(self.0)
     }
 
     pub fn colombian_records(&self) -> AccountColombianRecordsApi<'a> {
@@ -306,6 +379,18 @@ impl<'a> AccountApi<'a> {
 
     pub fn roles(&self) -> AccountRolesApi<'a> {
         AccountRolesApi(self.0)
+    }
+
+    pub fn usage_summary(&self) -> AccountUsageSummaryApi<'a> {
+        AccountUsageSummaryApi(self.0)
+    }
+
+    pub fn wallet_top_ups(&self) -> AccountWalletTopUpsApi<'a> {
+        AccountWalletTopUpsApi(self.0)
+    }
+
+    pub fn wallet_transactions(&self) -> AccountWalletTransactionsApi<'a> {
+        AccountWalletTransactionsApi(self.0)
     }
 }
 

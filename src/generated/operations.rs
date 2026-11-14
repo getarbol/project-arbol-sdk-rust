@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261114.55927";
+pub const RELEASE: &str = "1.20261114.221927";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -43,6 +43,28 @@ pub const ACCOUNT_API_KEYS_ROTATE: Operation = Operation {
     method: "POST",
     path: "/v1/account/api-keys/{apiKeyId}/rotate",
     path_field: Some("apiKeyId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 262144,
+};
+
+/// `account.billing.get`: Get billing
+pub const ACCOUNT_BILLING_GET: Operation = Operation {
+    name: "account.billing.get",
+    method: "GET",
+    path: "/v1/account/billing",
+    path_field: None,
+    query: Some(&[]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.billingPortalSessions.create`: Open the card portal
+pub const ACCOUNT_BILLING_PORTAL_SESSIONS_CREATE: Operation = Operation {
+    name: "account.billingPortalSessions.create",
+    method: "POST",
+    path: "/v1/account/billing-portal-sessions",
+    path_field: None,
     query: None,
     effect: Effect::Write,
     max_output_bytes: 262144,
@@ -207,6 +229,39 @@ pub const ACCOUNT_ROLES_LIST: Operation = Operation {
     name: "account.roles.list",
     method: "GET",
     path: "/v1/account/roles",
+    path_field: None,
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.usageSummary.get`: Get the usage summary
+pub const ACCOUNT_USAGE_SUMMARY_GET: Operation = Operation {
+    name: "account.usageSummary.get",
+    method: "GET",
+    path: "/v1/account/usage-summary",
+    path_field: None,
+    query: Some(&[("from", QueryKind::String), ("to", QueryKind::String), ("groupBy", QueryKind::String)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.walletTopUps.create`: Top up the wallet
+pub const ACCOUNT_WALLET_TOP_UPS_CREATE: Operation = Operation {
+    name: "account.walletTopUps.create",
+    method: "POST",
+    path: "/v1/account/wallet-top-ups",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 262144,
+};
+
+/// `account.walletTransactions.list`: List wallet transactions
+pub const ACCOUNT_WALLET_TRANSACTIONS_LIST: Operation = Operation {
+    name: "account.walletTransactions.list",
+    method: "GET",
+    path: "/v1/account/wallet-transactions",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
