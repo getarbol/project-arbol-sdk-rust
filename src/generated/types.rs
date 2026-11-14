@@ -545,7 +545,7 @@ pub struct AccountConnection {
     /// sura, visoft, agenda, or a custom server's name.
     #[serde(rename = "integration")]
     pub integration: String,
-    /// The independent portal this account connects to.
+    /// Which of the provider's independent sites this connection reaches.
     #[serde(rename = "portal", default, skip_serializing_if = "Option::is_none")]
     pub portal: Option<String>,
     #[serde(rename = "name")]
@@ -17983,6 +17983,41 @@ pub enum AgendaGetOrganizationForbiddenFailure {
     AgendaOriginNotAllowedFailure(AgendaOriginNotAllowedFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaGetOrganizationResultHolidaysCountry {
+    #[serde(rename = "CO")]
+    CO,
+    #[serde(rename = "MX")]
+    MX,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "CL")]
+    CL,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaGetOrganizationResultHolidaysMode {
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "notice")]
+    Notice,
+    #[serde(rename = "hidden")]
+    Hidden,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaGetOrganizationResultHolidays {
+    /// Country whose national holidays apply, as an ISO 3166-1 alpha-2 code.
+    #[serde(rename = "country")]
+    pub country: AgendaGetOrganizationResultHolidaysCountry,
+    /// Holidays that do something else than `mode`, by holiday id.
+    #[serde(rename = "exceptions")]
+    pub exceptions: std::collections::BTreeMap<String, serde_json::Value>,
+    /// What a holiday does: closed offers no availability that day, notice only shows it on the agenda and when booking, hidden neither shows nor changes anything.
+    #[serde(rename = "mode")]
+    pub mode: AgendaGetOrganizationResultHolidaysMode,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AgendaGetOrganizationResultModules {
     /// Enable organization-defined booking fields. Disabling hides them without deleting previously stored values.
@@ -17991,6 +18026,9 @@ pub struct AgendaGetOrganizationResultModules {
     /// Show patient and appointment documents without deleting stored files when disabled.
     #[serde(rename = "files")]
     pub files: bool,
+    /// Apply the national holidays of the configured country: closed days offer no availability, noticed days are only shown. Disabling changes nothing stored.
+    #[serde(rename = "holidays")]
+    pub holidays: bool,
     /// Show organization sites and site-based agenda filters.
     #[serde(rename = "locations")]
     pub locations: bool,
@@ -18016,6 +18054,9 @@ pub enum AgendaGetOrganizationResultObject {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AgendaGetOrganizationResult {
+    /// National holidays of the organization: the country, what a holiday does and its exceptions. They apply only while the holidays module is on.
+    #[serde(rename = "holidays")]
+    pub holidays: AgendaGetOrganizationResultHolidays,
     /// Effective module choices, combining saved configuration with organization usage.
     #[serde(rename = "modules")]
     pub modules: AgendaGetOrganizationResultModules,
@@ -37153,6 +37194,41 @@ pub enum AgendaSaveOrganizationBadRequestFailure {
     AgendaInvalidBodyFailure(AgendaInvalidBodyFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaSaveOrganizationBodyHolidaysCountry {
+    #[serde(rename = "CO")]
+    CO,
+    #[serde(rename = "MX")]
+    MX,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "CL")]
+    CL,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaSaveOrganizationBodyHolidaysMode {
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "notice")]
+    Notice,
+    #[serde(rename = "hidden")]
+    Hidden,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AgendaSaveOrganizationBodyHolidays {
+    /// Country whose national holidays apply, as an ISO 3166-1 alpha-2 code.
+    #[serde(rename = "country", default, skip_serializing_if = "Option::is_none")]
+    pub country: Option<AgendaSaveOrganizationBodyHolidaysCountry>,
+    /// Holidays that do something else than `mode`, by holiday id.
+    #[serde(rename = "exceptions", default, skip_serializing_if = "Option::is_none")]
+    pub exceptions: Option<std::collections::BTreeMap<String, serde_json::Value>>,
+    /// What a holiday does: closed offers no availability that day, notice only shows it on the agenda and when booking, hidden neither shows nor changes anything.
+    #[serde(rename = "mode", default, skip_serializing_if = "Option::is_none")]
+    pub mode: Option<AgendaSaveOrganizationBodyHolidaysMode>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct AgendaSaveOrganizationBodyModules {
     /// Enable organization-defined booking fields. Disabling hides them without deleting previously stored values.
@@ -37161,6 +37237,9 @@ pub struct AgendaSaveOrganizationBodyModules {
     /// Show patient and appointment documents without deleting stored files when disabled.
     #[serde(rename = "files", default, skip_serializing_if = "Option::is_none")]
     pub files: Option<bool>,
+    /// Apply the national holidays of the configured country: closed days offer no availability, noticed days are only shown. Disabling changes nothing stored.
+    #[serde(rename = "holidays", default, skip_serializing_if = "Option::is_none")]
+    pub holidays: Option<bool>,
     /// Show organization sites and site-based agenda filters.
     #[serde(rename = "locations", default, skip_serializing_if = "Option::is_none")]
     pub locations: Option<bool>,
@@ -37183,6 +37262,9 @@ pub struct AgendaSaveOrganizationBody {
     /// Organization settings version last observed; zero before the first save. A concurrent edit produces a conflict.
     #[serde(rename = "expectedVersion")]
     pub expected_version: i64,
+    /// Only supplied holiday settings are changed. Supplied exceptions replace the stored ones; an exception naming a holiday the country does not have is dropped.
+    #[serde(rename = "holidays", default, skip_serializing_if = "Option::is_none")]
+    pub holidays: Option<AgendaSaveOrganizationBodyHolidays>,
     /// Only supplied module choices are changed; unspecified modules retain their saved choice or usage-derived default.
     #[serde(rename = "modules", default, skip_serializing_if = "Option::is_none")]
     pub modules: Option<AgendaSaveOrganizationBodyModules>,
@@ -37301,6 +37383,41 @@ pub enum AgendaSaveOrganizationForbiddenFailure {
     AgendaOriginNotAllowedFailure(AgendaOriginNotAllowedFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaSaveOrganizationResultHolidaysCountry {
+    #[serde(rename = "CO")]
+    CO,
+    #[serde(rename = "MX")]
+    MX,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "CL")]
+    CL,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AgendaSaveOrganizationResultHolidaysMode {
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "notice")]
+    Notice,
+    #[serde(rename = "hidden")]
+    Hidden,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AgendaSaveOrganizationResultHolidays {
+    /// Country whose national holidays apply, as an ISO 3166-1 alpha-2 code.
+    #[serde(rename = "country")]
+    pub country: AgendaSaveOrganizationResultHolidaysCountry,
+    /// Holidays that do something else than `mode`, by holiday id.
+    #[serde(rename = "exceptions")]
+    pub exceptions: std::collections::BTreeMap<String, serde_json::Value>,
+    /// What a holiday does: closed offers no availability that day, notice only shows it on the agenda and when booking, hidden neither shows nor changes anything.
+    #[serde(rename = "mode")]
+    pub mode: AgendaSaveOrganizationResultHolidaysMode,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AgendaSaveOrganizationResultModules {
     /// Enable organization-defined booking fields. Disabling hides them without deleting previously stored values.
@@ -37309,6 +37426,9 @@ pub struct AgendaSaveOrganizationResultModules {
     /// Show patient and appointment documents without deleting stored files when disabled.
     #[serde(rename = "files")]
     pub files: bool,
+    /// Apply the national holidays of the configured country: closed days offer no availability, noticed days are only shown. Disabling changes nothing stored.
+    #[serde(rename = "holidays")]
+    pub holidays: bool,
     /// Show organization sites and site-based agenda filters.
     #[serde(rename = "locations")]
     pub locations: bool,
@@ -37334,6 +37454,9 @@ pub enum AgendaSaveOrganizationResultObject {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AgendaSaveOrganizationResult {
+    /// National holidays of the organization: the country, what a holiday does and its exceptions. They apply only while the holidays module is on.
+    #[serde(rename = "holidays")]
+    pub holidays: AgendaSaveOrganizationResultHolidays,
     /// Effective module choices, combining saved configuration with organization usage.
     #[serde(rename = "modules")]
     pub modules: AgendaSaveOrganizationResultModules,
@@ -69200,6 +69323,8 @@ pub struct RaizAgentSettings {
     pub reply_choices: Option<bool>,
     #[serde(rename = "sessionCloseAfterMinutes")]
     pub session_close_after_minutes: Option<i64>,
+    #[serde(rename = "teamCloseAfterMinutes")]
+    pub team_close_after_minutes: Option<i64>,
     #[serde(rename = "temperature")]
     pub temperature: Option<f64>,
     #[serde(rename = "toolDiscovery")]
@@ -69339,6 +69464,8 @@ pub struct RaizAgentSettingsInput {
     pub reply_choices: Option<Option<bool>>,
     #[serde(rename = "sessionCloseAfterMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub session_close_after_minutes: Option<Option<i64>>,
+    #[serde(rename = "teamCloseAfterMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub team_close_after_minutes: Option<Option<i64>>,
     #[serde(rename = "temperature", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub temperature: Option<Option<f64>>,
     #[serde(rename = "toolDiscovery", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -70015,6 +70142,89 @@ pub struct RaizAgentsUpdateInput {
 }
 
 pub type RaizAgentsUpdateOutput = RaizAgent;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAssignee {
+    #[serde(rename = "email")]
+    pub email: Option<String>,
+    /// The person's member id, as Arbol Account lists it (`account.members.list`): the value `assigneeId` takes.
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "name")]
+    pub name: Option<String>,
+    #[serde(rename = "picture")]
+    pub picture: Option<String>,
+    /// The person calling.
+    #[serde(rename = "self")]
+    pub self_: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAssigneeListObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAssigneeList {
+    /// By name. An organization's team is a short list: all of it.
+    #[serde(rename = "data")]
+    pub data: Vec<RaizAssignee>,
+    #[serde(rename = "object")]
+    pub object: RaizAssigneeListObject,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAssigneeListResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: RaizAssigneeList,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAssigneeUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// That person cannot take conversations in this organization. `listAssignees` names who can.
+    #[serde(rename = "error")]
+    pub error: RaizAssigneeUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizAssigneeUnavailableFailureCode {
+    #[serde(rename = "ASSIGNEE_UNAVAILABLE")]
+    ASSIGNEEUNAVAILABLE,
+}
+
+/// That person cannot take conversations in this organization. `listAssignees` names who can.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizAssigneeUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizAssigneeUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizBulletinStatus {
@@ -73173,6 +73383,16 @@ pub enum RaizConversationTitleAuthor {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationWaitingOn {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+    #[serde(rename = "contact")]
+    Contact,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationOutcomeReviewBasis {
     #[serde(rename = "business_completion")]
     BusinessCompletion,
@@ -73232,6 +73452,12 @@ pub struct RaizConversation {
     pub ai_paused_by: Option<RaizConversationAiPausedBy>,
     #[serde(rename = "analyzedAt")]
     pub analyzed_at: Option<String>,
+    #[serde(rename = "assignedAt")]
+    pub assigned_at: Option<String>,
+    #[serde(rename = "assignedBy")]
+    pub assigned_by: Option<String>,
+    #[serde(rename = "assigneeId")]
+    pub assignee_id: Option<String>,
     #[serde(rename = "campaignId")]
     pub campaign_id: Option<String>,
     #[serde(rename = "campaignRecipientId")]
@@ -73308,11 +73534,18 @@ pub struct RaizConversation {
     pub title: Option<String>,
     #[serde(rename = "titleAuthor")]
     pub title_author: Option<RaizConversationTitleAuthor>,
+    /// It closed for inactivity with a handoff nobody of the team answered. Such a conversation is also one to review (`toReview`).
+    #[serde(rename = "unattended")]
+    pub unattended: bool,
     /// An instant in RFC 3339 format, in UTC.
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
     #[serde(rename = "version")]
     pub version: i64,
+    #[serde(rename = "waitingOn")]
+    pub waiting_on: Option<RaizConversationWaitingOn>,
+    #[serde(rename = "waitingSinceAt")]
+    pub waiting_since_at: Option<String>,
     /// Who works the conversation for the organization, in the order each first wrote something the contact saw (those who have not yet, last): each Agent and the team that wrote in it and, while it is open or when nobody answered it, whoever has it (the assigned Agent while the AI handles it, the team otherwise). A campaign's message and a machine client's opening make nobody a worker: read who sent them from the message's `origin`. `agentId` is the Agent assigned now.
     #[serde(rename = "workers")]
     pub workers: Vec<RaizConversationWorker>,
@@ -73328,6 +73561,9 @@ pub struct RaizConversation {
     /// Staff-only, live read of a call's provider termination evidence. Never includes provider identifiers, credentials, transcript content or free-form error text. Unavailable evidence is explicit and does not change the stored conversation.
     #[serde(rename = "diagnostics", default, skip_serializing_if = "Option::is_none")]
     pub diagnostics: Option<RaizConversationDiagnostics>,
+    /// The case's history, oldest first: the handoff, who took it or was given it, the return to the AI, a person's pause or resume, and the closing. Present only when expanded. Who answered the contact is in `workers` and in each message's `memberId`.
+    #[serde(rename = "history", default, skip_serializing_if = "Option::is_none")]
+    pub history: Option<Vec<RaizConversationEvent>>,
     /// The transcript, oldest first, with tool calls and quoted replies. Present only when expanded.
     #[serde(rename = "messages", default, skip_serializing_if = "Option::is_none")]
     pub messages: Option<RaizMessagePage>,
@@ -73457,6 +73693,66 @@ pub struct RaizConversationDiagnostics {
     pub status: RaizConversationDiagnosticsStatus,
     #[serde(rename = "terminationReasonPresent")]
     pub termination_reason_present: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationEventAuthor {
+    #[serde(rename = "person")]
+    Person,
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "system")]
+    System,
+    #[serde(rename = "import")]
+    Import,
+    #[serde(rename = "provider")]
+    Provider,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationEventKind {
+    #[serde(rename = "handed_off")]
+    HandedOff,
+    #[serde(rename = "assigned")]
+    Assigned,
+    #[serde(rename = "unassigned")]
+    Unassigned,
+    #[serde(rename = "returned_to_ai")]
+    ReturnedToAi,
+    #[serde(rename = "ai_paused")]
+    AiPaused,
+    #[serde(rename = "ai_resumed")]
+    AiResumed,
+    #[serde(rename = "closed")]
+    Closed,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationEvent {
+    /// For `assigned`: the member who has the case from then on.
+    #[serde(rename = "assigneeId", default, skip_serializing_if = "Option::is_none")]
+    pub assignee_id: Option<String>,
+    /// An instant in RFC 3339 format, in UTC.
+    #[serde(rename = "at")]
+    pub at: String,
+    /// Who did it: a `person` of the organization, the `ai`, or the `system` (a rule, such as the inactivity close).
+    #[serde(rename = "author")]
+    pub author: RaizConversationEventAuthor,
+    #[serde(rename = "authorId")]
+    pub author_id: Option<String>,
+    /// For `returned_to_ai`: nobody of the team asked for it; an unanswered technical handoff came back by itself.
+    #[serde(rename = "automatic", default, skip_serializing_if = "Option::is_none")]
+    pub automatic: Option<bool>,
+    #[serde(rename = "closeReason", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub close_reason: Option<Option<String>>,
+    /// `handed_off`: the AI passed the conversation to the team (`messageId` is its handoff message). `assigned`: a person took the case or was given it (`authorId` is who decided, `assigneeId` who has it, `previousAssigneeId` who had it). `unassigned`: it was left with nobody. `returned_to_ai`: the team gave it back to the AI. `ai_paused`, `ai_resumed`: a person paused or resumed the AI for the recipient. `closed`: it closed, with `closeReason`.
+    #[serde(rename = "kind")]
+    pub kind: RaizConversationEventKind,
+    /// Message id.
+    #[serde(rename = "messageId", default, skip_serializing_if = "Option::is_none")]
+    pub message_id: Option<String>,
+    #[serde(rename = "previousAssigneeId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub previous_assignee_id: Option<Option<String>>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -73712,6 +74008,16 @@ pub enum RaizConversationViewFiltersWorker {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationViewFiltersWaitingOn {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+    #[serde(rename = "contact")]
+    Contact,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationViewFiltersStatus {
     #[serde(rename = "open")]
     Open,
@@ -73777,6 +74083,15 @@ pub struct RaizConversationViewFilters {
     /// Who works the conversation now. `ai`: calls and web chats, open WhatsApp conversations the AI answers (assigned to it and not paused), and closed ones the AI answered. `team`: open WhatsApp conversations the organization's people answer (not assigned to the AI, or paused) and closed ones they answered. Unlike `handling`, a conversation the AI answered and then handed to people is `team` while open.
     #[serde(rename = "worker", default, skip_serializing_if = "Option::is_none")]
     pub worker: Option<RaizConversationViewFiltersWorker>,
+    /// Open conversations by who they wait for, as each conversation's `waitingOn` says: `ai`, `team` (the team's cases to answer) or `contact`. Closed conversations never match.
+    #[serde(rename = "waitingOn", default, skip_serializing_if = "Option::is_none")]
+    pub waiting_on: Option<RaizConversationViewFiltersWaitingOn>,
+    /// Conversations by the case's owner: a member id, `me` (the person calling) or `none` (nobody has it). With `waitingOn=team`: one person's cases to answer, or the ones nobody took.
+    #[serde(rename = "assignee", default, skip_serializing_if = "Option::is_none")]
+    pub assignee: Option<String>,
+    /// `true`: conversations that closed for inactivity with a handoff nobody of the team answered.
+    #[serde(rename = "unattended", default, skip_serializing_if = "Option::is_none")]
+    pub unattended: Option<bool>,
     /// Comma-separated origins.
     #[serde(rename = "origin", default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
@@ -74069,6 +74384,16 @@ pub enum RaizConversationsCountInputWorker {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsCountInputWaitingOn {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+    #[serde(rename = "contact")]
+    Contact,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizConversationsCountInputStatus {
     #[serde(rename = "open")]
     Open,
@@ -74134,6 +74459,15 @@ pub struct RaizConversationsCountInput {
     /// Who works the conversation now. `ai`: calls and web chats, open WhatsApp conversations the AI answers (assigned to it and not paused), and closed ones the AI answered. `team`: open WhatsApp conversations the organization's people answer (not assigned to the AI, or paused) and closed ones they answered. Unlike `handling`, a conversation the AI answered and then handed to people is `team` while open.
     #[serde(rename = "worker", default, skip_serializing_if = "Option::is_none")]
     pub worker: Option<RaizConversationsCountInputWorker>,
+    /// Open conversations by who they wait for, as each conversation's `waitingOn` says: `ai`, `team` (the team's cases to answer) or `contact`. Closed conversations never match.
+    #[serde(rename = "waitingOn", default, skip_serializing_if = "Option::is_none")]
+    pub waiting_on: Option<RaizConversationsCountInputWaitingOn>,
+    /// Conversations by the case's owner: a member id, `me` (the person calling) or `none` (nobody has it). With `waitingOn=team`: one person's cases to answer, or the ones nobody took.
+    #[serde(rename = "assignee", default, skip_serializing_if = "Option::is_none")]
+    pub assignee: Option<String>,
+    /// `true`: conversations that closed for inactivity with a handoff nobody of the team answered.
+    #[serde(rename = "unattended", default, skip_serializing_if = "Option::is_none")]
+    pub unattended: Option<bool>,
     /// Comma-separated origins.
     #[serde(rename = "origin", default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
@@ -74197,7 +74531,7 @@ pub struct RaizConversationsCountInput {
     /// Calls of at most this many seconds.
     #[serde(rename = "durationMax", default, skip_serializing_if = "Option::is_none")]
     pub duration_max: Option<i64>,
-    /// `outcome`, `status`, `channel` (type), `agent`, `sentiment`, `tool` (each Agent tool and the conversations that used it; null for those that used none), `toolError` (failed calls, of `toolName` when given, by error) or `fact:<definition key>` (the current value of that definition, such as the reason for contact).
+    /// `outcome`, `status`, `channel` (type), `agent`, `sentiment`, `waitingOn` (who each open conversation waits for: `ai`, `team` or `contact`; null for the closed ones), `tool` (each Agent tool and the conversations that used it; null for those that used none), `toolError` (failed calls, of `toolName` when given, by error) or `fact:<definition key>` (the current value of that definition, such as the reason for contact).
     #[serde(rename = "groupBy", default, skip_serializing_if = "Option::is_none")]
     pub group_by: Option<String>,
 }
@@ -74226,7 +74560,7 @@ pub struct RaizConversationsGetInput {
     /// Conversation id.
     #[serde(rename = "conversationId")]
     pub conversation_id: String,
-    /// Related data to include, comma-separated: `messages`, `recording`, `diagnostics`.
+    /// Related data to include, comma-separated: `messages`, `recording`, `diagnostics`, `history`.
     #[serde(rename = "expand", default, skip_serializing_if = "Option::is_none")]
     pub expand: Option<String>,
     /// Opaque cursor the `messages` expansion's pageInfo returned; omit it for its first page.
@@ -74274,6 +74608,16 @@ pub enum RaizConversationsListInputWorker {
     Ai,
     #[serde(rename = "team")]
     Team,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationsListInputWaitingOn {
+    #[serde(rename = "ai")]
+    Ai,
+    #[serde(rename = "team")]
+    Team,
+    #[serde(rename = "contact")]
+    Contact,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -74361,6 +74705,15 @@ pub struct RaizConversationsListInput {
     /// Who works the conversation now. `ai`: calls and web chats, open WhatsApp conversations the AI answers (assigned to it and not paused), and closed ones the AI answered. `team`: open WhatsApp conversations the organization's people answer (not assigned to the AI, or paused) and closed ones they answered. Unlike `handling`, a conversation the AI answered and then handed to people is `team` while open.
     #[serde(rename = "worker", default, skip_serializing_if = "Option::is_none")]
     pub worker: Option<RaizConversationsListInputWorker>,
+    /// Open conversations by who they wait for, as each conversation's `waitingOn` says: `ai`, `team` (the team's cases to answer) or `contact`. Closed conversations never match.
+    #[serde(rename = "waitingOn", default, skip_serializing_if = "Option::is_none")]
+    pub waiting_on: Option<RaizConversationsListInputWaitingOn>,
+    /// Conversations by the case's owner: a member id, `me` (the person calling) or `none` (nobody has it). With `waitingOn=team`: one person's cases to answer, or the ones nobody took.
+    #[serde(rename = "assignee", default, skip_serializing_if = "Option::is_none")]
+    pub assignee: Option<String>,
+    /// `true`: conversations that closed for inactivity with a handoff nobody of the team answered.
+    #[serde(rename = "unattended", default, skip_serializing_if = "Option::is_none")]
+    pub unattended: Option<bool>,
     /// Comma-separated origins.
     #[serde(rename = "origin", default, skip_serializing_if = "Option::is_none")]
     pub origin: Option<String>,
@@ -74553,6 +74906,8 @@ pub struct RaizConversationsUpdateInput {
     /// WhatsApp only: pause or resume automatic replies for this recipient until their open conversation closes. Resuming answers what the contact wrote in this conversation after the last real answer.
     #[serde(rename = "aiPaused", default, skip_serializing_if = "Option::is_none")]
     pub ai_paused: Option<bool>,
+    #[serde(rename = "assigneeId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub assignee_id: Option<Option<String>>,
     #[serde(rename = "contactId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contact_id: Option<Option<String>>,
     /// The `version` you read. When present, the change applies only if nobody changed the resource since; otherwise it fails with VERSION_CONFLICT.
@@ -75409,6 +75764,7 @@ pub struct RaizCreateChannelServiceUnavailableError {
 #[serde(untagged)]
 pub enum RaizCreateChannelServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
     RaizCampaignHeaderNotStoredFailure(RaizCampaignHeaderNotStoredFailure),
     RaizVoiceUnavailableFailure(RaizVoiceUnavailableFailure),
     RaizFeedbackProposalUnavailableFailure(RaizFeedbackProposalUnavailableFailure),
@@ -75455,6 +75811,7 @@ pub struct RaizCreateChannelUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizCreateChannelUnprocessableContentFailure {
+    RaizAssigneeUnavailableFailure(RaizAssigneeUnavailableFailure),
     RaizContactUnreachableFailure(RaizContactUnreachableFailure),
     RaizDailyReportRecipientsMissingFailure(RaizDailyReportRecipientsMissingFailure),
     RaizDefinitionOptionsInvalidFailure(RaizDefinitionOptionsInvalidFailure),
@@ -76021,6 +76378,7 @@ pub struct RaizCreateConversationServiceUnavailableError {
 #[serde(untagged)]
 pub enum RaizCreateConversationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
     RaizCampaignHeaderNotStoredFailure(RaizCampaignHeaderNotStoredFailure),
     RaizVoiceUnavailableFailure(RaizVoiceUnavailableFailure),
     RaizFeedbackProposalUnavailableFailure(RaizFeedbackProposalUnavailableFailure),
@@ -76067,6 +76425,7 @@ pub struct RaizCreateConversationUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizCreateConversationUnprocessableContentFailure {
+    RaizAssigneeUnavailableFailure(RaizAssigneeUnavailableFailure),
     RaizContactUnreachableFailure(RaizContactUnreachableFailure),
     RaizDailyReportRecipientsMissingFailure(RaizDailyReportRecipientsMissingFailure),
     RaizDefinitionOptionsInvalidFailure(RaizDefinitionOptionsInvalidFailure),
@@ -78097,6 +78456,7 @@ pub struct RaizDeleteChannelServiceUnavailableError {
 #[serde(untagged)]
 pub enum RaizDeleteChannelServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
     RaizCampaignHeaderNotStoredFailure(RaizCampaignHeaderNotStoredFailure),
     RaizVoiceUnavailableFailure(RaizVoiceUnavailableFailure),
     RaizFeedbackProposalUnavailableFailure(RaizFeedbackProposalUnavailableFailure),
@@ -78143,6 +78503,7 @@ pub struct RaizDeleteChannelUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizDeleteChannelUnprocessableContentFailure {
+    RaizAssigneeUnavailableFailure(RaizAssigneeUnavailableFailure),
     RaizContactUnreachableFailure(RaizContactUnreachableFailure),
     RaizDailyReportRecipientsMissingFailure(RaizDailyReportRecipientsMissingFailure),
     RaizDefinitionOptionsInvalidFailure(RaizDefinitionOptionsInvalidFailure),
@@ -80427,6 +80788,27 @@ pub enum RaizListAgentsServiceUnavailableFailure {
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizListAssigneesServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: RaizListAssigneesServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizListAssigneesServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizListBulletinsBadRequestError {
     #[serde(rename = "success")]
     pub success: serde_json::Value,
@@ -81739,6 +82121,9 @@ pub struct RaizOrganizationSettingsNotifications {
     /// Email the recipients when the AI could not answer: a WhatsApp reply that ended with the fallback message, or a call that failed or in which one of the Agent's functions failed (default true).
     #[serde(rename = "failures")]
     pub failures: bool,
+    /// Within how many minutes a person of the team should answer a conversation the AI handed over (default 15). Past it, the case's owner (`assigneeId`), or the team's recipients while nobody has it, is reminded once; at four times that, the organization's owners and its `productNotices.administrators` hear that it is overdue. Each wait is announced once: a contact who writes again after the team answered starts another. With a digest `frequency`, the conversation is listed again in the next digest instead. `0`: no reminders.
+    #[serde(rename = "firstReplyMinutes")]
+    pub first_reply_minutes: i64,
     /// How often the notices reach the team (default `immediate`). `immediate` sends each notice as it happens, one email per conversation; a failure that repeats is notified once when its cause first appears, and the conversations the same cause touches in the next hour go out together an hour later, one follow-up an hour while it lasts. `hourly`, `every3Hours`, `every6Hours` and `every12Hours` send one digest at the end of each window of that length, counted from local midnight in the organization's time zone (every six hours: 00:00, 06:00, 12:00 and 18:00), listing the conversations that still need the team; the escalation's WhatsApp message follows the same schedule. A window without notices sends nothing.
     #[serde(rename = "frequency")]
     pub frequency: RaizOrganizationSettingsNotificationsFrequency,
@@ -81907,6 +82292,8 @@ pub struct RaizOrganizationUpdateInputSettingsNotifications {
     pub failed_outcomes: Option<Option<bool>>,
     #[serde(rename = "failures", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub failures: Option<Option<bool>>,
+    #[serde(rename = "firstReplyMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub first_reply_minutes: Option<Option<i64>>,
     #[serde(rename = "frequency", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub frequency: Option<Option<RaizOrganizationUpdateInputSettingsNotificationsFrequency>>,
     #[serde(rename = "phones", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -82739,6 +83126,62 @@ pub struct RaizReportConversationsDaily {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizReportHandoffsDailyName {
+    #[serde(rename = "handoffs_daily")]
+    HandoffsDaily,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizReportHandoffsDailyRowsItem {
+    #[serde(rename = "agentId")]
+    pub agent_id: Option<String>,
+    #[serde(rename = "agentName")]
+    pub agent_name: Option<String>,
+    /// Handoffs a person of the team answered.
+    #[serde(rename = "answeredCount")]
+    pub answered_count: i64,
+    /// Of those, the ones answered within the organization's first-reply time (`settings.notifications.firstReplyMinutes`, as it is set now).
+    #[serde(rename = "answeredInTimeCount")]
+    pub answered_in_time_count: i64,
+    #[serde(rename = "avgFirstReplySeconds")]
+    pub avg_first_reply_seconds: Option<f64>,
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "day")]
+    pub day: String,
+    /// Conversations the AI handed to the team that day, each once, by the handoff it keeps (its last).
+    #[serde(rename = "handoffCount")]
+    pub handoff_count: i64,
+    #[serde(rename = "memberId")]
+    pub member_id: Option<String>,
+    /// Handoffs the team gave back to the AI.
+    #[serde(rename = "returnedCount")]
+    pub returned_count: i64,
+    /// Handoffs that closed with nobody of the team answering and without going back to the AI.
+    #[serde(rename = "unattendedCount")]
+    pub unattended_count: i64,
+    /// Handoffs still open that nobody of the team answered.
+    #[serde(rename = "waitingCount")]
+    pub waiting_count: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizReportHandoffsDaily {
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "from")]
+    pub from: String,
+    /// More than 1000 rows matched: narrow the range or the filters.
+    #[serde(rename = "hasMore")]
+    pub has_more: bool,
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "to")]
+    pub to: String,
+    #[serde(rename = "name")]
+    pub name: RaizReportHandoffsDailyName,
+    #[serde(rename = "rows")]
+    pub rows: Vec<RaizReportHandoffsDailyRowsItem>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizReportPqrsfDailyName {
     #[serde(rename = "pqrsf_daily")]
     PqrsfDaily,
@@ -83113,6 +83556,7 @@ pub struct RaizReportCampaignProgress {
 #[serde(untagged)]
 pub enum RaizReport {
     ConversationsDaily(RaizReportConversationsDaily),
+    HandoffsDaily(RaizReportHandoffsDaily),
     PqrsfDaily(RaizReportPqrsfDaily),
     ToolCallsDaily(RaizReportToolCallsDaily),
     ToolCalls(RaizReportToolCalls),
@@ -83196,6 +83640,8 @@ pub enum RaizReportsGetInputChannelType {
 pub enum RaizReportsGetInputName {
     #[serde(rename = "conversations_daily")]
     ConversationsDaily,
+    #[serde(rename = "handoffs_daily")]
+    HandoffsDaily,
     #[serde(rename = "pqrsf_daily")]
     PqrsfDaily,
     #[serde(rename = "tool_calls_daily")]
@@ -83232,7 +83678,7 @@ pub struct RaizReportsGetInput {
     /// First day (`YYYY-MM-DD`) of a daily report. Default: 30 days ending on `to`.
     #[serde(rename = "from", default, skip_serializing_if = "Option::is_none")]
     pub from: Option<String>,
-    /// `conversations_daily`: conversations the AI took part in per day, Agent, channel type and direction, with outcomes and escalations (filters `agentId`, `channelType`). `booking_details`: individual patients and appointments from explicit successful creation receipts, including specialty, paired exams, deduplication, matched patient names and later recorded cancellations; filters agentId and specialty; requires conversation read/write permission too. Historical receipts with created=true, not current provider status or all provider protocols. unverifiedCount covers explicit creations missing a stable patient/slot. `booking_outcomes`: verified saved booking receipts per completion day, Agent and integration, excluding test/import/deleted conversations; confirmed new bookings, reschedules, cancellations, failed, pending, unverified and duplicate receipts separately (filter `agentId`). Historical evidence, not current appointment status; hasMore requires splitting the range and returns no partial totals. `tool_calls_daily`: tool calls per day, Agent and tool with failures/durations (filter `agentId`). `tool_calls`: individual calls, never inputs/outputs (filter `agentId`). `assessment_results_daily`: assessments per day/definition (filter `definitionId`). `pqrsf_daily`: classification, confirmed resolution and referral-link counts from the pqrsf_* definitions, including pending/unclassified conversations, excluding tests/imports/deleted records (filters `agentId`, `channelType`); no measured filing reduction is inferred. `campaign_progress`: recipients by status (filter `campaignId`; no dates).
+    /// `conversations_daily`: conversations the AI took part in per day, Agent, channel type and direction, with outcomes and escalations (filters `agentId`, `channelType`). `handoffs_daily`: the conversations the AI handed to the team, per day of the handoff, Agent and person (who answered first, else the case's owner), with how many were answered, answered in time, still waiting, closed unattended or returned to the AI, and the average seconds to the first answer (filter `agentId`). `booking_details`: individual patients and appointments from explicit successful creation receipts, including specialty, paired exams, deduplication, matched patient names and later recorded cancellations; filters agentId and specialty; requires conversation read/write permission too. Historical receipts with created=true, not current provider status or all provider protocols. unverifiedCount covers explicit creations missing a stable patient/slot. `booking_outcomes`: verified saved booking receipts per completion day, Agent and integration, excluding test/import/deleted conversations; confirmed new bookings, reschedules, cancellations, failed, pending, unverified and duplicate receipts separately (filter `agentId`). Historical evidence, not current appointment status; hasMore requires splitting the range and returns no partial totals. `tool_calls_daily`: tool calls per day, Agent and tool with failures/durations (filter `agentId`). `tool_calls`: individual calls, never inputs/outputs (filter `agentId`). `assessment_results_daily`: assessments per day/definition (filter `definitionId`). `pqrsf_daily`: classification, confirmed resolution and referral-link counts from the pqrsf_* definitions, including pending/unclassified conversations, excluding tests/imports/deleted records (filters `agentId`, `channelType`); no measured filing reduction is inferred. `campaign_progress`: recipients by status (filter `campaignId`; no dates).
     #[serde(rename = "name")]
     pub name: RaizReportsGetInputName,
     /// Last day (`YYYY-MM-DD`), inclusive, of a daily report. Default: today in the organization's time zone.
@@ -84278,6 +84724,29 @@ pub struct RaizTasksRetryInput {
 }
 
 pub type RaizTasksRetryOutput = RaizTask;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizTeamUnavailableFailureCode {
+    #[serde(rename = "TEAM_UNAVAILABLE")]
+    TEAMUNAVAILABLE,
+}
+
+/// The organization's team cannot be read right now. Try again shortly.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizTeamUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizTeamUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizTemplateButtonsItem {
@@ -85491,6 +85960,7 @@ pub struct RaizUpdateChannelServiceUnavailableError {
 #[serde(untagged)]
 pub enum RaizUpdateChannelServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
     RaizCampaignHeaderNotStoredFailure(RaizCampaignHeaderNotStoredFailure),
     RaizVoiceUnavailableFailure(RaizVoiceUnavailableFailure),
     RaizFeedbackProposalUnavailableFailure(RaizFeedbackProposalUnavailableFailure),
@@ -85537,6 +86007,7 @@ pub struct RaizUpdateChannelUnprocessableContentError {
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizUpdateChannelUnprocessableContentFailure {
+    RaizAssigneeUnavailableFailure(RaizAssigneeUnavailableFailure),
     RaizContactUnreachableFailure(RaizContactUnreachableFailure),
     RaizDailyReportRecipientsMissingFailure(RaizDailyReportRecipientsMissingFailure),
     RaizDefinitionOptionsInvalidFailure(RaizDefinitionOptionsInvalidFailure),
@@ -85698,6 +86169,8 @@ pub struct RaizUpdateConversationBody {
     /// WhatsApp only: pause or resume automatic replies for this recipient until their open conversation closes. Resuming answers what the contact wrote in this conversation after the last real answer.
     #[serde(rename = "aiPaused", default, skip_serializing_if = "Option::is_none")]
     pub ai_paused: Option<bool>,
+    #[serde(rename = "assigneeId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub assignee_id: Option<Option<String>>,
     #[serde(rename = "contactId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub contact_id: Option<Option<String>>,
     /// The `version` you read. When present, the change applies only if nobody changed the resource since; otherwise it fails with VERSION_CONFLICT.
@@ -85760,6 +86233,7 @@ pub struct RaizUpdateConversationServiceUnavailableError {
 #[serde(untagged)]
 pub enum RaizUpdateConversationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    RaizTeamUnavailableFailure(RaizTeamUnavailableFailure),
     RaizIntegrationsUnavailableFailure(RaizIntegrationsUnavailableFailure),
 }
 
@@ -86210,6 +86684,8 @@ pub struct RaizUpdateOrganizationBodySettingsNotifications {
     pub failed_outcomes: Option<Option<bool>>,
     #[serde(rename = "failures", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub failures: Option<Option<bool>>,
+    #[serde(rename = "firstReplyMinutes", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub first_reply_minutes: Option<Option<i64>>,
     #[serde(rename = "frequency", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub frequency: Option<Option<RaizUpdateOrganizationBodySettingsNotificationsFrequency>>,
     #[serde(rename = "phones", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
