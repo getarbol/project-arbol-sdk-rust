@@ -350,6 +350,8 @@ pub enum AccountBillingPlanRatesItemFeature {
     PhoneNumbers,
     #[serde(rename = "sisben_lookups")]
     SisbenLookups,
+    #[serde(rename = "postconsultations")]
+    Postconsultations,
     #[serde(rename = "agenda_plan")]
     AgendaPlan,
     #[serde(rename = "agenda_users")]
@@ -3018,6 +3020,8 @@ pub enum AccountUsageFeatureFeature {
     PhoneNumbers,
     #[serde(rename = "sisben_lookups")]
     SisbenLookups,
+    #[serde(rename = "postconsultations")]
+    Postconsultations,
     #[serde(rename = "agenda_plan")]
     AgendaPlan,
     #[serde(rename = "agenda_users")]
