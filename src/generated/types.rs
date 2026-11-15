@@ -312,6 +312,62 @@ pub enum AccountBillingPlanStatus {
     Scheduled,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountBillingPlanPriceCurrency {
+    #[serde(rename = "USD")]
+    USD,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingPlanPrice {
+    /// Fixed plan price in US dollars, before tax.
+    #[serde(rename = "amount")]
+    pub amount: f64,
+    #[serde(rename = "currency")]
+    pub currency: AccountBillingPlanPriceCurrency,
+    /// Billing interval, such as month or year.
+    #[serde(rename = "interval")]
+    pub interval: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountBillingPlanRatesItemFeature {
+    #[serde(rename = "voice_minutes")]
+    VoiceMinutes,
+    #[serde(rename = "telephony_minutes")]
+    TelephonyMinutes,
+    #[serde(rename = "whatsapp_conversations")]
+    WhatsappConversations,
+    #[serde(rename = "whatsapp_messages")]
+    WhatsappMessages,
+    #[serde(rename = "whatsapp_templates")]
+    WhatsappTemplates,
+    #[serde(rename = "tool_calls")]
+    ToolCalls,
+    #[serde(rename = "ai_cost")]
+    AiCost,
+    #[serde(rename = "phone_numbers")]
+    PhoneNumbers,
+    #[serde(rename = "sisben_lookups")]
+    SisbenLookups,
+    #[serde(rename = "agenda_plan")]
+    AgendaPlan,
+    #[serde(rename = "agenda_users")]
+    AgendaUsers,
+    #[serde(rename = "support_fee")]
+    SupportFee,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingPlanRatesItem {
+    #[serde(rename = "feature")]
+    pub feature: AccountBillingPlanRatesItemFeature,
+    #[serde(rename = "creditsPerUnit")]
+    pub credits_per_unit: f64,
+    #[serde(rename = "conditions")]
+    pub conditions: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountBillingPlan {
     /// The plan's id in Autumn, such as `arbol_prepaid` or a customer's own plan.
@@ -327,6 +383,11 @@ pub struct AccountBillingPlan {
     /// When the current period ends.
     #[serde(rename = "currentPeriodEndsAt")]
     pub current_period_ends_at: Option<String>,
+    #[serde(rename = "price")]
+    pub price: Option<AccountBillingPlanPrice>,
+    /// Usage rates from the live plan. Conditional rows override the base rate for matching events.
+    #[serde(rename = "rates")]
+    pub rates: Vec<AccountBillingPlanRatesItem>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
