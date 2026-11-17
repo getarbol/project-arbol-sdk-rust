@@ -3107,7 +3107,7 @@ impl<'a> VisoftAppointmentsApi<'a> {
 
     /// List assigned appointments
     ///
-    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the patient's document number, the contact phone and the state (`status`) SIIPS records. Never cached. A full upstream page that cannot prove completeness is PROVIDER_UNAVAILABLE; narrow by professionalId rather than treating a partial agenda as complete. This operation changes no appointment and sends no message.
+    /// Read assigned appointments for one day at a cost centre, ordered by moment and reference, with the patient's document number, the contact phone and the state (`status`) SIIPS records. The centre-wide list covers the professionals in its live directory. Each agenda is checked against the daily assigned report; an incomplete read is PROVIDER_UNAVAILABLE. Never cached. This operation changes no appointment and sends no message.
     pub async fn list(&self, input: &types::VisoftAppointmentsListInput) -> Result<types::VisoftAppointmentsListOutput, Error> {
         self.0.call(&operations::VISOFT_APPOINTMENTS_LIST, input).await
     }
