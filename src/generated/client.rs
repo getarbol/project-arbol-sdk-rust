@@ -154,6 +154,13 @@ impl<'a> AccountConnectionsApi<'a> {
     pub async fn list(&self, input: &types::AccountConnectionsListInput) -> Result<types::AccountConnectionsListOutput, Error> {
         self.0.call(&operations::ACCOUNT_CONNECTIONS_LIST, input).await
     }
+
+    /// Read a custom server's tools again now
+    ///
+    /// Read the organization's own server again now, as Account does by itself every 30 minutes, so a deploy of the server reaches its agents at their next turn. What a tool says and takes follows the server. A new tool, or one that now writes or writes through more integrations, waits for Arbol staff and counts as held, as its writes do until Arbol verifies the server's domain. A server's deploy calls this with an API key holding account:connections:write.
+    pub async fn refresh(&self, input: &types::AccountConnectionsRefreshInput) -> Result<types::AccountConnectionsRefreshOutput, Error> {
+        self.0.call(&operations::ACCOUNT_CONNECTIONS_REFRESH, input).await
+    }
 }
 
 /// `account.invitations`
@@ -289,6 +296,26 @@ impl<'a> AccountRolesApi<'a> {
     }
 }
 
+/// `account.servers`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountServersApi<'a>(&'a Client);
+
+impl<'a> AccountServersApi<'a> {
+    /// Register the organization's own server
+    ///
+    /// Register an organization's own server as one of its connections, read again as servers.discover reads it. Its agents may use its reads at once; its writes wait until Arbol verifies that the server's domain belongs to the organization. The secret is kept encrypted, sent only to this server and never shown again.
+    pub async fn create(&self, input: &types::AccountServersCreateInput) -> Result<types::AccountServersCreateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_SERVERS_CREATE, input).await
+    }
+
+    /// Read the organization's own server
+    ///
+    /// Read an organization's own server before registering it: its https address and the secret it admits calls with. Account finds whether it serves an OpenAPI document or MCP, and which header the secret travels in, and answers the tools an agent would get. Its writes wait until Arbol verifies that the server's domain belongs to the organization. Nothing is stored. It is a write because it sends the secret to the server.
+    pub async fn discover(&self, input: &types::AccountServersDiscoverInput) -> Result<types::AccountServersDiscoverOutput, Error> {
+        self.0.call(&operations::ACCOUNT_SERVERS_DISCOVER, input).await
+    }
+}
+
 /// `account.usageSummary`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountUsageSummaryApi<'a>(&'a Client);
@@ -379,6 +406,10 @@ impl<'a> AccountApi<'a> {
 
     pub fn roles(&self) -> AccountRolesApi<'a> {
         AccountRolesApi(self.0)
+    }
+
+    pub fn servers(&self) -> AccountServersApi<'a> {
+        AccountServersApi(self.0)
     }
 
     pub fn usage_summary(&self) -> AccountUsageSummaryApi<'a> {

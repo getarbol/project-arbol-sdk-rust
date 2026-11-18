@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261117.205209";
+pub const RELEASE: &str = "1.20261118.42105";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -90,6 +90,17 @@ pub const ACCOUNT_CONNECTIONS_LIST: Operation = Operation {
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer), ("tag", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 4194304,
+};
+
+/// `account.connections.refresh`: Read a custom server's tools again now
+pub const ACCOUNT_CONNECTIONS_REFRESH: Operation = Operation {
+    name: "account.connections.refresh",
+    method: "POST",
+    path: "/v1/account/connections/{connectionId}/refresh",
+    path_field: Some("connectionId"),
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 1048576,
 };
 
 /// `account.invitations.create`: Invite someone to a product
@@ -233,6 +244,28 @@ pub const ACCOUNT_ROLES_LIST: Operation = Operation {
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
     max_output_bytes: 262144,
+};
+
+/// `account.servers.create`: Register the organization's own server
+pub const ACCOUNT_SERVERS_CREATE: Operation = Operation {
+    name: "account.servers.create",
+    method: "POST",
+    path: "/v1/account/servers",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 1048576,
+};
+
+/// `account.servers.discover`: Read the organization's own server
+pub const ACCOUNT_SERVERS_DISCOVER: Operation = Operation {
+    name: "account.servers.discover",
+    method: "POST",
+    path: "/v1/account/servers/discover",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 1048576,
 };
 
 /// `account.usageSummary.get`: Get the usage summary

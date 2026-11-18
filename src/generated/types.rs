@@ -735,6 +735,98 @@ pub struct AccountConnectionToolsItem {
     pub capabilities: Option<AccountConnectionToolsItemCapabilities>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionHeldToolsItemRuntimeInputsItem {
+    #[serde(rename = "connectionId")]
+    ConnectionId,
+    #[serde(rename = "channel")]
+    Channel,
+    #[serde(rename = "conversationUrl")]
+    ConversationUrl,
+    #[serde(rename = "verifiedContact")]
+    VerifiedContact,
+    #[serde(rename = "outboundRecipient")]
+    OutboundRecipient,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionHeldToolsItemEffect {
+    #[serde(rename = "read")]
+    Read,
+    #[serde(rename = "write")]
+    Write,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionHeldToolsItemRestMethod {
+    #[serde(rename = "GET")]
+    GET,
+    #[serde(rename = "POST")]
+    POST,
+    #[serde(rename = "PUT")]
+    PUT,
+    #[serde(rename = "PATCH")]
+    PATCH,
+    #[serde(rename = "DELETE")]
+    DELETE,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionHeldToolsItemRest {
+    #[serde(rename = "method")]
+    pub method: AccountConnectionHeldToolsItemRestMethod,
+    #[serde(rename = "path")]
+    pub path: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionHeldToolsItemCapabilitiesMatch {
+    #[serde(rename = "any")]
+    Any,
+    #[serde(rename = "all")]
+    All,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionHeldToolsItemCapabilities {
+    #[serde(rename = "match")]
+    pub r#match: AccountConnectionHeldToolsItemCapabilitiesMatch,
+    #[serde(rename = "scopes")]
+    pub scopes: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionHeldToolsItem {
+    #[serde(rename = "runtimeInputs", default, skip_serializing_if = "Option::is_none")]
+    pub runtime_inputs: Option<Vec<AccountConnectionHeldToolsItemRuntimeInputsItem>>,
+    /// The tool name an agent calls: the MCP tool name, or the OpenAPI operationId.
+    #[serde(rename = "name")]
+    pub name: String,
+    /// The published operation (arbol only): sura.appointments.create.
+    #[serde(rename = "operation", default, skip_serializing_if = "Option::is_none")]
+    pub operation: Option<String>,
+    #[serde(rename = "description")]
+    pub description: String,
+    /// The tool's input, as a JSON Schema object.
+    #[serde(rename = "input")]
+    pub input: std::collections::BTreeMap<String, serde_json::Value>,
+    /// read changes nothing; write may.
+    #[serde(rename = "effect")]
+    pub effect: AccountConnectionHeldToolsItemEffect,
+    /// The owner's own method for the operation on its native RPC entrypoint (arbol only): bookAppointment for sura.appointments.create, or null when it serves none.
+    #[serde(rename = "rpcMethod", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub rpc_method: Option<Option<String>>,
+    /// The Arbol integrations this tool writes through (custom only): Raíz fences them jointly.
+    #[serde(rename = "writesThrough", default, skip_serializing_if = "Option::is_none")]
+    pub writes_through: Option<Vec<String>>,
+    /// The REST request the tool is: its method and path template.
+    #[serde(rename = "rest", default, skip_serializing_if = "Option::is_none")]
+    pub rest: Option<AccountConnectionHeldToolsItemRest>,
+    /// The scopes its caller needs (arbol only), as the release admits it: any one of them, or all.
+    #[serde(rename = "capabilities", default, skip_serializing_if = "Option::is_none")]
+    pub capabilities: Option<AccountConnectionHeldToolsItemCapabilities>,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountConnectionSkillsItem {
     #[serde(rename = "name")]
@@ -838,6 +930,9 @@ pub struct AccountConnection {
     pub tools_version: String,
     #[serde(rename = "tools")]
     pub tools: Vec<AccountConnectionToolsItem>,
+    /// A custom server's tools that agents do not get yet: its writes, until Arbol verifies that the server's domain belongs to the organization.
+    #[serde(rename = "heldTools", default, skip_serializing_if = "Option::is_none")]
+    pub held_tools: Option<Vec<AccountConnectionHeldToolsItem>>,
     /// A custom server's skills: procedures its document publishes beside its tools.
     #[serde(rename = "skills", default, skip_serializing_if = "Option::is_none")]
     pub skills: Option<Vec<AccountConnectionSkillsItem>>,
@@ -867,6 +962,82 @@ pub struct AccountConnection {
     pub arbi: AccountConnectionArbi,
 }
 
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionNameTakenError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// Another connection of this integration already has this name.
+    #[serde(rename = "error")]
+    pub error: AccountConnectionNameTakenFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionNameTakenFailureCode {
+    #[serde(rename = "CONNECTION_NAME_TAKEN")]
+    CONNECTIONNAMETAKEN,
+}
+
+/// Another connection of this integration already has this name.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionNameTakenFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountConnectionNameTakenFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// This connection does not exist.
+    #[serde(rename = "error")]
+    pub error: AccountConnectionNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountConnectionNotFoundFailureCode {
+    #[serde(rename = "CONNECTION_NOT_FOUND")]
+    CONNECTIONNOTFOUND,
+}
+
+/// This connection does not exist.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionNotFoundFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountConnectionNotFoundFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountConnectionPageObject {
     #[serde(rename = "list")]
@@ -893,6 +1064,21 @@ pub struct AccountConnectionPageResponse {
     pub success: serde_json::Value,
     #[serde(rename = "data")]
     pub data: AccountConnectionPage,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    /// One connection of an integration: what it is, its state and the tools it offers.
+    #[serde(rename = "data")]
+    pub data: AccountConnection,
     #[serde(rename = "error")]
     pub error: serde_json::Value,
     /// What every answer carries besides its data or error.
@@ -932,6 +1118,15 @@ pub struct AccountConnectionsListInput {
 }
 
 pub type AccountConnectionsListOutput = AccountConnectionPage;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountConnectionsRefreshInput {
+    /// A connection's id: con_ and 26 characters, stable and unique across the platform.
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+}
+
+pub type AccountConnectionsRefreshOutput = AccountRefreshConnectionResult;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountConsultIncludedRecordBodyInnerPart1Integration {
@@ -1242,6 +1437,33 @@ pub enum AccountCreateMemberServiceUnavailableFailure {
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountCreateServerBodyTransport {
+    #[serde(rename = "http")]
+    Http,
+    #[serde(rename = "mcp")]
+    Mcp,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountCreateServerBody {
+    /// The connection's name, as an agent's builder sees it and an agent picks it: 'Sede Norte'.
+    #[serde(rename = "name")]
+    pub name: String,
+    /// The OpenAPI document or the MCP endpoint: https, at a public address, without a query or a fragment.
+    #[serde(rename = "url")]
+    pub url: String,
+    /// http: an OpenAPI 3 document (or a server whose /openapi.json serves one). mcp: an MCP endpoint (Streamable HTTP). Leave it out and Account finds which the address serves.
+    #[serde(rename = "transport", default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<AccountCreateServerBodyTransport>,
+    /// The header the secret travels in, or null for Authorization: Bearer. Leave it out and Account uses the API key header the server's OpenAPI document declares, else Authorization: Bearer.
+    #[serde(rename = "authHeader", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub auth_header: Option<Option<String>>,
+    /// The secret the server admits calls with. Arbol keeps it encrypted, sends it only to this server and never shows it again.
+    #[serde(rename = "secret")]
+    pub secret: String,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountCreateWalletTopUpBody {
     /// Credits to buy, at one US dollar each.
@@ -1345,6 +1567,70 @@ pub struct AccountCurrentOrganizationResponse {
     /// What every answer carries besides its data or error.
     #[serde(rename = "metadata")]
     pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountCustomServerUnreachableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// The server's tools could not be read.
+    #[serde(rename = "error")]
+    pub error: AccountCustomServerUnreachableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountCustomServerUnreachableFailureCode {
+    #[serde(rename = "CUSTOM_SERVER_UNREACHABLE")]
+    CUSTOMSERVERUNREACHABLE,
+}
+
+/// The server's tools could not be read.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountCustomServerUnreachableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountCustomServerUnreachableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountCustomServerUnreachableFailureData,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountCustomServerUnreachableFailureDataReason {
+    #[serde(rename = "destination")]
+    Destination,
+    #[serde(rename = "redirect")]
+    Redirect,
+    #[serde(rename = "status")]
+    Status,
+    #[serde(rename = "too_large")]
+    TooLarge,
+    #[serde(rename = "timeout")]
+    Timeout,
+    #[serde(rename = "network")]
+    Network,
+    #[serde(rename = "document")]
+    Document,
+    #[serde(rename = "no_tools")]
+    NoTools,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountCustomServerUnreachableFailureData {
+    /// What stopped the read.
+    #[serde(rename = "reason")]
+    pub reason: AccountCustomServerUnreachableFailureDataReason,
 }
 
 /// A failed answer.
@@ -1477,6 +1763,30 @@ pub enum AccountDeleteMemberServiceUnavailableFailure {
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountDiscoverServersBodyTransport {
+    #[serde(rename = "http")]
+    Http,
+    #[serde(rename = "mcp")]
+    Mcp,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountDiscoverServersBody {
+    /// The OpenAPI document or the MCP endpoint: https, at a public address, without a query or a fragment.
+    #[serde(rename = "url")]
+    pub url: String,
+    /// http: an OpenAPI 3 document (or a server whose /openapi.json serves one). mcp: an MCP endpoint (Streamable HTTP). Leave it out and Account finds which the address serves.
+    #[serde(rename = "transport", default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<AccountDiscoverServersBodyTransport>,
+    /// The header the secret travels in, or null for Authorization: Bearer. Leave it out and Account uses the API key header the server's OpenAPI document declares, else Authorization: Bearer.
+    #[serde(rename = "authHeader", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub auth_header: Option<Option<String>>,
+    /// The secret the server admits calls with. Arbol keeps it encrypted, sends it only to this server and never shows it again.
+    #[serde(rename = "secret")]
+    pub secret: String,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountGetBillingServiceUnavailableError {
@@ -1593,6 +1903,44 @@ pub struct AccountIdentityUnavailableFailure {
     /// The failure code, stable across releases.
     #[serde(rename = "code")]
     pub code: AccountIdentityUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountIntegrationUnsupportedError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// This integration's connections are not managed from Account.
+    #[serde(rename = "error")]
+    pub error: AccountIntegrationUnsupportedFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountIntegrationUnsupportedFailureCode {
+    #[serde(rename = "INTEGRATION_UNSUPPORTED")]
+    INTEGRATIONUNSUPPORTED,
+}
+
+/// This integration's connections are not managed from Account.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountIntegrationUnsupportedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountIntegrationUnsupportedFailureCode,
     /// What went wrong, for people; it never contains input values.
     #[serde(rename = "message")]
     pub message: String,
@@ -2552,6 +2900,39 @@ pub struct AccountProductRoleCatalogPageResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountRefreshConnectionResult {
+    /// A connection's id: con_ and 26 characters, stable and unique across the platform.
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    /// Whether this read changed the connection's tools.
+    #[serde(rename = "updated")]
+    pub updated: bool,
+    /// How many tools the connection offers now.
+    #[serde(rename = "tools")]
+    pub tools: i64,
+    /// How many tools the server offers that wait for Arbol staff: new ones, ones that now write or write through more integrations, and its writes until Arbol verifies the server's domain.
+    #[serde(rename = "held")]
+    pub held: i64,
+    /// The version of the connection's tools, which changes with them.
+    #[serde(rename = "toolsVersion")]
+    pub tools_version: String,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountRefreshConnectionResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountRefreshConnectionResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountRegistryInstallation {
     #[serde(rename = "integration")]
     pub integration: String,
@@ -2650,6 +3031,250 @@ pub enum AccountRotateApiKeyServiceUnavailableFailure {
     AccountAccountNotConfiguredFailure(AccountAccountNotConfiguredFailure),
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoveryTransport {
+    #[serde(rename = "http")]
+    Http,
+    #[serde(rename = "mcp")]
+    Mcp,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoveryToolsItemRuntimeInputsItem {
+    #[serde(rename = "connectionId")]
+    ConnectionId,
+    #[serde(rename = "channel")]
+    Channel,
+    #[serde(rename = "conversationUrl")]
+    ConversationUrl,
+    #[serde(rename = "verifiedContact")]
+    VerifiedContact,
+    #[serde(rename = "outboundRecipient")]
+    OutboundRecipient,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoveryToolsItemEffect {
+    #[serde(rename = "read")]
+    Read,
+    #[serde(rename = "write")]
+    Write,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoveryToolsItemRestMethod {
+    #[serde(rename = "GET")]
+    GET,
+    #[serde(rename = "POST")]
+    POST,
+    #[serde(rename = "PUT")]
+    PUT,
+    #[serde(rename = "PATCH")]
+    PATCH,
+    #[serde(rename = "DELETE")]
+    DELETE,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoveryToolsItemRest {
+    #[serde(rename = "method")]
+    pub method: AccountServerDiscoveryToolsItemRestMethod,
+    #[serde(rename = "path")]
+    pub path: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoveryToolsItemCapabilitiesMatch {
+    #[serde(rename = "any")]
+    Any,
+    #[serde(rename = "all")]
+    All,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoveryToolsItemCapabilities {
+    #[serde(rename = "match")]
+    pub r#match: AccountServerDiscoveryToolsItemCapabilitiesMatch,
+    #[serde(rename = "scopes")]
+    pub scopes: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoveryToolsItem {
+    #[serde(rename = "runtimeInputs", default, skip_serializing_if = "Option::is_none")]
+    pub runtime_inputs: Option<Vec<AccountServerDiscoveryToolsItemRuntimeInputsItem>>,
+    /// The tool name an agent calls: the MCP tool name, or the OpenAPI operationId.
+    #[serde(rename = "name")]
+    pub name: String,
+    /// The published operation (arbol only): sura.appointments.create.
+    #[serde(rename = "operation", default, skip_serializing_if = "Option::is_none")]
+    pub operation: Option<String>,
+    #[serde(rename = "description")]
+    pub description: String,
+    /// The tool's input, as a JSON Schema object.
+    #[serde(rename = "input")]
+    pub input: std::collections::BTreeMap<String, serde_json::Value>,
+    /// read changes nothing; write may.
+    #[serde(rename = "effect")]
+    pub effect: AccountServerDiscoveryToolsItemEffect,
+    /// The owner's own method for the operation on its native RPC entrypoint (arbol only): bookAppointment for sura.appointments.create, or null when it serves none.
+    #[serde(rename = "rpcMethod", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub rpc_method: Option<Option<String>>,
+    /// The Arbol integrations this tool writes through (custom only): Raíz fences them jointly.
+    #[serde(rename = "writesThrough", default, skip_serializing_if = "Option::is_none")]
+    pub writes_through: Option<Vec<String>>,
+    /// The REST request the tool is: its method and path template.
+    #[serde(rename = "rest", default, skip_serializing_if = "Option::is_none")]
+    pub rest: Option<AccountServerDiscoveryToolsItemRest>,
+    /// The scopes its caller needs (arbol only), as the release admits it: any one of them, or all.
+    #[serde(rename = "capabilities", default, skip_serializing_if = "Option::is_none")]
+    pub capabilities: Option<AccountServerDiscoveryToolsItemCapabilities>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoverySkillsItem {
+    #[serde(rename = "name")]
+    pub name: String,
+    /// One line: what the procedure achieves and when to load it.
+    #[serde(rename = "description")]
+    pub description: String,
+    /// The Markdown procedure.
+    #[serde(rename = "instructions")]
+    pub instructions: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServerDiscoverySkippedItemReason {
+    #[serde(rename = "no_operation_id")]
+    NoOperationId,
+    #[serde(rename = "invalid_name")]
+    InvalidName,
+    #[serde(rename = "duplicate_name")]
+    DuplicateName,
+    #[serde(rename = "non_json_body")]
+    NonJsonBody,
+    #[serde(rename = "unsupported_parameter")]
+    UnsupportedParameter,
+    #[serde(rename = "parameter_conflict")]
+    ParameterConflict,
+    #[serde(rename = "unresolvable_schema")]
+    UnresolvableSchema,
+    #[serde(rename = "no_read_only_hint")]
+    NoReadOnlyHint,
+    #[serde(rename = "invalid_input_schema")]
+    InvalidInputSchema,
+    #[serde(rename = "too_many")]
+    TooMany,
+    #[serde(rename = "invalid_skill")]
+    InvalidSkill,
+    #[serde(rename = "duplicate_skill")]
+    DuplicateSkill,
+    #[serde(rename = "too_many_skills")]
+    TooManySkills,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoverySkippedItem {
+    #[serde(rename = "name")]
+    pub name: String,
+    #[serde(rename = "reason")]
+    pub reason: AccountServerDiscoverySkippedItemReason,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscovery {
+    /// What the address serves: an OpenAPI document (http) or an MCP endpoint (mcp).
+    #[serde(rename = "transport")]
+    pub transport: AccountServerDiscoveryTransport,
+    /// The header the secret travels in, or null for Authorization: Bearer.
+    #[serde(rename = "authHeader")]
+    pub auth_header: Option<String>,
+    /// The tools an agent would get. Its reads are offered once the server is registered; its writes wait until Arbol verifies that the server's domain belongs to the organization.
+    #[serde(rename = "tools")]
+    pub tools: Vec<AccountServerDiscoveryToolsItem>,
+    #[serde(rename = "skills")]
+    pub skills: Vec<AccountServerDiscoverySkillsItem>,
+    #[serde(rename = "skipped")]
+    pub skipped: Vec<AccountServerDiscoverySkippedItem>,
+    #[serde(rename = "toolsVersion")]
+    pub tools_version: String,
+    /// Where the tools' requests go.
+    #[serde(rename = "baseUrl")]
+    pub base_url: String,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServerDiscoveryResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    /// An organization's own server as Account read it, before it is registered.
+    #[serde(rename = "data")]
+    pub data: AccountServerDiscovery,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServersCreateInputTransport {
+    #[serde(rename = "http")]
+    Http,
+    #[serde(rename = "mcp")]
+    Mcp,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServersCreateInput {
+    /// The connection's name, as an agent's builder sees it and an agent picks it: 'Sede Norte'.
+    #[serde(rename = "name")]
+    pub name: String,
+    /// The OpenAPI document or the MCP endpoint: https, at a public address, without a query or a fragment.
+    #[serde(rename = "url")]
+    pub url: String,
+    /// http: an OpenAPI 3 document (or a server whose /openapi.json serves one). mcp: an MCP endpoint (Streamable HTTP). Leave it out and Account finds which the address serves.
+    #[serde(rename = "transport", default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<AccountServersCreateInputTransport>,
+    /// The header the secret travels in, or null for Authorization: Bearer. Leave it out and Account uses the API key header the server's OpenAPI document declares, else Authorization: Bearer.
+    #[serde(rename = "authHeader", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub auth_header: Option<Option<String>>,
+    /// The secret the server admits calls with. Arbol keeps it encrypted, sends it only to this server and never shows it again.
+    #[serde(rename = "secret")]
+    pub secret: String,
+}
+
+/// One connection of an integration: what it is, its state and the tools it offers.
+pub type AccountServersCreateOutput = AccountConnection;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountServersDiscoverInputTransport {
+    #[serde(rename = "http")]
+    Http,
+    #[serde(rename = "mcp")]
+    Mcp,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountServersDiscoverInput {
+    /// The OpenAPI document or the MCP endpoint: https, at a public address, without a query or a fragment.
+    #[serde(rename = "url")]
+    pub url: String,
+    /// http: an OpenAPI 3 document (or a server whose /openapi.json serves one). mcp: an MCP endpoint (Streamable HTTP). Leave it out and Account finds which the address serves.
+    #[serde(rename = "transport", default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<AccountServersDiscoverInputTransport>,
+    /// The header the secret travels in, or null for Authorization: Bearer. Leave it out and Account uses the API key header the server's OpenAPI document declares, else Authorization: Bearer.
+    #[serde(rename = "authHeader", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub auth_header: Option<Option<String>>,
+    /// The secret the server admits calls with. Arbol keeps it encrypted, sends it only to this server and never shows it again.
+    #[serde(rename = "secret")]
+    pub secret: String,
+}
+
+/// An organization's own server as Account read it, before it is registered.
+pub type AccountServersDiscoverOutput = AccountServerDiscovery;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountSisbenClassificationDNPSISBENIVSource {
@@ -67950,7 +68575,7 @@ pub struct RaizAgentIntegrationToolsItem {
     /// A connection's id in Account (`con_…`).
     #[serde(rename = "connectionId")]
     pub connection_id: String,
-    /// The digest of the definition the Agent was saved with. When the connection's tool (`listConnections`) has another digest, the tool changed: the Agent keeps this definition until it is saved again.
+    /// The digest of the definition the Agent was saved with. The Agent runs the tool as its connection lists it now (`listConnections`): another digest there only says the tool changed since.
     #[serde(rename = "digest")]
     pub digest: String,
     /// `read` only looks; `write` may change data.
@@ -68014,7 +68639,7 @@ pub struct RaizAgent {
     /// The procedures the Agent takes from its connections, each saved with the text its connection published then. They run as free-form procedures beside `procedures`.
     #[serde(rename = "integrationProcedures")]
     pub integration_procedures: Vec<RaizAgentIntegrationProceduresItem>,
-    /// The integrations' tools the Agent may call, each on the connection it runs on, with the definition it was saved with.
+    /// The integrations' tools the Agent may call, each on the connection it runs on. The Agent runs each as its connection lists it now.
     #[serde(rename = "integrationTools")]
     pub integration_tools: Vec<RaizAgentIntegrationToolsItem>,
     /// The Knowledge documents the Agent consults.
@@ -69940,6 +70565,43 @@ pub enum RaizAgentSettingsModel {
     ArbolitoTop,
 }
 
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentSettingsProtection {
+    /// Hours someone stays in spam once they pass a limit (default 6). A person can lift the rule earlier by deleting it.
+    #[serde(rename = "spamHours", default, skip_serializing_if = "Option::is_none")]
+    pub spam_hours: Option<i64>,
+    /// Inbound calls one number may make in an hour, whoever spoke (default 10). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "voiceCallsPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub voice_calls_per_hour: Option<i64>,
+    /// Whether callers can fall into spam (default true). False: no call is ever refused for what its number consumed.
+    #[serde(rename = "voiceEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub voice_enabled: Option<bool>,
+    /// Minutes of inbound calls one number may use in 24 hours (default 60). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts, its calls are not answered.
+    #[serde(rename = "voiceMinutesPerDay", default, skip_serializing_if = "Option::is_none")]
+    pub voice_minutes_per_day: Option<i64>,
+    /// Inbound calls of one number in an hour in which the caller never spoke (default 5). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier. A call that failed does not count.
+    #[serde(rename = "voiceSilentCallsPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub voice_silent_calls_per_hour: Option<i64>,
+    /// Tokens one web conversation may use (default 10000000). A conversation that reaches it takes no more messages.
+    #[serde(rename = "webConversationTokens", default, skip_serializing_if = "Option::is_none")]
+    pub web_conversation_tokens: Option<i64>,
+    /// Whether web chat visitors can fall into spam (default true).
+    #[serde(rename = "webEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub web_enabled: Option<bool>,
+    /// Messages one web visitor may send in 24 hours, across their chats (default 100). A visitor who reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts they cannot open a chat. Visitors are told apart by network address, so people who share one count together.
+    #[serde(rename = "webMessagesPerDay", default, skip_serializing_if = "Option::is_none")]
+    pub web_messages_per_day: Option<i64>,
+    /// Tokens (input, cached input included, plus output) one WhatsApp conversation may use since the AI last took it (default 10000000). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "whatsappConversationTokens", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_conversation_tokens: Option<i64>,
+    /// Whether WhatsApp contacts can fall into spam (default true).
+    #[serde(rename = "whatsappEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_enabled: Option<bool>,
+    /// Replies the AI may write in one WhatsApp conversation in an hour (default 60). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts the AI does not answer them, and their messages are still stored for the team.
+    #[serde(rename = "whatsappRepliesPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_replies_per_hour: Option<i64>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentSettingsReasoningEffort {
     #[serde(rename = "none")]
@@ -69998,6 +70660,8 @@ pub struct RaizAgentSettings {
     pub policy: Option<RaizAgentTurnPolicy>,
     #[serde(rename = "pollPendingOperations")]
     pub poll_pending_operations: Option<bool>,
+    #[serde(rename = "protection")]
+    pub protection: Option<RaizAgentSettingsProtection>,
     #[serde(rename = "reasoningEffort")]
     pub reasoning_effort: Option<RaizAgentSettingsReasoningEffort>,
     #[serde(rename = "replyChoices")]
@@ -70079,6 +70743,43 @@ pub enum RaizAgentSettingsInputModel {
     ArbolitoTop,
 }
 
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizAgentSettingsInputProtection {
+    /// Hours someone stays in spam once they pass a limit (default 6). A person can lift the rule earlier by deleting it.
+    #[serde(rename = "spamHours", default, skip_serializing_if = "Option::is_none")]
+    pub spam_hours: Option<i64>,
+    /// Inbound calls one number may make in an hour, whoever spoke (default 10). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "voiceCallsPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub voice_calls_per_hour: Option<i64>,
+    /// Whether callers can fall into spam (default true). False: no call is ever refused for what its number consumed.
+    #[serde(rename = "voiceEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub voice_enabled: Option<bool>,
+    /// Minutes of inbound calls one number may use in 24 hours (default 60). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts, its calls are not answered.
+    #[serde(rename = "voiceMinutesPerDay", default, skip_serializing_if = "Option::is_none")]
+    pub voice_minutes_per_day: Option<i64>,
+    /// Inbound calls of one number in an hour in which the caller never spoke (default 5). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier. A call that failed does not count.
+    #[serde(rename = "voiceSilentCallsPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub voice_silent_calls_per_hour: Option<i64>,
+    /// Tokens one web conversation may use (default 10000000). A conversation that reaches it takes no more messages.
+    #[serde(rename = "webConversationTokens", default, skip_serializing_if = "Option::is_none")]
+    pub web_conversation_tokens: Option<i64>,
+    /// Whether web chat visitors can fall into spam (default true).
+    #[serde(rename = "webEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub web_enabled: Option<bool>,
+    /// Messages one web visitor may send in 24 hours, across their chats (default 100). A visitor who reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts they cannot open a chat. Visitors are told apart by network address, so people who share one count together.
+    #[serde(rename = "webMessagesPerDay", default, skip_serializing_if = "Option::is_none")]
+    pub web_messages_per_day: Option<i64>,
+    /// Tokens (input, cached input included, plus output) one WhatsApp conversation may use since the AI last took it (default 10000000). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "whatsappConversationTokens", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_conversation_tokens: Option<i64>,
+    /// Whether WhatsApp contacts can fall into spam (default true).
+    #[serde(rename = "whatsappEnabled", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_enabled: Option<bool>,
+    /// Replies the AI may write in one WhatsApp conversation in an hour (default 60). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts the AI does not answer them, and their messages are still stored for the team.
+    #[serde(rename = "whatsappRepliesPerHour", default, skip_serializing_if = "Option::is_none")]
+    pub whatsapp_replies_per_hour: Option<i64>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentSettingsInputReasoningEffort {
     #[serde(rename = "none")]
@@ -70139,6 +70840,8 @@ pub struct RaizAgentSettingsInput {
     pub policy: Option<Option<RaizAgentTurnPolicy>>,
     #[serde(rename = "pollPendingOperations", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub poll_pending_operations: Option<Option<bool>>,
+    #[serde(rename = "protection", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub protection: Option<Option<RaizAgentSettingsInputProtection>>,
     #[serde(rename = "reasoningEffort", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub reasoning_effort: Option<Option<RaizAgentSettingsInputReasoningEffort>>,
     #[serde(rename = "replyChoices", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
@@ -70324,6 +71027,13 @@ pub enum RaizAgentVoiceSettingsReplyTiming {
     Quick,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum RaizAgentVoiceSettingsSilenceEndCallTimeoutSeconds {
+    Variant1(i64),
+    Variant2(serde_json::Value),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizAgentVoiceSettingsToolCallSound {
     #[serde(rename = "typing")]
@@ -70412,7 +71122,7 @@ pub struct RaizAgentVoiceSettings {
     #[serde(rename = "responseDelayMessages", default, skip_serializing_if = "Option::is_none")]
     pub response_delay_messages: Option<bool>,
     #[serde(rename = "silenceEndCallTimeoutSeconds")]
-    pub silence_end_call_timeout_seconds: Option<i64>,
+    pub silence_end_call_timeout_seconds: Option<RaizAgentVoiceSettingsSilenceEndCallTimeoutSeconds>,
     #[serde(rename = "similarityBoost")]
     pub similarity_boost: Option<f64>,
     #[serde(rename = "speed")]
@@ -70658,7 +71368,7 @@ pub struct RaizAgentsCreateInput {
     /// Text Agents. Procedures a connection publishes (`listConnections`, checked live in Account), each saved with its current text and run as a free-form procedure beside `procedures`. In an update, the complete new set.
     #[serde(rename = "integrationProcedures", default, skip_serializing_if = "Option::is_none")]
     pub integration_procedures: Option<Vec<RaizAgentIntegrationProcedureInput>>,
-    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). Each is saved with its current definition. In an update, the complete new set.
+    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). The Agent runs each as its connection lists it at every turn. In an update, the complete new set.
     #[serde(rename = "integrationTools", default, skip_serializing_if = "Option::is_none")]
     pub integration_tools: Option<Vec<RaizAgentIntegrationToolInput>>,
     /// The Knowledge documents the Agent consults. In an update, the complete new set.
@@ -70783,7 +71493,7 @@ pub struct RaizAgentsUpdateInput {
     /// Text Agents. Procedures a connection publishes (`listConnections`, checked live in Account), each saved with its current text and run as a free-form procedure beside `procedures`. In an update, the complete new set.
     #[serde(rename = "integrationProcedures", default, skip_serializing_if = "Option::is_none")]
     pub integration_procedures: Option<Vec<RaizAgentIntegrationProcedureInput>>,
-    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). Each is saved with its current definition. In an update, the complete new set.
+    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). The Agent runs each as its connection lists it at every turn. In an update, the complete new set.
     #[serde(rename = "integrationTools", default, skip_serializing_if = "Option::is_none")]
     pub integration_tools: Option<Vec<RaizAgentIntegrationToolInput>>,
     /// The Knowledge documents the Agent consults. In an update, the complete new set.
@@ -73109,7 +73819,7 @@ pub struct RaizConnection {
     pub summary: Option<String>,
     #[serde(rename = "tools")]
     pub tools: Vec<RaizConnectionToolsItem>,
-    /// The version of the connection's tool list; an Agent keeps the definitions it was saved with until it is saved again.
+    /// The version of the connection's tool list. An Agent always runs the tools as the connection lists them now.
     #[serde(rename = "toolsVersion")]
     pub tools_version: String,
 }
@@ -75716,7 +76426,7 @@ pub struct RaizCreateAgentBody {
     /// Text Agents. Procedures a connection publishes (`listConnections`, checked live in Account), each saved with its current text and run as a free-form procedure beside `procedures`. In an update, the complete new set.
     #[serde(rename = "integrationProcedures", default, skip_serializing_if = "Option::is_none")]
     pub integration_procedures: Option<Vec<RaizAgentIntegrationProcedureInput>>,
-    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). Each is saved with its current definition. In an update, the complete new set.
+    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). The Agent runs each as its connection lists it at every turn. In an update, the complete new set.
     #[serde(rename = "integrationTools", default, skip_serializing_if = "Option::is_none")]
     pub integration_tools: Option<Vec<RaizAgentIntegrationToolInput>>,
     /// The Knowledge documents the Agent consults. In an update, the complete new set.
@@ -82758,6 +83468,8 @@ pub enum RaizOrganizationSettingsProductNoticesEventsItem {
     MonthlySummary,
     #[serde(rename = "outage-resolved")]
     OutageResolved,
+    #[serde(rename = "spam-blocked")]
+    SpamBlocked,
     #[serde(rename = "template-approved")]
     TemplateApproved,
     #[serde(rename = "template-rejected")]
@@ -82817,6 +83529,43 @@ pub struct RaizOrganizationSettingsNotifications {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizOrganizationSettingsProtection {
+    /// Hours someone stays in spam once they pass a limit (default 6). A person can lift the rule earlier by deleting it.
+    #[serde(rename = "spamHours")]
+    pub spam_hours: i64,
+    /// Inbound calls one number may make in an hour, whoever spoke (default 10). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "voiceCallsPerHour")]
+    pub voice_calls_per_hour: i64,
+    /// Whether callers can fall into spam (default true). False: no call is ever refused for what its number consumed.
+    #[serde(rename = "voiceEnabled")]
+    pub voice_enabled: bool,
+    /// Minutes of inbound calls one number may use in 24 hours (default 60). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts, its calls are not answered.
+    #[serde(rename = "voiceMinutesPerDay")]
+    pub voice_minutes_per_day: i64,
+    /// Inbound calls of one number in an hour in which the caller never spoke (default 5). A number that reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier. A call that failed does not count.
+    #[serde(rename = "voiceSilentCallsPerHour")]
+    pub voice_silent_calls_per_hour: i64,
+    /// Tokens one web conversation may use (default 10000000). A conversation that reaches it takes no more messages.
+    #[serde(rename = "webConversationTokens")]
+    pub web_conversation_tokens: i64,
+    /// Whether web chat visitors can fall into spam (default true).
+    #[serde(rename = "webEnabled")]
+    pub web_enabled: bool,
+    /// Messages one web visitor may send in 24 hours, across their chats (default 100). A visitor who reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts they cannot open a chat. Visitors are told apart by network address, so people who share one count together.
+    #[serde(rename = "webMessagesPerDay")]
+    pub web_messages_per_day: i64,
+    /// Tokens (input, cached input included, plus output) one WhatsApp conversation may use since the AI last took it (default 10000000). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier.
+    #[serde(rename = "whatsappConversationTokens")]
+    pub whatsapp_conversation_tokens: i64,
+    /// Whether WhatsApp contacts can fall into spam (default true).
+    #[serde(rename = "whatsappEnabled")]
+    pub whatsapp_enabled: bool,
+    /// Replies the AI may write in one WhatsApp conversation in an hour (default 60). A contact whose conversation reaches it falls into spam: an automatic suppression of that channel, inbound only, that expires after `spamHours` and that a person can lift earlier; while it lasts the AI does not answer them, and their messages are still stored for the team.
+    #[serde(rename = "whatsappRepliesPerHour")]
+    pub whatsapp_replies_per_hour: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationSettingsWhatsapp {
     /// WhatsApp replies the organization's Agents write at once (default 20). A reply past it waits for the next scheduler tick, so a peak in one organization never slows the others.
     #[serde(rename = "maxConcurrentReplies")]
@@ -82833,6 +83582,8 @@ pub struct RaizOrganizationSettings {
     pub product_notices: RaizOrganizationSettingsProductNotices,
     #[serde(rename = "notifications")]
     pub notifications: RaizOrganizationSettingsNotifications,
+    #[serde(rename = "protection")]
+    pub protection: RaizOrganizationSettingsProtection,
     #[serde(rename = "whatsapp")]
     pub whatsapp: RaizOrganizationSettingsWhatsapp,
 }
@@ -82933,6 +83684,8 @@ pub enum RaizOrganizationUpdateInputSettingsProductNoticesEventsItem {
     MonthlySummary,
     #[serde(rename = "outage-resolved")]
     OutageResolved,
+    #[serde(rename = "spam-blocked")]
+    SpamBlocked,
     #[serde(rename = "template-approved")]
     TemplateApproved,
     #[serde(rename = "template-rejected")]
@@ -82984,6 +83737,32 @@ pub struct RaizOrganizationUpdateInputSettingsNotifications {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizOrganizationUpdateInputSettingsProtection {
+    #[serde(rename = "spamHours", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub spam_hours: Option<Option<i64>>,
+    #[serde(rename = "voiceCallsPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_calls_per_hour: Option<Option<i64>>,
+    #[serde(rename = "voiceEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_enabled: Option<Option<bool>>,
+    #[serde(rename = "voiceMinutesPerDay", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_minutes_per_day: Option<Option<i64>>,
+    #[serde(rename = "voiceSilentCallsPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_silent_calls_per_hour: Option<Option<i64>>,
+    #[serde(rename = "webConversationTokens", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_conversation_tokens: Option<Option<i64>>,
+    #[serde(rename = "webEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_enabled: Option<Option<bool>>,
+    #[serde(rename = "webMessagesPerDay", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_messages_per_day: Option<Option<i64>>,
+    #[serde(rename = "whatsappConversationTokens", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_conversation_tokens: Option<Option<i64>>,
+    #[serde(rename = "whatsappEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_enabled: Option<Option<bool>>,
+    #[serde(rename = "whatsappRepliesPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_replies_per_hour: Option<Option<i64>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizOrganizationUpdateInputSettingsWhatsapp {
     #[serde(rename = "maxConcurrentReplies", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub max_concurrent_replies: Option<Option<i64>>,
@@ -82999,6 +83778,8 @@ pub struct RaizOrganizationUpdateInputSettings {
     pub product_notices: Option<RaizOrganizationUpdateInputSettingsProductNotices>,
     #[serde(rename = "notifications", default, skip_serializing_if = "Option::is_none")]
     pub notifications: Option<RaizOrganizationUpdateInputSettingsNotifications>,
+    #[serde(rename = "protection", default, skip_serializing_if = "Option::is_none")]
+    pub protection: Option<RaizOrganizationUpdateInputSettingsProtection>,
     #[serde(rename = "whatsapp", default, skip_serializing_if = "Option::is_none")]
     pub whatsapp: Option<RaizOrganizationUpdateInputSettingsWhatsapp>,
 }
@@ -84949,6 +85730,24 @@ pub enum RaizStartCampaignUnprocessableContentFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizSuppressionCause {
+    #[serde(rename = "VOICE_CALLS")]
+    VOICECALLS,
+    #[serde(rename = "VOICE_MINUTES")]
+    VOICEMINUTES,
+    #[serde(rename = "VOICE_SILENT_CALLS")]
+    VOICESILENTCALLS,
+    #[serde(rename = "WEB_MESSAGES")]
+    WEBMESSAGES,
+    #[serde(rename = "WEB_TOKENS")]
+    WEBTOKENS,
+    #[serde(rename = "WHATSAPP_REPLIES")]
+    WHATSAPPREPLIES,
+    #[serde(rename = "WHATSAPP_TOKENS")]
+    WHATSAPPTOKENS,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum RaizSuppressionKind {
     #[serde(rename = "phone")]
     Phone,
@@ -84960,13 +85759,27 @@ pub enum RaizSuppressionKind {
     Country,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizSuppressionScope {
+    #[serde(rename = "voice")]
+    Voice,
+    #[serde(rename = "whatsapp")]
+    Whatsapp,
+    #[serde(rename = "web")]
+    Web,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct RaizSuppression {
+    #[serde(rename = "cause")]
+    pub cause: Option<RaizSuppressionCause>,
     #[serde(rename = "countryCode")]
     pub country_code: Option<String>,
     /// An instant in RFC 3339 format, in UTC.
     #[serde(rename = "createdAt")]
     pub created_at: String,
+    #[serde(rename = "expiresAt")]
+    pub expires_at: Option<String>,
     /// Suppression id.
     #[serde(rename = "id")]
     pub id: String,
@@ -84980,6 +85793,8 @@ pub struct RaizSuppression {
     pub phone_prefix: Option<String>,
     #[serde(rename = "reason")]
     pub reason: String,
+    #[serde(rename = "scope")]
+    pub scope: Option<RaizSuppressionScope>,
 }
 
 /// A failed answer.
@@ -86017,7 +86832,7 @@ pub struct RaizUpdateAgentBody {
     /// Text Agents. Procedures a connection publishes (`listConnections`, checked live in Account), each saved with its current text and run as a free-form procedure beside `procedures`. In an update, the complete new set.
     #[serde(rename = "integrationProcedures", default, skip_serializing_if = "Option::is_none")]
     pub integration_procedures: Option<Vec<RaizAgentIntegrationProcedureInput>>,
-    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). Each is saved with its current definition. In an update, the complete new set.
+    /// The integrations' tools the Agent may call, each on one of the organization's connections (`listConnections`, checked live in Account). The Agent runs each as its connection lists it at every turn. In an update, the complete new set.
     #[serde(rename = "integrationTools", default, skip_serializing_if = "Option::is_none")]
     pub integration_tools: Option<Vec<RaizAgentIntegrationToolInput>>,
     /// The Knowledge documents the Agent consults. In an update, the complete new set.
@@ -87325,6 +88140,8 @@ pub enum RaizUpdateOrganizationBodySettingsProductNoticesEventsItem {
     MonthlySummary,
     #[serde(rename = "outage-resolved")]
     OutageResolved,
+    #[serde(rename = "spam-blocked")]
+    SpamBlocked,
     #[serde(rename = "template-approved")]
     TemplateApproved,
     #[serde(rename = "template-rejected")]
@@ -87376,6 +88193,32 @@ pub struct RaizUpdateOrganizationBodySettingsNotifications {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct RaizUpdateOrganizationBodySettingsProtection {
+    #[serde(rename = "spamHours", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub spam_hours: Option<Option<i64>>,
+    #[serde(rename = "voiceCallsPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_calls_per_hour: Option<Option<i64>>,
+    #[serde(rename = "voiceEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_enabled: Option<Option<bool>>,
+    #[serde(rename = "voiceMinutesPerDay", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_minutes_per_day: Option<Option<i64>>,
+    #[serde(rename = "voiceSilentCallsPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub voice_silent_calls_per_hour: Option<Option<i64>>,
+    #[serde(rename = "webConversationTokens", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_conversation_tokens: Option<Option<i64>>,
+    #[serde(rename = "webEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_enabled: Option<Option<bool>>,
+    #[serde(rename = "webMessagesPerDay", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub web_messages_per_day: Option<Option<i64>>,
+    #[serde(rename = "whatsappConversationTokens", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_conversation_tokens: Option<Option<i64>>,
+    #[serde(rename = "whatsappEnabled", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_enabled: Option<Option<bool>>,
+    #[serde(rename = "whatsappRepliesPerHour", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub whatsapp_replies_per_hour: Option<Option<i64>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct RaizUpdateOrganizationBodySettingsWhatsapp {
     #[serde(rename = "maxConcurrentReplies", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub max_concurrent_replies: Option<Option<i64>>,
@@ -87391,6 +88234,8 @@ pub struct RaizUpdateOrganizationBodySettings {
     pub product_notices: Option<RaizUpdateOrganizationBodySettingsProductNotices>,
     #[serde(rename = "notifications", default, skip_serializing_if = "Option::is_none")]
     pub notifications: Option<RaizUpdateOrganizationBodySettingsNotifications>,
+    #[serde(rename = "protection", default, skip_serializing_if = "Option::is_none")]
+    pub protection: Option<RaizUpdateOrganizationBodySettingsProtection>,
     #[serde(rename = "whatsapp", default, skip_serializing_if = "Option::is_none")]
     pub whatsapp: Option<RaizUpdateOrganizationBodySettingsWhatsapp>,
 }
