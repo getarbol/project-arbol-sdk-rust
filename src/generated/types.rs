@@ -2709,6 +2709,8 @@ pub enum AccountPermissionGroup {
     Oficlinic,
     #[serde(rename = "pijaos-salud")]
     PijaosSalud,
+    #[serde(rename = "famisanar")]
+    Famisanar,
     #[serde(rename = "sanitas")]
     Sanitas,
     #[serde(rename = "gmedic")]
@@ -50939,17 +50941,43 @@ pub enum FamisanarAffiliationsLookupInputDocumentType {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct FamisanarAffiliationsLookupInput {
-    #[serde(rename = "connectionId")]
-    pub connection_id: String,
+    /// Omit when the organization has exactly one active Famisanar connection. Required to choose among multiple active connections.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// Identity document type. Defaults to CC; send another supported type explicitly.
     #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
     pub document_type: Option<FamisanarAffiliationsLookupInputDocumentType>,
     #[serde(rename = "documentNumber")]
     pub document_number: String,
+    /// Maximum age in days of an observation from this IPS connection. Zero contacts the provider and refreshes the saved result.
     #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
     pub max_age_days: Option<i64>,
 }
 
 pub type FamisanarAffiliationsLookupOutput = FamisanarLookupAffiliationResult;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarConnectionRequiredFailureCode {
+    #[serde(rename = "CONNECTION_REQUIRED")]
+    CONNECTIONREQUIRED,
+}
+
+/// More than one active Famisanar connection is available. Supply connectionId.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarConnectionRequiredFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarConnectionRequiredFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -50989,6 +51017,15 @@ pub struct FamisanarConnectionUnavailableFailure {
     pub data: Empty,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarConnectionsGetInput {
+    /// The IPS connection saved in Account. This is not a provider session ID.
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+}
+
+pub type FamisanarConnectionsGetOutput = FamisanarGetConnectionResult;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum FamisanarCredentialsRejectedFailureCode {
     #[serde(rename = "CREDENTIALS_REJECTED")]
@@ -51010,6 +51047,159 @@ pub struct FamisanarCredentialsRejectedFailure {
     /// No fields.
     #[serde(rename = "data")]
     pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarGetConnectionBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarGetConnectionBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    FamisanarAffiliationUnresolvedFailure(FamisanarAffiliationUnresolvedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarGetConnectionConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarGetConnectionConflictFailure {
+    FamisanarConnectionRequiredFailure(FamisanarConnectionRequiredFailure),
+    FamisanarSelectionRequiredFailure(FamisanarSelectionRequiredFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionForbiddenError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarGetConnectionForbiddenFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarGetConnectionForbiddenFailure {
+    ForbiddenFailure(ForbiddenFailure),
+    FamisanarProviderAccessDeniedFailure(FamisanarProviderAccessDeniedFailure),
+    FamisanarCredentialsRejectedFailure(FamisanarCredentialsRejectedFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarGetConnectionResultSessionStatus {
+    #[serde(rename = "active")]
+    Active,
+    #[serde(rename = "expired")]
+    Expired,
+    #[serde(rename = "not_started")]
+    NotStarted,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarGetConnectionResultSessionExpirySource {
+    #[serde(rename = "cookie")]
+    Cookie,
+    #[serde(rename = "unknown")]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionResultSession {
+    #[serde(rename = "status")]
+    pub status: FamisanarGetConnectionResultSessionStatus,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<String>,
+    #[serde(rename = "lastVerifiedAt")]
+    pub last_verified_at: Option<String>,
+    /// Cookie expiry bound when provided. Null means the provider has not disclosed a deadline; the server may expire earlier.
+    #[serde(rename = "expiresAt")]
+    pub expires_at: Option<String>,
+    #[serde(rename = "expirySource")]
+    pub expiry_source: FamisanarGetConnectionResultSessionExpirySource,
+    /// Local browser idle deadline, independent of the provider session expiry.
+    #[serde(rename = "idleExpiresAt")]
+    pub idle_expires_at: Option<String>,
+    #[serde(rename = "lastExpiredAt")]
+    pub last_expired_at: Option<String>,
+    #[serde(rename = "sessionCookieCount")]
+    pub session_cookie_count: i64,
+    #[serde(rename = "persistentSessionCookieCount")]
+    pub persistent_session_cookie_count: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionResult {
+    /// The IPS connection saved in Account. This is not a provider session ID.
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "session")]
+    pub session: FamisanarGetConnectionResultSession,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: FamisanarGetConnectionResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarGetConnectionServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarGetConnectionServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarGetConnectionServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    FamisanarAccountUnavailableFailure(FamisanarAccountUnavailableFailure),
+    FamisanarProviderNotConfiguredFailure(FamisanarProviderNotConfiguredFailure),
+    FamisanarProviderUnavailableFailure(FamisanarProviderUnavailableFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
 }
 
 /// A failed answer.
@@ -51065,14 +51255,38 @@ pub enum FamisanarLookupAffiliationBodyDocumentType {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct FamisanarLookupAffiliationBody {
-    #[serde(rename = "connectionId")]
-    pub connection_id: String,
+    /// Omit when the organization has exactly one active Famisanar connection. Required to choose among multiple active connections.
+    #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
+    pub connection_id: Option<String>,
+    /// Identity document type. Defaults to CC; send another supported type explicitly.
     #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
     pub document_type: Option<FamisanarLookupAffiliationBodyDocumentType>,
     #[serde(rename = "documentNumber")]
     pub document_number: String,
+    /// Maximum age in days of an observation from this IPS connection. Zero contacts the provider and refreshes the saved result.
     #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
     pub max_age_days: Option<i64>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarLookupAffiliationConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarLookupAffiliationConflictFailure {
+    FamisanarConnectionRequiredFailure(FamisanarConnectionRequiredFailure),
+    FamisanarSelectionRequiredFailure(FamisanarSelectionRequiredFailure),
 }
 
 /// A failed answer.
@@ -51259,21 +51473,6 @@ pub struct FamisanarProviderUnavailableFailure {
     /// No fields.
     #[serde(rename = "data")]
     pub data: Empty,
-}
-
-/// A failed answer.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct FamisanarSelectionRequiredError {
-    #[serde(rename = "success")]
-    pub success: serde_json::Value,
-    #[serde(rename = "data")]
-    pub data: serde_json::Value,
-    /// Choose an unambiguous IPS and active branch for this account.
-    #[serde(rename = "error")]
-    pub error: FamisanarSelectionRequiredFailure,
-    /// What every answer carries besides its data or error.
-    #[serde(rename = "metadata")]
-    pub metadata: ResponseMetadata,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]

@@ -1047,9 +1047,22 @@ pub struct FamisanarAffiliationsApi<'a>(&'a Client);
 impl<'a> FamisanarAffiliationsApi<'a> {
     /// Look up affiliation
     ///
-    /// Look up one document using an active IPS connection. The document type defaults to CC. Observations retain their original checkedAt for at most seven days. Set maxAgeDays to zero to refresh. The provider combines missing and invalid records into one outcome.
+    /// Look up one document using the organization’s active IPS connection. Omit connectionId when exactly one is active. The document type defaults to CC and may be supplied explicitly. Observations retain their original checkedAt for at most seven days. Set maxAgeDays to zero to refresh. The provider combines missing and invalid records into one outcome.
     pub async fn lookup(&self, input: &types::FamisanarAffiliationsLookupInput) -> Result<types::FamisanarAffiliationsLookupOutput, Error> {
         self.0.call(&operations::FAMISANAR_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `famisanar.connections`
+#[derive(Debug, Clone, Copy)]
+pub struct FamisanarConnectionsApi<'a>(&'a Client);
+
+impl<'a> FamisanarConnectionsApi<'a> {
+    /// Get a Famisanar connection
+    ///
+    /// Read session availability and observed expiry without signing in. An undisclosed provider deadline is null. Credentials, cookies and session handles are never returned. Expired sessions reconnect automatically on the next uncached affiliation lookup.
+    pub async fn get(&self, input: &types::FamisanarConnectionsGetInput) -> Result<types::FamisanarConnectionsGetOutput, Error> {
+        self.0.call(&operations::FAMISANAR_CONNECTIONS_GET, input).await
     }
 }
 
@@ -1060,6 +1073,10 @@ pub struct FamisanarApi<'a>(&'a Client);
 impl<'a> FamisanarApi<'a> {
     pub fn affiliations(&self) -> FamisanarAffiliationsApi<'a> {
         FamisanarAffiliationsApi(self.0)
+    }
+
+    pub fn connections(&self) -> FamisanarConnectionsApi<'a> {
+        FamisanarConnectionsApi(self.0)
     }
 }
 

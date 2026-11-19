@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261119.63051";
+pub const RELEASE: &str = "1.20261119.71101";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -847,6 +847,17 @@ pub const FAMISANAR_AFFILIATIONS_LOOKUP: Operation = Operation {
     path: "/v1/famisanar/affiliations/lookup",
     path_field: None,
     query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `famisanar.connections.get`: Get a Famisanar connection
+pub const FAMISANAR_CONNECTIONS_GET: Operation = Operation {
+    name: "famisanar.connections.get",
+    method: "GET",
+    path: "/v1/famisanar/connections/{connectionId}",
+    path_field: Some("connectionId"),
+    query: Some(&[]),
     effect: Effect::Read,
     max_output_bytes: 262144,
 };
