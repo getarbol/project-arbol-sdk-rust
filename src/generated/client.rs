@@ -25,6 +25,10 @@ impl Client {
         ComfachocoApi(self)
     }
 
+    pub fn famisanar(&self) -> FamisanarApi<'_> {
+        FamisanarApi(self)
+    }
+
     pub fn gmedic(&self) -> GmedicApi<'_> {
         GmedicApi(self)
     }
@@ -39,6 +43,10 @@ impl Client {
 
     pub fn oficlinic(&self) -> OficlinicApi<'_> {
         OficlinicApi(self)
+    }
+
+    pub fn pijaos_salud(&self) -> PijaosSaludApi<'_> {
+        PijaosSaludApi(self)
     }
 
     pub fn policia_colombia(&self) -> PoliciaColombiaApi<'_> {
@@ -1032,6 +1040,29 @@ impl<'a> ComfachocoApi<'a> {
     }
 }
 
+/// `famisanar.affiliations`
+#[derive(Debug, Clone, Copy)]
+pub struct FamisanarAffiliationsApi<'a>(&'a Client);
+
+impl<'a> FamisanarAffiliationsApi<'a> {
+    /// Look up affiliation
+    ///
+    /// Look up one document using an active IPS connection. The document type defaults to CC. Observations retain their original checkedAt for at most seven days. Set maxAgeDays to zero to refresh. The provider combines missing and invalid records into one outcome.
+    pub async fn lookup(&self, input: &types::FamisanarAffiliationsLookupInput) -> Result<types::FamisanarAffiliationsLookupOutput, Error> {
+        self.0.call(&operations::FAMISANAR_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `famisanar`
+#[derive(Debug, Clone, Copy)]
+pub struct FamisanarApi<'a>(&'a Client);
+
+impl<'a> FamisanarApi<'a> {
+    pub fn affiliations(&self) -> FamisanarAffiliationsApi<'a> {
+        FamisanarAffiliationsApi(self.0)
+    }
+}
+
 /// `gmedic.agendaServices`
 #[derive(Debug, Clone, Copy)]
 pub struct GmedicAgendaServicesApi<'a>(&'a Client);
@@ -1969,6 +2000,29 @@ impl<'a> OficlinicApi<'a> {
 
     pub fn services(&self) -> OficlinicServicesApi<'a> {
         OficlinicServicesApi(self.0)
+    }
+}
+
+/// `pijaos-salud.affiliations`
+#[derive(Debug, Clone, Copy)]
+pub struct PijaosSaludAffiliationsApi<'a>(&'a Client);
+
+impl<'a> PijaosSaludAffiliationsApi<'a> {
+    /// Look up affiliation
+    ///
+    /// Read the affiliation status for one document through the organization’s active Pijaos Salud connection. An unconfirmed identity leaves affiliation unknown.
+    pub async fn lookup(&self, input: &types::PijaosSaludAffiliationsLookupInput) -> Result<types::PijaosSaludAffiliationsLookupOutput, Error> {
+        self.0.call(&operations::PIJAOS_SALUD_AFFILIATIONS_LOOKUP, input).await
+    }
+}
+
+/// `pijaos-salud`
+#[derive(Debug, Clone, Copy)]
+pub struct PijaosSaludApi<'a>(&'a Client);
+
+impl<'a> PijaosSaludApi<'a> {
+    pub fn affiliations(&self) -> PijaosSaludAffiliationsApi<'a> {
+        PijaosSaludAffiliationsApi(self.0)
     }
 }
 

@@ -2707,6 +2707,8 @@ pub enum AccountPermissionGroup {
     Comfachoco,
     #[serde(rename = "oficlinic")]
     Oficlinic,
+    #[serde(rename = "pijaos-salud")]
+    PijaosSalud,
     #[serde(rename = "sanitas")]
     Sanitas,
     #[serde(rename = "gmedic")]
@@ -50859,6 +50861,444 @@ pub struct DeletedObjectResponse {
 /// No fields.
 pub type Empty = serde_json::Map<String, serde_json::Value>;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarAccountUnavailableFailureCode {
+    #[serde(rename = "ACCOUNT_UNAVAILABLE")]
+    ACCOUNTUNAVAILABLE,
+}
+
+/// Account could not verify this connection.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarAccountUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarAccountUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarAffiliationUnresolvedFailureCode {
+    #[serde(rename = "AFFILIATION_UNRESOLVED")]
+    AFFILIATIONUNRESOLVED,
+}
+
+/// The provider returned no confirmed observation.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarAffiliationUnresolvedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarAffiliationUnresolvedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarAffiliationsLookupInputDocumentType {
+    #[serde(rename = "CC")]
+    CC,
+    #[serde(rename = "CD")]
+    CD,
+    #[serde(rename = "CE")]
+    CE,
+    #[serde(rename = "CN")]
+    CN,
+    #[serde(rename = "ME")]
+    ME,
+    #[serde(rename = "NT")]
+    NT,
+    #[serde(rename = "PC")]
+    PC,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "PS")]
+    PS,
+    #[serde(rename = "PT")]
+    PT,
+    #[serde(rename = "RC")]
+    RC,
+    #[serde(rename = "SC")]
+    SC,
+    #[serde(rename = "TI")]
+    TI,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarAffiliationsLookupInput {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
+    pub document_type: Option<FamisanarAffiliationsLookupInputDocumentType>,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+    #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
+    pub max_age_days: Option<i64>,
+}
+
+pub type FamisanarAffiliationsLookupOutput = FamisanarLookupAffiliationResult;
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarConnectionUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// No active Famisanar connection is available.
+    #[serde(rename = "error")]
+    pub error: FamisanarConnectionUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarConnectionUnavailableFailureCode {
+    #[serde(rename = "CONNECTION_UNAVAILABLE")]
+    CONNECTIONUNAVAILABLE,
+}
+
+/// No active Famisanar connection is available.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarConnectionUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarConnectionUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarCredentialsRejectedFailureCode {
+    #[serde(rename = "CREDENTIALS_REJECTED")]
+    CREDENTIALSREJECTED,
+}
+
+/// The provider rejected these credentials.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarCredentialsRejectedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarCredentialsRejectedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarLookupAffiliationBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarLookupAffiliationBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    FamisanarAffiliationUnresolvedFailure(FamisanarAffiliationUnresolvedFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarLookupAffiliationBodyDocumentType {
+    #[serde(rename = "CC")]
+    CC,
+    #[serde(rename = "CD")]
+    CD,
+    #[serde(rename = "CE")]
+    CE,
+    #[serde(rename = "CN")]
+    CN,
+    #[serde(rename = "ME")]
+    ME,
+    #[serde(rename = "NT")]
+    NT,
+    #[serde(rename = "PC")]
+    PC,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "PS")]
+    PS,
+    #[serde(rename = "PT")]
+    PT,
+    #[serde(rename = "RC")]
+    RC,
+    #[serde(rename = "SC")]
+    SC,
+    #[serde(rename = "TI")]
+    TI,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationBody {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "documentType", default, skip_serializing_if = "Option::is_none")]
+    pub document_type: Option<FamisanarLookupAffiliationBodyDocumentType>,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+    #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
+    pub max_age_days: Option<i64>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationForbiddenError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarLookupAffiliationForbiddenFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarLookupAffiliationForbiddenFailure {
+    ForbiddenFailure(ForbiddenFailure),
+    FamisanarProviderAccessDeniedFailure(FamisanarProviderAccessDeniedFailure),
+    FamisanarCredentialsRejectedFailure(FamisanarCredentialsRejectedFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarLookupAffiliationResultNotFoundOrInvalidOutcome {
+    #[serde(rename = "not_found_or_invalid")]
+    NotFoundOrInvalid,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarLookupAffiliationResultNotFoundOrInvalidSource {
+    #[serde(rename = "provider")]
+    Provider,
+    #[serde(rename = "cache")]
+    Cache,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationResultNotFoundOrInvalid {
+    #[serde(rename = "outcome")]
+    pub outcome: FamisanarLookupAffiliationResultNotFoundOrInvalidOutcome,
+    #[serde(rename = "source")]
+    pub source: FamisanarLookupAffiliationResultNotFoundOrInvalidSource,
+    #[serde(rename = "checkedAt")]
+    pub checked_at: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarLookupAffiliationResultAffiliationReportedOutcome {
+    #[serde(rename = "affiliation_reported")]
+    AffiliationReported,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarLookupAffiliationResultAffiliationReportedSource {
+    #[serde(rename = "provider")]
+    Provider,
+    #[serde(rename = "cache")]
+    Cache,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationResultAffiliationReported {
+    #[serde(rename = "outcome")]
+    pub outcome: FamisanarLookupAffiliationResultAffiliationReportedOutcome,
+    #[serde(rename = "affiliationStatus")]
+    pub affiliation_status: String,
+    #[serde(rename = "source")]
+    pub source: FamisanarLookupAffiliationResultAffiliationReportedSource,
+    #[serde(rename = "checkedAt")]
+    pub checked_at: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarLookupAffiliationResult {
+    NotFoundOrInvalid(FamisanarLookupAffiliationResultNotFoundOrInvalid),
+    AffiliationReported(FamisanarLookupAffiliationResultAffiliationReported),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: FamisanarLookupAffiliationResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarLookupAffiliationServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: FamisanarLookupAffiliationServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum FamisanarLookupAffiliationServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    FamisanarAccountUnavailableFailure(FamisanarAccountUnavailableFailure),
+    FamisanarProviderNotConfiguredFailure(FamisanarProviderNotConfiguredFailure),
+    FamisanarProviderUnavailableFailure(FamisanarProviderUnavailableFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarProviderAccessDeniedFailureCode {
+    #[serde(rename = "PROVIDER_ACCESS_DENIED")]
+    PROVIDERACCESSDENIED,
+}
+
+/// The provider declined this request.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarProviderAccessDeniedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarProviderAccessDeniedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarProviderNotConfiguredFailureCode {
+    #[serde(rename = "PROVIDER_NOT_CONFIGURED")]
+    PROVIDERNOTCONFIGURED,
+}
+
+/// The authorized source has not been connected.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarProviderNotConfiguredFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarProviderNotConfiguredFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarProviderUnavailableFailureCode {
+    #[serde(rename = "PROVIDER_UNAVAILABLE")]
+    PROVIDERUNAVAILABLE,
+}
+
+/// The provider is unavailable.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarProviderUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarProviderUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarSelectionRequiredError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// Choose an unambiguous IPS and active branch for this account.
+    #[serde(rename = "error")]
+    pub error: FamisanarSelectionRequiredFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum FamisanarSelectionRequiredFailureCode {
+    #[serde(rename = "SELECTION_REQUIRED")]
+    SELECTIONREQUIRED,
+}
+
+/// Choose an unambiguous IPS and active branch for this account.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct FamisanarSelectionRequiredFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: FamisanarSelectionRequiredFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ForbiddenError {
@@ -68245,6 +68685,372 @@ pub struct PageInfo {
     /// Opaque cursor for the previous page, or null when there is none.
     #[serde(rename = "previousCursor")]
     pub previous_cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludAccountUnavailableFailureCode {
+    #[serde(rename = "ACCOUNT_UNAVAILABLE")]
+    ACCOUNTUNAVAILABLE,
+}
+
+/// The connection could not be read.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludAccountUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: PijaosSaludAccountUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludAffiliationUnresolvedFailureCode {
+    #[serde(rename = "AFFILIATION_UNRESOLVED")]
+    AFFILIATIONUNRESOLVED,
+}
+
+/// The provider response could not be verified for the requested document.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludAffiliationUnresolvedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: PijaosSaludAffiliationUnresolvedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludAffiliationsLookupInputDocumentType {
+    #[serde(rename = "NI")]
+    NI,
+    #[serde(rename = "CC")]
+    CC,
+    #[serde(rename = "MS")]
+    MS,
+    #[serde(rename = "RC")]
+    RC,
+    #[serde(rename = "TI")]
+    TI,
+    #[serde(rename = "CE")]
+    CE,
+    #[serde(rename = "PA")]
+    PA,
+    #[serde(rename = "AS")]
+    AS,
+    #[serde(rename = "CD")]
+    CD,
+    #[serde(rename = "CN")]
+    CN,
+    #[serde(rename = "SC")]
+    SC,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "PT")]
+    PT,
+    #[serde(rename = "DE")]
+    DE,
+    #[serde(rename = "OT")]
+    OT,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludAffiliationsLookupInput {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "documentType")]
+    pub document_type: PijaosSaludAffiliationsLookupInputDocumentType,
+    /// Maximum age in days of a result from this IPS connection. Zero contacts the provider and refreshes the saved result.
+    #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
+    pub max_age_days: Option<i64>,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+}
+
+pub type PijaosSaludAffiliationsLookupOutput = PijaosSaludLookupAffiliationResult;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludConnectionUnavailableFailureCode {
+    #[serde(rename = "CONNECTION_UNAVAILABLE")]
+    CONNECTIONUNAVAILABLE,
+}
+
+/// Select an active Pijaos Salud connection for this organization.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludConnectionUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: PijaosSaludConnectionUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludCredentialsRejectedFailureCode {
+    #[serde(rename = "CREDENTIALS_REJECTED")]
+    CREDENTIALSREJECTED,
+}
+
+/// Pijaos Salud did not accept the configured IPS login.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludCredentialsRejectedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: PijaosSaludCredentialsRejectedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationBadGatewayError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: PijaosSaludLookupAffiliationBadGatewayFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum PijaosSaludLookupAffiliationBadGatewayFailure {
+    OutcomeUnknownFailure(OutcomeUnknownFailure),
+    PijaosSaludAffiliationUnresolvedFailure(PijaosSaludAffiliationUnresolvedFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationBodyDocumentType {
+    #[serde(rename = "NI")]
+    NI,
+    #[serde(rename = "CC")]
+    CC,
+    #[serde(rename = "MS")]
+    MS,
+    #[serde(rename = "RC")]
+    RC,
+    #[serde(rename = "TI")]
+    TI,
+    #[serde(rename = "CE")]
+    CE,
+    #[serde(rename = "PA")]
+    PA,
+    #[serde(rename = "AS")]
+    AS,
+    #[serde(rename = "CD")]
+    CD,
+    #[serde(rename = "CN")]
+    CN,
+    #[serde(rename = "SC")]
+    SC,
+    #[serde(rename = "PE")]
+    PE,
+    #[serde(rename = "PT")]
+    PT,
+    #[serde(rename = "DE")]
+    DE,
+    #[serde(rename = "OT")]
+    OT,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationBody {
+    #[serde(rename = "connectionId")]
+    pub connection_id: String,
+    #[serde(rename = "documentType")]
+    pub document_type: PijaosSaludLookupAffiliationBodyDocumentType,
+    /// Maximum age in days of a result from this IPS connection. Zero contacts the provider and refreshes the saved result.
+    #[serde(rename = "maxAgeDays", default, skip_serializing_if = "Option::is_none")]
+    pub max_age_days: Option<i64>,
+    #[serde(rename = "documentNumber")]
+    pub document_number: String,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: PijaosSaludLookupAffiliationConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum PijaosSaludLookupAffiliationConflictFailure {
+    PijaosSaludConnectionUnavailableFailure(PijaosSaludConnectionUnavailableFailure),
+    PijaosSaludCredentialsRejectedFailure(PijaosSaludCredentialsRejectedFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationResultIdentityNotConfirmedOutcome {
+    #[serde(rename = "identity_not_confirmed")]
+    IdentityNotConfirmed,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationResultIdentityNotConfirmedSource {
+    #[serde(rename = "provider")]
+    Provider,
+    #[serde(rename = "cache")]
+    Cache,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationResultIdentityNotConfirmed {
+    #[serde(rename = "outcome")]
+    pub outcome: PijaosSaludLookupAffiliationResultIdentityNotConfirmedOutcome,
+    /// Time of the original provider lookup.
+    #[serde(rename = "checkedAt")]
+    pub checked_at: String,
+    #[serde(rename = "source")]
+    pub source: PijaosSaludLookupAffiliationResultIdentityNotConfirmedSource,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationResultStatusReportedOutcome {
+    #[serde(rename = "status_reported")]
+    StatusReported,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationResultStatusReportedStatus {
+    #[serde(rename = "activo")]
+    Activo,
+    #[serde(rename = "inactivo")]
+    Inactivo,
+    #[serde(rename = "suspendido")]
+    Suspendido,
+    #[serde(rename = "retirado")]
+    Retirado,
+    #[serde(rename = "fallecido")]
+    Fallecido,
+    #[serde(rename = "cancelado")]
+    Cancelado,
+    #[serde(rename = "trasladado")]
+    Trasladado,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludLookupAffiliationResultStatusReportedSource {
+    #[serde(rename = "provider")]
+    Provider,
+    #[serde(rename = "cache")]
+    Cache,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationResultStatusReported {
+    #[serde(rename = "outcome")]
+    pub outcome: PijaosSaludLookupAffiliationResultStatusReportedOutcome,
+    #[serde(rename = "status")]
+    pub status: PijaosSaludLookupAffiliationResultStatusReportedStatus,
+    /// Time of the original provider lookup.
+    #[serde(rename = "checkedAt")]
+    pub checked_at: String,
+    #[serde(rename = "source")]
+    pub source: PijaosSaludLookupAffiliationResultStatusReportedSource,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum PijaosSaludLookupAffiliationResult {
+    IdentityNotConfirmed(PijaosSaludLookupAffiliationResultIdentityNotConfirmed),
+    StatusReported(PijaosSaludLookupAffiliationResultStatusReported),
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationResultResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: PijaosSaludLookupAffiliationResult,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludLookupAffiliationServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: PijaosSaludLookupAffiliationServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum PijaosSaludLookupAffiliationServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    PijaosSaludAccountUnavailableFailure(PijaosSaludAccountUnavailableFailure),
+    PijaosSaludProviderUnavailableFailure(PijaosSaludProviderUnavailableFailure),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum PijaosSaludProviderUnavailableFailureCode {
+    #[serde(rename = "PROVIDER_UNAVAILABLE")]
+    PROVIDERUNAVAILABLE,
+}
+
+/// Pijaos Salud could not complete the operation.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct PijaosSaludProviderUnavailableFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: PijaosSaludProviderUnavailableFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -90584,7 +91390,7 @@ pub enum SaludTotalCountNoticesServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -90706,7 +91512,7 @@ pub enum SaludTotalDownloadAuthorizationDocumentServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -90945,7 +91751,7 @@ pub enum SaludTotalListAuthorizationsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -91078,7 +91884,7 @@ pub enum SaludTotalLookupAffiliationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -91339,7 +92145,7 @@ pub enum SaludTotalLookupAuthorizationsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -91432,7 +92238,7 @@ pub enum SaludTotalLookupFilingsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -91526,7 +92332,7 @@ pub enum SaludTotalLookupInvoiceServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SaludTotalAuthorizationStoreUnavailableFailure(SaludTotalAuthorizationStoreUnavailableFailure),
     SaludTotalAccountUnavailableFailure(SaludTotalAccountUnavailableFailure),
-    SaludTotalSessionExpiredFailure(SaludTotalSessionExpiredFailure),
+    SessionExpiredFailure(SessionExpiredFailure),
     SaludTotalProviderUnavailableFailure(SaludTotalProviderUnavailableFailure),
 }
 
@@ -91803,29 +92609,6 @@ pub struct SaludTotalSessionClosedFailure {
     /// The failure code, stable across releases.
     #[serde(rename = "code")]
     pub code: SaludTotalSessionClosedFailureCode,
-    /// What went wrong, for people; it never contains input values.
-    #[serde(rename = "message")]
-    pub message: String,
-    /// Whether repeating the same request may succeed.
-    #[serde(rename = "retryable")]
-    pub retryable: serde_json::Value,
-    /// No fields.
-    #[serde(rename = "data")]
-    pub data: Empty,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
-pub enum SaludTotalSessionExpiredFailureCode {
-    #[serde(rename = "SESSION_EXPIRED")]
-    SESSIONEXPIRED,
-}
-
-/// The provider session expired.
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
-pub struct SaludTotalSessionExpiredFailure {
-    /// The failure code, stable across releases.
-    #[serde(rename = "code")]
-    pub code: SaludTotalSessionExpiredFailureCode,
     /// What went wrong, for people; it never contains input values.
     #[serde(rename = "message")]
     pub message: String,
@@ -92631,6 +93414,29 @@ pub struct SanitasSanitasNoContract {
     pub active: serde_json::Value,
     #[serde(rename = "outcome")]
     pub outcome: SanitasSanitasNoContractOutcome,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SessionExpiredFailureCode {
+    #[serde(rename = "SESSION_EXPIRED")]
+    SESSIONEXPIRED,
+}
+
+/// The provider session expired.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SessionExpiredFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: SessionExpiredFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]

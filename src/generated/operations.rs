@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261118.42105";
+pub const RELEASE: &str = "1.20261119.63051";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -840,6 +840,17 @@ pub const COMFACHOCO_CONNECTIONS_VERIFY: Operation = Operation {
     max_output_bytes: 32768,
 };
 
+/// `famisanar.affiliations.lookup`: Look up affiliation
+pub const FAMISANAR_AFFILIATIONS_LOOKUP: Operation = Operation {
+    name: "famisanar.affiliations.lookup",
+    method: "POST",
+    path: "/v1/famisanar/affiliations/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
 /// `gmedic.agendaServices.list`: List agenda services
 pub const GMEDIC_AGENDA_SERVICES_LIST: Operation = Operation {
     name: "gmedic.agendaServices.list",
@@ -1586,6 +1597,17 @@ pub const OFICLINIC_SERVICES_SEARCH: Operation = Operation {
     query: None,
     effect: Effect::Read,
     max_output_bytes: 65536,
+};
+
+/// `pijaos-salud.affiliations.lookup`: Look up affiliation
+pub const PIJAOS_SALUD_AFFILIATIONS_LOOKUP: Operation = Operation {
+    name: "pijaos-salud.affiliations.lookup",
+    method: "POST",
+    path: "/v1/pijaos-salud/affiliations/lookup",
+    path_field: None,
+    query: None,
+    effect: Effect::Read,
+    max_output_bytes: 262144,
 };
 
 /// `policia-colombia.judicialRecords.lookup`: Look up a Colombian judicial statement
