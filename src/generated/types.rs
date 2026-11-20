@@ -57318,12 +57318,12 @@ pub struct GmedicPatientsPageResponse {
     pub metadata: ResponseMetadata,
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct GmedicPatientsUpdateInputData {
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
-    #[serde(rename = "documentTypeId")]
-    pub document_type_id: String,
+    #[serde(rename = "documentNumber", default, skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+    #[serde(rename = "documentTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub document_type_id: Option<String>,
     #[serde(rename = "sourceCountryCode", default, skip_serializing_if = "Option::is_none")]
     pub source_country_code: Option<String>,
     #[serde(rename = "expeditionPlaceCode", default, skip_serializing_if = "Option::is_none")]
@@ -58307,12 +58307,12 @@ pub enum GmedicUpdatePatientBadGatewayFailure {
     GmedicProviderResponseInvalidFailure(GmedicProviderResponseInvalidFailure),
 }
 
-#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
 pub struct GmedicUpdatePatientBodyData {
-    #[serde(rename = "documentNumber")]
-    pub document_number: String,
-    #[serde(rename = "documentTypeId")]
-    pub document_type_id: String,
+    #[serde(rename = "documentNumber", default, skip_serializing_if = "Option::is_none")]
+    pub document_number: Option<String>,
+    #[serde(rename = "documentTypeId", default, skip_serializing_if = "Option::is_none")]
+    pub document_type_id: Option<String>,
     #[serde(rename = "sourceCountryCode", default, skip_serializing_if = "Option::is_none")]
     pub source_country_code: Option<String>,
     #[serde(rename = "expeditionPlaceCode", default, skip_serializing_if = "Option::is_none")]

@@ -1346,7 +1346,7 @@ pub struct GmedicPatientsApi<'a>(&'a Client);
 impl<'a> GmedicPatientsApi<'a> {
     /// Create patient
     ///
-    /// Use the organization gMedic account. No automatic write retries; reconcile an unknown outcome before repeating.
+    /// Use the organization gMedic account. Some clinics need every detail of a patient an agent registers (names, document, birth date, sex, mobilePhone, email, address); a refusal names what is missing. No automatic write retries; reconcile an unknown outcome before repeating.
     pub async fn create(&self, input: &types::GmedicPatientsCreateInput) -> Result<types::GmedicPatientsCreateOutput, Error> {
         self.0.call(&operations::GMEDIC_PATIENTS_CREATE, input).await
     }
@@ -1367,7 +1367,7 @@ impl<'a> GmedicPatientsApi<'a> {
 
     /// Update patient
     ///
-    /// Use the organization gMedic account. No automatic write retries; reconcile an unknown outcome before repeating.
+    /// Use the organization gMedic account. Send only the fields that change: every other field gMedic stores is kept. An agent cannot change a patient’s document, names or birth date. No automatic write retries; reconcile an unknown outcome before repeating.
     pub async fn update(&self, input: &types::GmedicPatientsUpdateInput) -> Result<types::GmedicPatientsUpdateOutput, Error> {
         self.0.call(&operations::GMEDIC_PATIENTS_UPDATE, input).await
     }
