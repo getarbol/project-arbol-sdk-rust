@@ -242,6 +242,118 @@ pub struct AccountBillingTopUp {
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingAutoTopUp {
+    #[serde(rename = "enabled")]
+    pub enabled: bool,
+    /// When the balance falls below this many credits…
+    #[serde(rename = "threshold")]
+    pub threshold: f64,
+    /// …buy this many credits with the saved card…
+    #[serde(rename = "credits")]
+    pub credits: i64,
+    /// …at most this many times a month.
+    #[serde(rename = "perMonth")]
+    pub per_month: Option<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingToppedUp {
+    /// Credits paid with money this calendar month (UTC): top-ups and transfers.
+    #[serde(rename = "thisMonth")]
+    pub this_month: Option<f64>,
+    /// Credits paid with money since the beginning.
+    #[serde(rename = "allTime")]
+    pub all_time: Option<f64>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountBillingGrantsItemKind {
+    #[serde(rename = "trial")]
+    Trial,
+    #[serde(rename = "promo")]
+    Promo,
+    #[serde(rename = "subsidy")]
+    Subsidy,
+    #[serde(rename = "courtesy")]
+    Courtesy,
+    #[serde(rename = "correction")]
+    Correction,
+    #[serde(rename = "other")]
+    Other,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingGrantsItem {
+    #[serde(rename = "id")]
+    pub id: String,
+    #[serde(rename = "kind")]
+    pub kind: AccountBillingGrantsItemKind,
+    /// The name Arbol gave it.
+    #[serde(rename = "label")]
+    pub label: Option<String>,
+    /// Credits it granted.
+    #[serde(rename = "credits")]
+    pub credits: f64,
+    /// Credits left of it.
+    #[serde(rename = "remaining")]
+    pub remaining: f64,
+    /// When what is left of it ends.
+    #[serde(rename = "expiresAt")]
+    pub expires_at: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountBillingBundlesItemFeature {
+    #[serde(rename = "voice_minutes")]
+    VoiceMinutes,
+    #[serde(rename = "telephony_minutes")]
+    TelephonyMinutes,
+    #[serde(rename = "telephony_cost")]
+    TelephonyCost,
+    #[serde(rename = "whatsapp_conversations")]
+    WhatsappConversations,
+    #[serde(rename = "whatsapp_messages")]
+    WhatsappMessages,
+    #[serde(rename = "whatsapp_templates")]
+    WhatsappTemplates,
+    #[serde(rename = "tool_calls")]
+    ToolCalls,
+    #[serde(rename = "ai_cost")]
+    AiCost,
+    #[serde(rename = "phone_numbers")]
+    PhoneNumbers,
+    #[serde(rename = "sisben_lookups")]
+    SisbenLookups,
+    #[serde(rename = "adres_lookups")]
+    AdresLookups,
+    #[serde(rename = "policia_colombia_lookups")]
+    PoliciaColombiaLookups,
+    #[serde(rename = "postconsultations")]
+    Postconsultations,
+    #[serde(rename = "agenda_users")]
+    AgendaUsers,
+    #[serde(rename = "sms_messages")]
+    SmsMessages,
+    #[serde(rename = "agenda_plan")]
+    AgendaPlan,
+    #[serde(rename = "support_fee")]
+    SupportFee,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingBundlesItem {
+    #[serde(rename = "feature")]
+    pub feature: AccountBillingBundlesItemFeature,
+    /// Units the plan includes in the period, in the fact's units.
+    #[serde(rename = "included")]
+    pub included: f64,
+    #[serde(rename = "remaining")]
+    pub remaining: f64,
+    #[serde(rename = "resetsAt")]
+    pub resets_at: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountBilling {
     /// `new`: the organization has no wallet yet; its first use or top-up opens one.
     #[serde(rename = "status")]
@@ -275,6 +387,21 @@ pub struct AccountBilling {
     /// The credits one top-up may buy, in whole credits.
     #[serde(rename = "topUp")]
     pub top_up: AccountBillingTopUp,
+    /// The automatic top-up; null when it was never set.
+    #[serde(rename = "autoTopUp")]
+    pub auto_top_up: Option<AccountBillingAutoTopUp>,
+    /// The balance at which the organization's administrators are emailed; null when off.
+    #[serde(rename = "lowBalanceAlert")]
+    pub low_balance_alert: Option<f64>,
+    /// How much the organization has topped up; null when it could not be read.
+    #[serde(rename = "toppedUp")]
+    pub topped_up: AccountBillingToppedUp,
+    /// Credits Arbol gave that are still in force, spent before paid credits when they end sooner.
+    #[serde(rename = "grants")]
+    pub grants: Vec<AccountBillingGrantsItem>,
+    /// Allowances of one fact on the plan (600 minutes a month), spent before credits.
+    #[serde(rename = "bundles")]
+    pub bundles: Vec<AccountBillingBundlesItem>,
 }
 
 pub type AccountBillingGetInput = serde_json::Map<String, serde_json::Value>;
@@ -336,6 +463,8 @@ pub enum AccountBillingPlanRatesItemFeature {
     VoiceMinutes,
     #[serde(rename = "telephony_minutes")]
     TelephonyMinutes,
+    #[serde(rename = "telephony_cost")]
+    TelephonyCost,
     #[serde(rename = "whatsapp_conversations")]
     WhatsappConversations,
     #[serde(rename = "whatsapp_messages")]
@@ -350,12 +479,18 @@ pub enum AccountBillingPlanRatesItemFeature {
     PhoneNumbers,
     #[serde(rename = "sisben_lookups")]
     SisbenLookups,
+    #[serde(rename = "adres_lookups")]
+    AdresLookups,
+    #[serde(rename = "policia_colombia_lookups")]
+    PoliciaColombiaLookups,
     #[serde(rename = "postconsultations")]
     Postconsultations,
-    #[serde(rename = "agenda_plan")]
-    AgendaPlan,
     #[serde(rename = "agenda_users")]
     AgendaUsers,
+    #[serde(rename = "sms_messages")]
+    SmsMessages,
+    #[serde(rename = "agenda_plan")]
+    AgendaPlan,
     #[serde(rename = "support_fee")]
     SupportFee,
 }
@@ -372,7 +507,7 @@ pub struct AccountBillingPlanRatesItem {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountBillingPlan {
-    /// The plan's id in Autumn, such as `arbol_prepaid` or a customer's own plan.
+    /// The plan's id, such as `arbol_prepaid` or a customer's own plan.
     #[serde(rename = "id")]
     pub id: String,
     #[serde(rename = "name")]
@@ -394,7 +529,7 @@ pub struct AccountBillingPlan {
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountBillingPortalSession {
-    /// Stripe's portal, for the organization's cards and receipts.
+    /// The payment processor's portal, for the organization's cards and receipts.
     #[serde(rename = "url")]
     pub url: String,
 }
@@ -455,6 +590,44 @@ pub struct AccountBillingPortalUnavailableFailure {
     pub data: Empty,
 }
 
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingRefusedError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// The billing service refused the change; nothing was changed.
+    #[serde(rename = "error")]
+    pub error: AccountBillingRefusedFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountBillingRefusedFailureCode {
+    #[serde(rename = "BILLING_REFUSED")]
+    BILLINGREFUSED,
+}
+
+/// The billing service refused the change; nothing was changed.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingRefusedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountBillingRefusedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
 /// A successful answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountBillingResponse {
@@ -491,6 +664,32 @@ pub struct AccountBillingUnavailableFailure {
     #[serde(rename = "data")]
     pub data: Empty,
 }
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingUpdateInputAutoTopUp {
+    #[serde(rename = "enabled")]
+    pub enabled: bool,
+    /// When the balance falls below this…
+    #[serde(rename = "threshold")]
+    pub threshold: f64,
+    /// …buy this many credits with the saved card…
+    #[serde(rename = "credits")]
+    pub credits: i64,
+    /// …at most this many times a month.
+    #[serde(rename = "perMonth")]
+    pub per_month: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AccountBillingUpdateInput {
+    #[serde(rename = "autoTopUp", default, skip_serializing_if = "Option::is_none")]
+    pub auto_top_up: Option<AccountBillingUpdateInputAutoTopUp>,
+    /// The balance at which administrators are emailed; null turns it off.
+    #[serde(rename = "lowBalanceAlert", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub low_balance_alert: Option<Option<f64>>,
+}
+
+pub type AccountBillingUpdateOutput = AccountBilling;
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountColombiaLookupPresentationVariant2 {
@@ -1437,6 +1636,28 @@ pub enum AccountCreateMemberServiceUnavailableFailure {
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
 }
 
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountCreatePaymentMethodSetupServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: AccountCreatePaymentMethodSetupServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountCreatePaymentMethodSetupServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    AccountBillingNotConfiguredFailure(AccountBillingNotConfiguredFailure),
+    AccountBillingUnavailableFailure(AccountBillingUnavailableFailure),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountCreateServerBodyTransport {
     #[serde(rename = "http")]
@@ -1916,6 +2137,44 @@ pub struct AccountIdentityUnavailableFailure {
 
 /// A failed answer.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInsufficientCreditsError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// The organization's wallet has no credits for this; nothing was changed. Top up, then try again.
+    #[serde(rename = "error")]
+    pub error: AccountInsufficientCreditsFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInsufficientCreditsFailureCode {
+    #[serde(rename = "INSUFFICIENT_CREDITS")]
+    INSUFFICIENTCREDITS,
+}
+
+/// The organization's wallet has no credits for this; nothing was changed. Top up, then try again.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInsufficientCreditsFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountInsufficientCreditsFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountIntegrationUnsupportedError {
     #[serde(rename = "success")]
     pub success: serde_json::Value,
@@ -2136,6 +2395,161 @@ pub struct AccountInvitationsListInput {
 
 pub type AccountInvitationsListOutput = AccountInvitationPage;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoiceSource {
+    #[serde(rename = "generated")]
+    Generated,
+    #[serde(rename = "uploaded")]
+    Uploaded,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoiceStatus {
+    #[serde(rename = "open")]
+    Open,
+    #[serde(rename = "paid")]
+    Paid,
+    #[serde(rename = "void")]
+    Void,
+    #[serde(rename = "uncollectible")]
+    Uncollectible,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoiceFilesItem {
+    #[serde(rename = "pdf")]
+    Pdf,
+    #[serde(rename = "xml")]
+    Xml,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoice {
+    #[serde(rename = "id")]
+    pub id: String,
+    /// `generated`: issued by the payment processor, opened on `hostedUrl`; `uploaded`: issued by Arbol, downloaded as a file.
+    #[serde(rename = "source")]
+    pub source: AccountInvoiceSource,
+    #[serde(rename = "number")]
+    pub number: Option<String>,
+    #[serde(rename = "issuedAt")]
+    pub issued_at: Option<String>,
+    #[serde(rename = "periodStartsAt")]
+    pub period_starts_at: Option<String>,
+    #[serde(rename = "periodEndsAt")]
+    pub period_ends_at: Option<String>,
+    #[serde(rename = "total")]
+    pub total: Option<f64>,
+    /// ISO 4217, such as USD.
+    #[serde(rename = "currency")]
+    pub currency: String,
+    #[serde(rename = "status")]
+    pub status: AccountInvoiceStatus,
+    /// The generated invoice's own page.
+    #[serde(rename = "hostedUrl")]
+    pub hosted_url: Option<String>,
+    /// The files of an uploaded invoice, served by GET /v1/invoice-files/{invoiceId}.
+    #[serde(rename = "files")]
+    pub files: Vec<AccountInvoiceFilesItem>,
+    /// An electronic invoice's number at the tax authority (Colombia's CUFE).
+    #[serde(rename = "taxAuthorityNumber")]
+    pub tax_authority_number: Option<String>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoiceNotFoundError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// This organization has no such invoice file.
+    #[serde(rename = "error")]
+    pub error: AccountInvoiceNotFoundFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoiceNotFoundFailureCode {
+    #[serde(rename = "INVOICE_NOT_FOUND")]
+    INVOICENOTFOUND,
+}
+
+/// This organization has no such invoice file.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoiceNotFoundFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: AccountInvoiceNotFoundFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoicePageObject {
+    #[serde(rename = "list")]
+    List,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoicePage {
+    /// Items admitted by this resource contract within the verified organization.
+    #[serde(rename = "data")]
+    pub data: Vec<AccountInvoice>,
+    /// Discriminator for a resource list response.
+    #[serde(rename = "object")]
+    pub object: AccountInvoicePageObject,
+    /// Opaque navigation cursors for this page’s stable keyset order.
+    #[serde(rename = "pageInfo")]
+    pub page_info: PageInfo,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoicePageResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountInvoicePage,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountInvoicesListInputDirection {
+    #[serde(rename = "forward")]
+    Forward,
+    #[serde(rename = "backward")]
+    Backward,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AccountInvoicesListInput {
+    /// Opaque cursor returned by pageInfo; omit it to request the first page.
+    #[serde(rename = "cursor", default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Direction to traverse the stable keyset ordering from the supplied cursor.
+    #[serde(rename = "direction", default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<AccountInvoicesListInputDirection>,
+    /// Maximum items returned in one page. Defaults to 25; larger reads require another cursor.
+    #[serde(rename = "limit", default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+pub type AccountInvoicesListOutput = AccountInvoicePage;
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountIssuedApiKey {
     #[serde(rename = "apiKey")]
@@ -2224,6 +2638,28 @@ pub enum AccountListInvitationsServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     AccountAccountNotConfiguredFailure(AccountAccountNotConfiguredFailure),
     AccountIdentityUnavailableFailure(AccountIdentityUnavailableFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountListInvoicesServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: AccountListInvoicesServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountListInvoicesServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    AccountBillingNotConfiguredFailure(AccountBillingNotConfiguredFailure),
+    AccountBillingUnavailableFailure(AccountBillingUnavailableFailure),
 }
 
 /// A failed answer.
@@ -2686,6 +3122,31 @@ pub struct AccountOrganizationsListInput {
 }
 
 pub type AccountOrganizationsListOutput = AccountOrganizationPage;
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountPaymentMethodSetup {
+    /// The payment processor's page to add or change the card, with no purchase.
+    #[serde(rename = "url")]
+    pub url: String,
+}
+
+/// A successful answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountPaymentMethodSetupResponse {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: AccountPaymentMethodSetup,
+    #[serde(rename = "error")]
+    pub error: serde_json::Value,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+pub type AccountPaymentMethodSetupsCreateInput = serde_json::Map<String, serde_json::Value>;
+
+pub type AccountPaymentMethodSetupsCreateOutput = AccountPaymentMethodSetup;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountPermissionGroup {
@@ -3533,6 +3994,52 @@ pub struct AccountTopUpDeclinedFailure {
     pub data: Empty,
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountUpdateBillingBodyAutoTopUp {
+    #[serde(rename = "enabled")]
+    pub enabled: bool,
+    /// When the balance falls below this…
+    #[serde(rename = "threshold")]
+    pub threshold: f64,
+    /// …buy this many credits with the saved card…
+    #[serde(rename = "credits")]
+    pub credits: i64,
+    /// …at most this many times a month.
+    #[serde(rename = "perMonth")]
+    pub per_month: i64,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
+pub struct AccountUpdateBillingBody {
+    #[serde(rename = "autoTopUp", default, skip_serializing_if = "Option::is_none")]
+    pub auto_top_up: Option<AccountUpdateBillingBodyAutoTopUp>,
+    /// The balance at which administrators are emailed; null turns it off.
+    #[serde(rename = "lowBalanceAlert", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
+    pub low_balance_alert: Option<Option<f64>>,
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountUpdateBillingServiceUnavailableError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: AccountUpdateBillingServiceUnavailableFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum AccountUpdateBillingServiceUnavailableFailure {
+    UpstreamUnavailableFailure(UpstreamUnavailableFailure),
+    AccountBillingNotConfiguredFailure(AccountBillingNotConfiguredFailure),
+    AccountBillingUnavailableFailure(AccountBillingUnavailableFailure),
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum AccountUpdateMemberBodyProduct {
     #[serde(rename = "raiz")]
@@ -3635,6 +4142,8 @@ pub enum AccountUsageFeatureFeature {
     VoiceMinutes,
     #[serde(rename = "telephony_minutes")]
     TelephonyMinutes,
+    #[serde(rename = "telephony_cost")]
+    TelephonyCost,
     #[serde(rename = "whatsapp_conversations")]
     WhatsappConversations,
     #[serde(rename = "whatsapp_messages")]
@@ -3649,35 +4158,47 @@ pub enum AccountUsageFeatureFeature {
     PhoneNumbers,
     #[serde(rename = "sisben_lookups")]
     SisbenLookups,
+    #[serde(rename = "adres_lookups")]
+    AdresLookups,
+    #[serde(rename = "policia_colombia_lookups")]
+    PoliciaColombiaLookups,
     #[serde(rename = "postconsultations")]
     Postconsultations,
-    #[serde(rename = "agenda_plan")]
-    AgendaPlan,
     #[serde(rename = "agenda_users")]
     AgendaUsers,
+    #[serde(rename = "sms_messages")]
+    SmsMessages,
+    #[serde(rename = "agenda_plan")]
+    AgendaPlan,
     #[serde(rename = "support_fee")]
     SupportFee,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountUsageFeatureGroupsItem {
-    /// The product (`raiz`) or channel (`voice`).
+    /// The product (`raiz`), the channel (`voice`), the Agent or the campaign id.
     #[serde(rename = "key")]
     pub key: String,
     #[serde(rename = "units")]
     pub units: f64,
+    /// Its value at the organization's own rates.
+    #[serde(rename = "credits")]
+    pub credits: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountUsageFeature {
     #[serde(rename = "feature")]
     pub feature: AccountUsageFeatureFeature,
-    /// What was used, in the feature's units: minutes, conversations, lookups… For `ai_cost`, the model calls.
+    /// What was used, in the feature's units: minutes, conversations, lookups… For `ai_cost` and `telephony_cost`, the reports.
     #[serde(rename = "units")]
     pub units: f64,
     /// How many reports made it up.
     #[serde(rename = "events")]
     pub events: i64,
+    /// Its value at the organization's own rates.
+    #[serde(rename = "credits")]
+    pub credits: f64,
     #[serde(rename = "groups")]
     pub groups: Vec<AccountUsageFeatureGroupsItem>,
 }
@@ -3688,6 +4209,23 @@ pub enum AccountUsageSummaryGroupBy {
     Product,
     #[serde(rename = "channel")]
     Channel,
+    #[serde(rename = "agent")]
+    Agent,
+    #[serde(rename = "campaign")]
+    Campaign,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct AccountUsageSummaryDaysItem {
+    /// The day, in the summary's time zone.
+    #[serde(rename = "date")]
+    pub date: String,
+    /// Credits the wallet paid that day.
+    #[serde(rename = "credits")]
+    pub credits: f64,
+    /// Each feature's units that day.
+    #[serde(rename = "units")]
+    pub units: std::collections::BTreeMap<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -3696,6 +4234,8 @@ pub struct AccountUsageSummary {
     pub from: String,
     #[serde(rename = "to")]
     pub to: String,
+    #[serde(rename = "timezone")]
+    pub timezone: String,
     #[serde(rename = "groupBy")]
     pub group_by: AccountUsageSummaryGroupBy,
     /// Credits the wallet paid in the range.
@@ -3703,6 +4243,8 @@ pub struct AccountUsageSummary {
     pub credits: f64,
     #[serde(rename = "features")]
     pub features: Vec<AccountUsageFeature>,
+    #[serde(rename = "days")]
+    pub days: Vec<AccountUsageSummaryDaysItem>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -3711,6 +4253,10 @@ pub enum AccountUsageSummaryGetInputGroupBy {
     Product,
     #[serde(rename = "channel")]
     Channel,
+    #[serde(rename = "agent")]
+    Agent,
+    #[serde(rename = "campaign")]
+    Campaign,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, serde::Serialize, serde::Deserialize)]
@@ -3718,12 +4264,15 @@ pub struct AccountUsageSummaryGetInput {
     /// Start of the range; the current month by default.
     #[serde(rename = "from", default, skip_serializing_if = "Option::is_none")]
     pub from: Option<String>,
-    /// End of the range; now by default.
+    /// End of the range; now by default. At most 366 days after `from`.
     #[serde(rename = "to", default, skip_serializing_if = "Option::is_none")]
     pub to: Option<String>,
     /// Breaks each feature down; by product by default.
     #[serde(rename = "groupBy", default, skip_serializing_if = "Option::is_none")]
     pub group_by: Option<AccountUsageSummaryGetInputGroupBy>,
+    /// An IANA time zone (`America/Bogota`) that days and the default month follow; UTC by default.
+    #[serde(rename = "timezone", default, skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<String>,
 }
 
 pub type AccountUsageSummaryGetOutput = AccountUsageSummary;
@@ -3755,7 +4304,7 @@ pub struct AccountWalletTopUp {
     /// `paid`: the saved card was charged and the credits are in the wallet; `checkout`: pay on `checkoutUrl`.
     #[serde(rename = "status")]
     pub status: AccountWalletTopUpStatus,
-    /// Stripe's page to pay on, for `checkout`.
+    /// The payment processor's page to pay on, for `checkout`.
     #[serde(rename = "checkoutUrl")]
     pub checkout_url: Option<String>,
 }
@@ -3789,6 +4338,10 @@ pub enum AccountWalletTransactionKind {
     Usage,
     #[serde(rename = "top_up")]
     TopUp,
+    #[serde(rename = "transfer")]
+    Transfer,
+    #[serde(rename = "grant")]
+    Grant,
     #[serde(rename = "plan")]
     Plan,
     #[serde(rename = "reset")]
@@ -3797,13 +4350,42 @@ pub enum AccountWalletTransactionKind {
     Adjustment,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountWalletTransactionGrantKind {
+    #[serde(rename = "promo")]
+    Promo,
+    #[serde(rename = "subsidy")]
+    Subsidy,
+    #[serde(rename = "courtesy")]
+    Courtesy,
+    #[serde(rename = "correction")]
+    Correction,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum AccountWalletTransactionFunding {
+    #[serde(rename = "paid")]
+    Paid,
+    #[serde(rename = "granted")]
+    Granted,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct AccountWalletTransaction {
     #[serde(rename = "id")]
     pub id: String,
-    /// `usage`: credits spent, one entry per UTC day; `top_up`: credits bought; `plan`: a plan's grant or change; `reset`: the plan's period renewed; `adjustment`: a change Arbol made.
+    /// `usage`: credits spent, one entry per UTC day; `top_up`: credits bought by card; `transfer`: credits paid by bank transfer, which Arbol recorded; `grant`: credits Arbol gave, named by `label`; `plan`: a plan's grant or change; `reset`: the plan's period renewed; `adjustment`: another change Arbol made.
     #[serde(rename = "kind")]
     pub kind: AccountWalletTransactionKind,
+    /// The name Arbol gave a grant or a transfer ("Arbol promo", "Bank transfer").
+    #[serde(rename = "label")]
+    pub label: Option<String>,
+    /// For a `grant`, what Arbol gave it as; its name when `label` is null.
+    #[serde(rename = "grantKind")]
+    pub grant_kind: Option<AccountWalletTransactionGrantKind>,
+    /// `paid`: money came in; `granted`: Arbol gave the credits; null for spending and renewals.
+    #[serde(rename = "funding")]
+    pub funding: Option<AccountWalletTransactionFunding>,
     /// When it happened; for a day of usage, its first use.
     #[serde(rename = "occurredAt")]
     pub occurred_at: String,
@@ -3813,13 +4395,13 @@ pub struct AccountWalletTransaction {
     /// For usage, how many reports it groups.
     #[serde(rename = "count")]
     pub count: Option<i64>,
-    /// Credits it added (positive) or took (negative); null when Autumn could not tell.
+    /// Credits it added (positive) or took (negative); null when billing could not tell.
     #[serde(rename = "amount")]
     pub amount: Option<f64>,
     /// Credits left right after it.
     #[serde(rename = "balanceAfter")]
     pub balance_after: Option<f64>,
-    /// Its amounts are Autumn’s estimate, not an exact record.
+    /// Its amounts are an estimate, not an exact record.
     #[serde(rename = "approximate")]
     pub approximate: bool,
 }
@@ -73071,7 +73653,7 @@ pub struct RaizCampaign {
     pub version: i64,
     #[serde(rename = "waitingUntilAt")]
     pub waiting_until_at: Option<String>,
-    /// Whether the campaign can start, checked against its Agent, line, template and recipients without reaching anyone. Present only when expanded.
+    /// Whether the campaign can start, checked against its Agent, line, template, recipients and the organization's balance without reaching anyone. Present only when expanded.
     #[serde(rename = "readiness", default, skip_serializing_if = "Option::is_none")]
     pub readiness: Option<RaizCampaignReadiness>,
     /// The campaign's recipients in the order they were added, each with its latest attempt. Present only when expanded.
@@ -73110,12 +73692,42 @@ pub struct RaizCampaignBlocker {
     /// The recipient it is about, when it is one.
     #[serde(rename = "address", default, skip_serializing_if = "Option::is_none")]
     pub address: Option<String>,
-    /// The error `startCampaign` would refuse with: `CAMPAIGN_AGENT_NOT_READY`, `CAMPAIGN_NO_RECIPIENTS`, `CAMPAIGN_VARIABLE_MISSING`, `CHANNEL_NOT_READY`, a `TEMPLATE_*` code, `UPSTREAM_UNAVAILABLE` or `VOICE_AGENT_NOT_READY`.
+    /// The error `startCampaign` would refuse with: `CAMPAIGN_AGENT_NOT_READY`, `CAMPAIGN_NO_RECIPIENTS`, `CAMPAIGN_VARIABLE_MISSING`, `CHANNEL_NOT_READY`, `CREDITS_EXHAUSTED` (see `estimate`), a `TEMPLATE_*` code, `UPSTREAM_UNAVAILABLE` or `VOICE_AGENT_NOT_READY`.
     #[serde(rename = "code")]
     pub code: String,
     /// The variable it lacks, when it is one.
     #[serde(rename = "variable", default, skip_serializing_if = "Option::is_none")]
     pub variable: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignEstimateCallMinutes {
+    /// How many of those calls the figure comes from.
+    #[serde(rename = "calls")]
+    pub calls: i64,
+    /// Minutes billed per call on average, a call nobody answered counting zero.
+    #[serde(rename = "perCall")]
+    pub per_call: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCampaignEstimate {
+    #[serde(rename = "callMinutes")]
+    pub call_minutes: Option<RaizCampaignEstimateCallMinutes>,
+    /// Whether the organization's balance covers `credits`, or the organization is never stopped at zero, as billing answers it now. True when nothing was counted, or billing did not answer (`degraded`).
+    #[serde(rename = "covered")]
+    pub covered: bool,
+    #[serde(rename = "credits")]
+    pub credits: Option<f64>,
+    /// Billing did not answer in time: `credits` may be null, and `covered` is assumed.
+    #[serde(rename = "degraded")]
+    pub degraded: bool,
+    /// Whether a balance that does not cover what is used stops this organization's work now. When it does and `covered` is false, the campaign cannot start (`CREDITS_EXHAUSTED`); while it does not, it starts anyway. False when nothing was counted.
+    #[serde(rename = "enforced")]
+    pub enforced: bool,
+    /// The recipients still to be reached, each counted once.
+    #[serde(rename = "people")]
+    pub people: i64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -73282,6 +73894,9 @@ pub struct RaizCampaignReadiness {
     /// What has to be fixed first. Empty when it can start.
     #[serde(rename = "blockers")]
     pub blockers: Vec<RaizCampaignBlocker>,
+    /// What reaching each pending recipient once would cost, checked against the organization's balance without reaching anyone.
+    #[serde(rename = "estimate")]
+    pub estimate: RaizCampaignEstimate,
     #[serde(rename = "preview")]
     pub preview: Option<String>,
     /// Whether `startCampaign` would accept it now.
@@ -75947,6 +76562,9 @@ pub struct RaizConversation {
     pub workers: Vec<RaizConversationWorker>,
     #[serde(rename = "toolCalls")]
     pub tool_calls: RaizConversationToolCalls,
+    /// What the conversation used, as billing valued it. What an integration charged for a tool the Agent ran is part of `tools` once billing hands it over, which it does when the integration names the conversation in its report.
+    #[serde(rename = "usage")]
+    pub usage: RaizConversationUsage,
     #[serde(rename = "outcomeReview", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub outcome_review: Option<Option<RaizConversationOutcomeReview>>,
     #[serde(rename = "analysisErrorCode")]
@@ -76296,6 +76914,49 @@ pub struct RaizConversationToolFailure {
     pub error_message: Option<String>,
     #[serde(rename = "toolName")]
     pub tool_name: String,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationUsage {
+    #[serde(rename = "credits")]
+    pub credits: Option<f64>,
+    #[serde(rename = "items")]
+    pub items: Vec<RaizConversationUsageItem>,
+    /// Part of the usage is still waiting for its value in credits.
+    #[serde(rename = "pending")]
+    pub pending: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizConversationUsageItemKind {
+    #[serde(rename = "voice")]
+    Voice,
+    #[serde(rename = "phone_line")]
+    PhoneLine,
+    #[serde(rename = "phone_numbers")]
+    PhoneNumbers,
+    #[serde(rename = "messages")]
+    Messages,
+    #[serde(rename = "templates")]
+    Templates,
+    #[serde(rename = "conversations")]
+    Conversations,
+    #[serde(rename = "tools")]
+    Tools,
+    #[serde(rename = "ai")]
+    Ai,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizConversationUsageItem {
+    #[serde(rename = "credits")]
+    pub credits: Option<f64>,
+    /// `voice`: minutes of the voice Agent, rounded up per call. `phone_line`: minutes of the phone line; its credits include what the line was charged when the plan bills it apart. `phone_numbers`: a number's month. `messages`: WhatsApp messages, in and out. `templates`: WhatsApp templates sent. `conversations`: WhatsApp conversations started. `tools`: integration tools the Agent ran; its credits include what an integration charged for a run, once billing hands that over. `ai`: model calls.
+    #[serde(rename = "kind")]
+    pub kind: RaizConversationUsageItemKind,
+    /// How much of it: minutes, messages, templates, conversations, tool runs or model calls.
+    #[serde(rename = "units")]
+    pub units: f64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -80023,6 +80684,44 @@ pub struct RaizCreateWhatsAppTestSessionTooManyRequestsError {
 pub enum RaizCreateWhatsAppTestSessionTooManyRequestsFailure {
     RateLimitedFailure(RateLimitedFailure),
     RaizWhatsappRateLimitedFailure(RaizWhatsappRateLimitedFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCreditsExhaustedError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    /// The organization's credits do not cover this, so nothing was started. Try again once the organization adds credits.
+    #[serde(rename = "error")]
+    pub error: RaizCreditsExhaustedFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizCreditsExhaustedFailureCode {
+    #[serde(rename = "CREDITS_EXHAUSTED")]
+    CREDITSEXHAUSTED,
+}
+
+/// The organization's credits do not cover this, so nothing was started. Try again once the organization adds credits.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizCreditsExhaustedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: RaizCreditsExhaustedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
 }
 
 /// A failed answer.
@@ -84463,6 +85162,8 @@ pub enum RaizOrganizationSettingsProductNoticesEventsItem {
     ChannelQuality,
     #[serde(rename = "channel-restored")]
     ChannelRestored,
+    #[serde(rename = "credits-exhausted")]
+    CreditsExhausted,
     #[serde(rename = "import-finished")]
     ImportFinished,
     #[serde(rename = "knowledge-failed")]
@@ -84679,6 +85380,8 @@ pub enum RaizOrganizationUpdateInputSettingsProductNoticesEventsItem {
     ChannelQuality,
     #[serde(rename = "channel-restored")]
     ChannelRestored,
+    #[serde(rename = "credits-exhausted")]
+    CreditsExhausted,
     #[serde(rename = "import-finished")]
     ImportFinished,
     #[serde(rename = "knowledge-failed")]
@@ -86019,6 +86722,107 @@ pub struct RaizReportCampaignProgress {
     pub rows: Vec<RaizReportCampaignProgressRowsItem>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizReportUsageDailyName {
+    #[serde(rename = "usage_daily")]
+    UsageDaily,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizReportUsageDailyRowsItemChannelType {
+    #[serde(rename = "voice")]
+    Voice,
+    #[serde(rename = "whatsapp")]
+    Whatsapp,
+    #[serde(rename = "web")]
+    Web,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizReportUsageDailyRowsItemKind {
+    #[serde(rename = "voice")]
+    Voice,
+    #[serde(rename = "phone_line")]
+    PhoneLine,
+    #[serde(rename = "phone_numbers")]
+    PhoneNumbers,
+    #[serde(rename = "messages")]
+    Messages,
+    #[serde(rename = "templates")]
+    Templates,
+    #[serde(rename = "conversations")]
+    Conversations,
+    #[serde(rename = "tools")]
+    Tools,
+    #[serde(rename = "ai")]
+    Ai,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum RaizReportUsageDailyRowsItemModel {
+    #[serde(rename = "arbolito/agile")]
+    ArbolitoAgile,
+    #[serde(rename = "arbolito/balanced")]
+    ArbolitoBalanced,
+    #[serde(rename = "arbolito/advanced")]
+    ArbolitoAdvanced,
+    #[serde(rename = "arbolito/top")]
+    ArbolitoTop,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizReportUsageDailyRowsItem {
+    #[serde(rename = "agentId")]
+    pub agent_id: Option<String>,
+    #[serde(rename = "agentName")]
+    pub agent_name: Option<String>,
+    #[serde(rename = "cacheReadTokens")]
+    pub cache_read_tokens: i64,
+    #[serde(rename = "cacheWriteTokens")]
+    pub cache_write_tokens: i64,
+    #[serde(rename = "campaignId")]
+    pub campaign_id: Option<String>,
+    #[serde(rename = "channelType")]
+    pub channel_type: Option<RaizReportUsageDailyRowsItemChannelType>,
+    #[serde(rename = "credits")]
+    pub credits: Option<f64>,
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "day")]
+    pub day: String,
+    #[serde(rename = "inputTokens")]
+    pub input_tokens: i64,
+    /// `voice`: minutes of the voice Agent, rounded up per call. `phone_line`: minutes of the phone line; its credits include what the line was charged when the plan bills it apart. `phone_numbers`: a number's month. `messages`: WhatsApp messages, in and out. `templates`: WhatsApp templates sent. `conversations`: WhatsApp conversations started. `tools`: integration tools the Agent ran; its credits include what an integration charged for a run, once billing hands that over. `ai`: model calls.
+    #[serde(rename = "kind")]
+    pub kind: RaizReportUsageDailyRowsItemKind,
+    #[serde(rename = "model")]
+    pub model: Option<RaizReportUsageDailyRowsItemModel>,
+    #[serde(rename = "outputTokens")]
+    pub output_tokens: i64,
+    /// Parts still waiting for their value in credits.
+    #[serde(rename = "pendingCount")]
+    pub pending_count: i64,
+    /// Minutes, messages, templates, conversations, numbers, tool runs or model calls.
+    #[serde(rename = "units")]
+    pub units: f64,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct RaizReportUsageDaily {
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "from")]
+    pub from: String,
+    /// More than 1000 rows matched: narrow the range or the filters.
+    #[serde(rename = "hasMore")]
+    pub has_more: bool,
+    /// A calendar day in the organization's time zone.
+    #[serde(rename = "to")]
+    pub to: String,
+    #[serde(rename = "name")]
+    pub name: RaizReportUsageDailyName,
+    #[serde(rename = "rows")]
+    pub rows: Vec<RaizReportUsageDailyRowsItem>,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
 pub enum RaizReport {
@@ -86031,6 +86835,7 @@ pub enum RaizReport {
     BookingDetails(RaizReportBookingDetails),
     AssessmentResultsDaily(RaizReportAssessmentResultsDaily),
     CampaignProgress(RaizReportCampaignProgress),
+    UsageDaily(RaizReportUsageDaily),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
@@ -86123,6 +86928,8 @@ pub enum RaizReportsGetInputName {
     AssessmentResultsDaily,
     #[serde(rename = "campaign_progress")]
     CampaignProgress,
+    #[serde(rename = "usage_daily")]
+    UsageDaily,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
@@ -86145,7 +86952,7 @@ pub struct RaizReportsGetInput {
     /// First day (`YYYY-MM-DD`) of a daily report. Default: 30 days ending on `to`.
     #[serde(rename = "from", default, skip_serializing_if = "Option::is_none")]
     pub from: Option<String>,
-    /// `conversations_daily`: conversations the AI took part in per day, Agent, channel type and direction, with outcomes and escalations (filters `agentId`, `channelType`). `handoffs_daily`: the conversations the AI handed to the team, per day of the handoff, Agent and person (who answered first, else the case's owner), with how many were answered, answered in time, still waiting, closed unattended or returned to the AI, and the average seconds to the first answer (filter `agentId`). `booking_details`: individual patients and appointments from explicit successful creation receipts, including specialty, paired exams, deduplication, matched patient names and later recorded cancellations; filters agentId and specialty; requires conversation read/write permission too. Historical receipts with created=true, not current provider status or all provider protocols. unverifiedCount covers explicit creations missing a stable patient/slot. `booking_outcomes`: verified saved booking receipts per completion day, Agent and integration, excluding test/import/deleted conversations; confirmed new bookings, reschedules, cancellations, failed, pending, unverified and duplicate receipts separately (filter `agentId`). Historical evidence, not current appointment status; hasMore requires splitting the range and returns no partial totals. `tool_calls_daily`: tool calls per day, Agent and tool with failures/durations (filter `agentId`). `tool_calls`: individual calls, never inputs/outputs (filter `agentId`). `assessment_results_daily`: assessments per day/definition (filter `definitionId`). `pqrsf_daily`: classification, confirmed resolution and referral-link counts from the pqrsf_* definitions, including pending/unclassified conversations, excluding tests/imports/deleted records (filters `agentId`, `channelType`); no measured filing reduction is inferred. `campaign_progress`: recipients by status (filter `campaignId`; no dates).
+    /// `conversations_daily`: conversations the AI took part in per day, Agent, channel type and direction, with outcomes and escalations (filters `agentId`, `channelType`). `handoffs_daily`: the conversations the AI handed to the team, per day of the handoff, Agent and person (who answered first, else the case's owner), with how many were answered, answered in time, still waiting, closed unattended or returned to the AI, and the average seconds to the first answer (filter `agentId`). `booking_details`: individual patients and appointments from explicit successful creation receipts, including specialty, paired exams, deduplication, matched patient names and later recorded cancellations; filters agentId and specialty; requires conversation read/write permission too. Historical receipts with created=true, not current provider status or all provider protocols. unverifiedCount covers explicit creations missing a stable patient/slot. `booking_outcomes`: verified saved booking receipts per completion day, Agent and integration, excluding test/import/deleted conversations; confirmed new bookings, reschedules, cancellations, failed, pending, unverified and duplicate receipts separately (filter `agentId`). Historical evidence, not current appointment status; hasMore requires splitting the range and returns no partial totals. `tool_calls_daily`: tool calls per day, Agent and tool with failures/durations (filter `agentId`). `tool_calls`: individual calls, never inputs/outputs (filter `agentId`). `assessment_results_daily`: assessments per day/definition (filter `definitionId`). `pqrsf_daily`: classification, confirmed resolution and referral-link counts from the pqrsf_* definitions, including pending/unclassified conversations, excluding tests/imports/deleted records (filters `agentId`, `channelType`); no measured filing reduction is inferred. `campaign_progress`: recipients by status (filter `campaignId`; no dates). `usage_daily`: what was used per day, Agent, channel type, campaign and kind, with its credits at the organization's rates and, for AI, the model tier and its tokens (filters `agentId`, `channelType`, `campaignId`); test conversations count like any other.
     #[serde(rename = "name")]
     pub name: RaizReportsGetInputName,
     /// Last day (`YYYY-MM-DD`), inclusive, of a daily report. Default: today in the organization's time zone.
@@ -89135,6 +89942,8 @@ pub enum RaizUpdateOrganizationBodySettingsProductNoticesEventsItem {
     ChannelQuality,
     #[serde(rename = "channel-restored")]
     ChannelRestored,
+    #[serde(rename = "credits-exhausted")]
+    CreditsExhausted,
     #[serde(rename = "import-finished")]
     ImportFinished,
     #[serde(rename = "knowledge-failed")]
@@ -93083,6 +93892,7 @@ pub struct SanitasGetConnectionServiceUnavailableError {
 pub enum SanitasGetConnectionServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SanitasProviderUnavailableFailure(SanitasProviderUnavailableFailure),
+    SanitasProviderAccessDeniedFailure(SanitasProviderAccessDeniedFailure),
     SanitasProviderChallengeRequiredFailure(SanitasProviderChallengeRequiredFailure),
 }
 
@@ -93273,6 +94083,7 @@ pub struct SanitasLookupAffiliationServiceUnavailableError {
 pub enum SanitasLookupAffiliationServiceUnavailableFailure {
     UpstreamUnavailableFailure(UpstreamUnavailableFailure),
     SanitasProviderUnavailableFailure(SanitasProviderUnavailableFailure),
+    SanitasProviderAccessDeniedFailure(SanitasProviderAccessDeniedFailure),
     SanitasProviderChallengeRequiredFailure(SanitasProviderChallengeRequiredFailure),
 }
 
@@ -93309,6 +94120,29 @@ pub struct SanitasPatientUnresolvedFailure {
     /// The failure code, stable across releases.
     #[serde(rename = "code")]
     pub code: SanitasPatientUnresolvedFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum SanitasProviderAccessDeniedFailureCode {
+    #[serde(rename = "PROVIDER_ACCESS_DENIED")]
+    PROVIDERACCESSDENIED,
+}
+
+/// Sanitas denied the validator request. Coverage is unknown.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct SanitasProviderAccessDeniedFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: SanitasProviderAccessDeniedFailureCode,
     /// What went wrong, for people; it never contains input values.
     #[serde(rename = "message")]
     pub message: String,

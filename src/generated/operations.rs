@@ -2,7 +2,7 @@
 use crate::{Effect, Operation, QueryKind};
 
 /// The platform release these operations come from.
-pub const RELEASE: &str = "1.20261119.71101";
+pub const RELEASE: &str = "1.20261120.15943";
 
 /// `account.apiKeys.create`: Create an API key
 pub const ACCOUNT_API_KEYS_CREATE: Operation = Operation {
@@ -56,6 +56,17 @@ pub const ACCOUNT_BILLING_GET: Operation = Operation {
     path_field: None,
     query: Some(&[]),
     effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.billing.update`: Change the automatic top-up and the low-balance alert
+pub const ACCOUNT_BILLING_UPDATE: Operation = Operation {
+    name: "account.billing.update",
+    method: "PATCH",
+    path: "/v1/account/billing",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
     max_output_bytes: 262144,
 };
 
@@ -130,6 +141,17 @@ pub const ACCOUNT_INVITATIONS_LIST: Operation = Operation {
     name: "account.invitations.list",
     method: "GET",
     path: "/v1/account/invitations",
+    path_field: None,
+    query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
+    effect: Effect::Read,
+    max_output_bytes: 262144,
+};
+
+/// `account.invoices.list`: List invoices
+pub const ACCOUNT_INVOICES_LIST: Operation = Operation {
+    name: "account.invoices.list",
+    method: "GET",
+    path: "/v1/account/invoices",
     path_field: None,
     query: Some(&[("cursor", QueryKind::String), ("direction", QueryKind::String), ("limit", QueryKind::Integer)]),
     effect: Effect::Read,
@@ -213,6 +235,17 @@ pub const ACCOUNT_ORGANIZATIONS_LIST: Operation = Operation {
     max_output_bytes: 262144,
 };
 
+/// `account.paymentMethodSetups.create`: Add or change the card
+pub const ACCOUNT_PAYMENT_METHOD_SETUPS_CREATE: Operation = Operation {
+    name: "account.paymentMethodSetups.create",
+    method: "POST",
+    path: "/v1/account/payment-method-setups",
+    path_field: None,
+    query: None,
+    effect: Effect::Write,
+    max_output_bytes: 262144,
+};
+
 /// `account.permissions.list`: List the platform permissions
 pub const ACCOUNT_PERMISSIONS_LIST: Operation = Operation {
     name: "account.permissions.list",
@@ -274,7 +307,7 @@ pub const ACCOUNT_USAGE_SUMMARY_GET: Operation = Operation {
     method: "GET",
     path: "/v1/account/usage-summary",
     path_field: None,
-    query: Some(&[("from", QueryKind::String), ("to", QueryKind::String), ("groupBy", QueryKind::String)]),
+    query: Some(&[("from", QueryKind::String), ("to", QueryKind::String), ("groupBy", QueryKind::String), ("timezone", QueryKind::String)]),
     effect: Effect::Read,
     max_output_bytes: 262144,
 };

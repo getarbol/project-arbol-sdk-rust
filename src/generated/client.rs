@@ -119,9 +119,16 @@ pub struct AccountBillingApi<'a>(&'a Client);
 impl<'a> AccountBillingApi<'a> {
     /// Get billing
     ///
-    /// The organization's wallet in credits (one credit is one US dollar): credits left, granted and spent in the current period, whether running out stops service, its plans and the card a top-up charges.
+    /// The organization's wallet in credits (one credit is one US dollar): credits left, granted and spent in the current period, whether running out stops service, its plans, the card a top-up charges, how much it has topped up, the credits Arbol gave that are still in force, and its plan's allowances.
     pub async fn get(&self, input: &types::AccountBillingGetInput) -> Result<types::AccountBillingGetOutput, Error> {
         self.0.call(&operations::ACCOUNT_BILLING_GET, input).await
+    }
+
+    /// Change the automatic top-up and the low-balance alert
+    ///
+    /// Turns the automatic top-up on or off (the balance that triggers it, the credits it buys with the saved card, the most times a month) and sets the balance at which the organization's administrators are emailed.
+    pub async fn update(&self, input: &types::AccountBillingUpdateInput) -> Result<types::AccountBillingUpdateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_BILLING_UPDATE, input).await
     }
 }
 
@@ -132,7 +139,7 @@ pub struct AccountBillingPortalSessionsApi<'a>(&'a Client);
 impl<'a> AccountBillingPortalSessionsApi<'a> {
     /// Open the card portal
     ///
-    /// A session of Stripe's portal, where the organization's people change its saved card and download its card receipts.
+    /// A session of the payment processor's portal, where the organization's people change its saved card and download its card receipts.
     pub async fn create(&self, input: &types::AccountBillingPortalSessionsCreateInput) -> Result<types::AccountBillingPortalSessionsCreateOutput, Error> {
         self.0.call(&operations::ACCOUNT_BILLING_PORTAL_SESSIONS_CREATE, input).await
     }
@@ -178,7 +185,7 @@ pub struct AccountInvitationsApi<'a>(&'a Client);
 impl<'a> AccountInvitationsApi<'a> {
     /// Invite someone to a product
     ///
-    /// Invites someone without an Arbol account by email with a role in Raíz, Agenda, Ámbar or Account. The invitation email comes from the product's own application. Existing accounts receive access with `members.create` and sign in with their current password.
+    /// Invites someone without an Arbol account by email with a role in Raíz, Agenda, Ámbar or Account. The invitation email comes from the product's own application. Existing accounts receive access with `members.create` and sign in with their current password. A new Agenda seat the organization's wallet cannot pay is refused with INSUFFICIENT_CREDITS once billing stops service at zero.
     pub async fn create(&self, input: &types::AccountInvitationsCreateInput) -> Result<types::AccountInvitationsCreateOutput, Error> {
         self.0.call(&operations::ACCOUNT_INVITATIONS_CREATE, input).await
     }
@@ -198,6 +205,19 @@ impl<'a> AccountInvitationsApi<'a> {
     }
 }
 
+/// `account.invoices`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountInvoicesApi<'a>(&'a Client);
+
+impl<'a> AccountInvoicesApi<'a> {
+    /// List invoices
+    ///
+    /// The organization's invoices in one list, newest first: those the payment processor generated, each with its own page, and those Arbol issued and uploaded, each with its files. One page: the most recent `limit`.
+    pub async fn list(&self, input: &types::AccountInvoicesListInput) -> Result<types::AccountInvoicesListOutput, Error> {
+        self.0.call(&operations::ACCOUNT_INVOICES_LIST, input).await
+    }
+}
+
 /// `account.members`
 #[derive(Debug, Clone, Copy)]
 pub struct AccountMembersApi<'a>(&'a Client);
@@ -205,7 +225,7 @@ pub struct AccountMembersApi<'a>(&'a Client);
 impl<'a> AccountMembersApi<'a> {
     /// Give a member a role in a product
     ///
-    /// Gives someone with an existing Arbol account a role in Raíz, Agenda, Ámbar or Account, joining them to this organization when needed. They sign in with their current password. Someone without an account is invited with `invitations.create`.
+    /// Gives someone with an existing Arbol account a role in Raíz, Agenda, Ámbar or Account, joining them to this organization when needed. They sign in with their current password. Someone without an account is invited with `invitations.create`. A new Agenda seat the organization's wallet cannot pay is refused with INSUFFICIENT_CREDITS once billing stops service at zero.
     pub async fn create(&self, input: &types::AccountMembersCreateInput) -> Result<types::AccountMembersCreateOutput, Error> {
         self.0.call(&operations::ACCOUNT_MEMBERS_CREATE, input).await
     }
@@ -226,7 +246,7 @@ impl<'a> AccountMembersApi<'a> {
 
     /// Change someone's role in a product
     ///
-    /// Sets a member's role in Raíz, Agenda, Ámbar or Account, or removes their access to that product with null. Their other roles stay.
+    /// Sets a member's role in Raíz, Agenda, Ámbar or Account, or removes their access to that product with null. Their other roles stay. A new Agenda seat the organization's wallet cannot pay is refused with INSUFFICIENT_CREDITS once billing stops service at zero.
     pub async fn update(&self, input: &types::AccountMembersUpdateInput) -> Result<types::AccountMembersUpdateOutput, Error> {
         self.0.call(&operations::ACCOUNT_MEMBERS_UPDATE, input).await
     }
@@ -262,6 +282,19 @@ impl<'a> AccountOrganizationsApi<'a> {
     /// The organizations the signed-in person belongs to, to switch between them.
     pub async fn list(&self, input: &types::AccountOrganizationsListInput) -> Result<types::AccountOrganizationsListOutput, Error> {
         self.0.call(&operations::ACCOUNT_ORGANIZATIONS_LIST, input).await
+    }
+}
+
+/// `account.paymentMethodSetups`
+#[derive(Debug, Clone, Copy)]
+pub struct AccountPaymentMethodSetupsApi<'a>(&'a Client);
+
+impl<'a> AccountPaymentMethodSetupsApi<'a> {
+    /// Add or change the card
+    ///
+    /// A page of the payment processor to add or change the organization's card without buying anything; the card becomes the one top-ups charge, and the person comes back to the Payment page.
+    pub async fn create(&self, input: &types::AccountPaymentMethodSetupsCreateInput) -> Result<types::AccountPaymentMethodSetupsCreateOutput, Error> {
+        self.0.call(&operations::ACCOUNT_PAYMENT_METHOD_SETUPS_CREATE, input).await
     }
 }
 
@@ -331,7 +364,7 @@ pub struct AccountUsageSummaryApi<'a>(&'a Client);
 impl<'a> AccountUsageSummaryApi<'a> {
     /// Get the usage summary
     ///
-    /// What the organization used in a range, the current month by default: each metered feature in its own units (minutes, conversations, lookups…), broken down by product or channel, and the credits its wallet paid.
+    /// What the organization used in a range (the current month by default, at most 366 days): each metered feature in its own units (minutes, conversations, lookups…) and its value in credits at the organization's own rates, broken down by product, channel, Agent or campaign, a series by day in the organization's time zone, and the credits its wallet paid.
     pub async fn get(&self, input: &types::AccountUsageSummaryGetInput) -> Result<types::AccountUsageSummaryGetOutput, Error> {
         self.0.call(&operations::ACCOUNT_USAGE_SUMMARY_GET, input).await
     }
@@ -344,7 +377,7 @@ pub struct AccountWalletTopUpsApi<'a>(&'a Client);
 impl<'a> AccountWalletTopUpsApi<'a> {
     /// Top up the wallet
     ///
-    /// Buys credits at one US dollar each. The organization's saved card is charged at once; without one, or when the bank asks to confirm, the answer is Stripe's page to pay on. Never repeated on its own: a lost answer is OUTCOME_UNKNOWN, and the wallet's transactions say whether it was paid.
+    /// Buys credits at one US dollar each. The organization's saved card is charged at once; without one, or when the bank asks to confirm, the answer is the payment processor's page to pay on. Never repeated on its own: a lost answer is OUTCOME_UNKNOWN, and the wallet's transactions say whether it was paid.
     pub async fn create(&self, input: &types::AccountWalletTopUpsCreateInput) -> Result<types::AccountWalletTopUpsCreateOutput, Error> {
         self.0.call(&operations::ACCOUNT_WALLET_TOP_UPS_CREATE, input).await
     }
@@ -357,7 +390,7 @@ pub struct AccountWalletTransactionsApi<'a>(&'a Client);
 impl<'a> AccountWalletTransactionsApi<'a> {
     /// List wallet transactions
     ///
-    /// What moved the organization's wallet, newest first: top-ups, plan grants and renewals, adjustments Arbol made, and the credits spent, one entry per UTC day, each with the balance right after it. Listed forward only.
+    /// What moved the organization's wallet, newest first: top-ups, transfers, credits Arbol gave (by name), plan grants and renewals, adjustments, and the credits spent, one entry per UTC day, each with whether it was paid or granted and the balance right after it. Listed forward only.
     pub async fn list(&self, input: &types::AccountWalletTransactionsListInput) -> Result<types::AccountWalletTransactionsListOutput, Error> {
         self.0.call(&operations::ACCOUNT_WALLET_TRANSACTIONS_LIST, input).await
     }
@@ -392,6 +425,10 @@ impl<'a> AccountApi<'a> {
         AccountInvitationsApi(self.0)
     }
 
+    pub fn invoices(&self) -> AccountInvoicesApi<'a> {
+        AccountInvoicesApi(self.0)
+    }
+
     pub fn members(&self) -> AccountMembersApi<'a> {
         AccountMembersApi(self.0)
     }
@@ -402,6 +439,10 @@ impl<'a> AccountApi<'a> {
 
     pub fn organizations(&self) -> AccountOrganizationsApi<'a> {
         AccountOrganizationsApi(self.0)
+    }
+
+    pub fn payment_method_setups(&self) -> AccountPaymentMethodSetupsApi<'a> {
+        AccountPaymentMethodSetupsApi(self.0)
     }
 
     pub fn permissions(&self) -> AccountPermissionsApi<'a> {
@@ -2162,7 +2203,7 @@ impl<'a> RaizCampaignsApi<'a> {
 
     /// Get a campaign
     ///
-    /// Read one campaign: Agent, schedule, contact hours, retries, progress and, in `errorCode`, why it cannot reach anyone now. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call or message; continue with `recipientsCursor` (`recipientsDirection` reads the other way). `expand=readiness` says whether it can start and lists what has to be fixed first, without reaching anyone. `expand=results` counts what people answered, by the Agent's data definitions with options; each recipient also says their own. Read it before `update_campaign` and send `expectedVersion`.
+    /// Read one campaign: Agent, schedule, contact hours, retries, progress and, in `errorCode`, why it cannot reach anyone now. `expand=recipients` adds its recipients in the order they were added, each with attempts, next attempt, error and latest call or message; continue with `recipientsCursor` (`recipientsDirection` reads the other way). `expand=readiness` says whether it can start, lists what has to be fixed first and estimates what reaching each pending recipient once would cost in credits against the organization's balance (`estimate`), without reaching anyone. `expand=results` counts what people answered, by the Agent's data definitions with options; each recipient also says their own. Read it before `update_campaign` and send `expectedVersion`.
     pub async fn get(&self, input: &types::RaizCampaignsGetInput) -> Result<types::RaizCampaignsGetOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_GET, input).await
     }
@@ -2176,7 +2217,7 @@ impl<'a> RaizCampaignsApi<'a> {
 
     /// Start a campaign
     ///
-    /// Start reaching people: from now on the campaign's due recipients are called, at most `settings.channels.maxConcurrentOutboundCalls` (five by default) at once across the organization, or sent their message, a few a second. A call campaign needs an active, published voice Agent (VOICE_AGENT_NOT_READY). A WhatsApp campaign needs an active text Agent (CAMPAIGN_AGENT_NOT_READY), a line that can send (CHANNEL_NOT_READY), an approved template whose parameters fit (a `TEMPLATE_*` code), a value for every variable (CAMPAIGN_VARIABLE_MISSING) and, when the template's header is a document, image or video, the first pending recipient's own `header` file (CAMPAIGN_HEADER_MISSING). A recipient must be pending (CAMPAIGN_NO_RECIPIENTS). `get_campaign` with `expand=readiness` lists all of this beforehand. A campaign starts once: starting a running one changes nothing, and a paused one resumes with `update_campaign` and `paused: false`. Not an AI tool: it reaches real people.
+    /// Start reaching people: from now on the campaign's due recipients are called, at most `settings.channels.maxConcurrentOutboundCalls` (five by default) at once across the organization, or sent their message, a few a second. A call campaign needs an active, published voice Agent (VOICE_AGENT_NOT_READY). A WhatsApp campaign needs an active text Agent (CAMPAIGN_AGENT_NOT_READY), a line that can send (CHANNEL_NOT_READY), an approved template whose parameters fit (a `TEMPLATE_*` code), a value for every variable (CAMPAIGN_VARIABLE_MISSING) and, when the template's header is a document, image or video, the first pending recipient's own `header` file (CAMPAIGN_HEADER_MISSING). A recipient must be pending (CAMPAIGN_NO_RECIPIENTS). What reaching each pending recipient once would cost is checked against the organization's balance: when the balance does not cover it and billing stops the organization's work for that, it does not start (CREDITS_EXHAUSTED). `get_campaign` with `expand=readiness` lists all of this beforehand, with the estimate. A campaign starts once: starting a running one changes nothing, and a paused one resumes with `update_campaign` and `paused: false`. Not an AI tool: it reaches real people.
     pub async fn start(&self, input: &types::RaizCampaignsStartInput) -> Result<types::RaizCampaignsStartOutput, Error> {
         self.0.call(&operations::RAIZ_CAMPAIGNS_START, input).await
     }
