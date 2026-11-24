@@ -52119,6 +52119,29 @@ pub struct ForbiddenFailure {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicAgendaInactiveFailureCode {
+    #[serde(rename = "AGENDA_INACTIVE")]
+    AGENDAINACTIVE,
+}
+
+/// This agenda is inactive in gMedic. Do not offer or book it: choose an active agenda from list_agendas or refer the request to reception.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicAgendaInactiveFailure {
+    /// The failure code, stable across releases.
+    #[serde(rename = "code")]
+    pub code: GmedicAgendaInactiveFailureCode,
+    /// What went wrong, for people; it never contains input values.
+    #[serde(rename = "message")]
+    pub message: String,
+    /// Whether repeating the same request may succeed.
+    #[serde(rename = "retryable")]
+    pub retryable: serde_json::Value,
+    /// No fields.
+    #[serde(rename = "data")]
+    pub data: Empty,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum GmedicAgendaServicesListInputDirection {
     #[serde(rename = "forward")]
     Forward,
@@ -53460,6 +53483,7 @@ pub struct GmedicCreateAppointmentConflictError {
 pub enum GmedicCreateAppointmentConflictFailure {
     GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
     GmedicBookingColorRequiredFailure(GmedicBookingColorRequiredFailure),
+    GmedicAgendaInactiveFailure(GmedicAgendaInactiveFailure),
     GmedicBookingInProgressFailure(GmedicBookingInProgressFailure),
 }
 
@@ -55191,6 +55215,7 @@ pub struct GmedicListAvailabilityConflictError {
 pub enum GmedicListAvailabilityConflictFailure {
     GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
     GmedicBookingColorRequiredFailure(GmedicBookingColorRequiredFailure),
+    GmedicAgendaInactiveFailure(GmedicAgendaInactiveFailure),
 }
 
 /// A failed answer.
@@ -55256,6 +55281,27 @@ pub enum GmedicListAvailableDaysBadGatewayFailure {
     OutcomeUnknownFailure(OutcomeUnknownFailure),
     GmedicProviderAccessRejectedFailure(GmedicProviderAccessRejectedFailure),
     GmedicProviderResponseInvalidFailure(GmedicProviderResponseInvalidFailure),
+}
+
+/// A failed answer.
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct GmedicListAvailableDaysConflictError {
+    #[serde(rename = "success")]
+    pub success: serde_json::Value,
+    #[serde(rename = "data")]
+    pub data: serde_json::Value,
+    #[serde(rename = "error")]
+    pub error: GmedicListAvailableDaysConflictFailure,
+    /// What every answer carries besides its data or error.
+    #[serde(rename = "metadata")]
+    pub metadata: ResponseMetadata,
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(untagged)]
+pub enum GmedicListAvailableDaysConflictFailure {
+    GmedicNotConfiguredFailure(GmedicNotConfiguredFailure),
+    GmedicAgendaInactiveFailure(GmedicAgendaInactiveFailure),
 }
 
 /// A failed answer.
@@ -61727,7 +61773,7 @@ pub struct OficlinicAppointmentsCreateInputReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. A payer that requires authorization (requiresAuthorization in list_payers) is still booked without one, as the clinic's staff do; they complete it before the visit.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -61918,7 +61964,7 @@ pub struct OficlinicAppointmentsRescheduleInputReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. A payer that requires authorization (requiresAuthorization in list_payers) is still booked without one, as the clinic's staff do; they complete it before the visit.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -63095,7 +63141,7 @@ pub struct OficlinicCreateAppointmentBodyReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. A payer that requires authorization (requiresAuthorization in list_payers) is still booked without one, as the clinic's staff do; they complete it before the visit.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.
@@ -68197,7 +68243,7 @@ pub struct OficlinicRescheduleAppointmentBodyReferral {
     /// Sent as pProfeSol; empty when null.
     #[serde(rename = "requestingProfessionalId", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub requesting_professional_id: Option<Option<String>>,
-    /// Sent as pAutorizacion: the payer's authorization number; empty when null. The screen requires one only when the payer requires it (requiresAuthorization in list_payers): leaving it out then answers BOOKING_VALUE_UNRESOLVED.
+    /// Sent as pAutorizacion: the payer's authorization number; empty when null. A payer that requires authorization (requiresAuthorization in list_payers) is still booked without one, as the clinic's staff do; they complete it before the visit.
     #[serde(rename = "authorizationNumber", default, skip_serializing_if = "Option::is_none", with = "crate::nullable")]
     pub authorization_number: Option<Option<String>>,
     /// Sent as pSolicitudUsuario, 1 or 0: the booking screen's user-request checkbox, unchecked by default.

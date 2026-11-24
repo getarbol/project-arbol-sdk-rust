@@ -1141,7 +1141,7 @@ pub struct GmedicAgendasApi<'a>(&'a Client);
 impl<'a> GmedicAgendasApi<'a> {
     /// List agendas
     ///
-    /// Use the organization gMedic account. Read-only request; provider failures are never empty results.
+    /// Use the organization gMedic account. Read-only request; provider failures are never empty results. Agendas gMedic marks inactive (active: false) are left out, so they are never offered; agendas without that flag are kept. A page can hold fewer items than limit: follow nextCursor while hasNextPage is true.
     pub async fn list(&self, input: &types::GmedicAgendasListInput) -> Result<types::GmedicAgendasListOutput, Error> {
         self.0.call(&operations::GMEDIC_AGENDAS_LIST, input).await
     }
@@ -1154,7 +1154,7 @@ pub struct GmedicAppointmentsApi<'a>(&'a Client);
 impl<'a> GmedicAppointmentsApi<'a> {
     /// Create appointment
     ///
-    /// Create a patient appointment. For agents at clinics using colored booking windows, send bookingRoute with the verified payment route. The connector selects the appointment color and rechecks the entire interval. Reconcile unknown outcomes before repeating.
+    /// Create a patient appointment. For agents at clinics using colored booking windows, send bookingRoute with the verified payment route. The connector selects the appointment color and rechecks the entire interval. An agenda gMedic marks inactive is refused with AGENDA_INACTIVE before anything is written. Reconcile unknown outcomes before repeating.
     pub async fn create(&self, input: &types::GmedicAppointmentsCreateInput) -> Result<types::GmedicAppointmentsCreateOutput, Error> {
         self.0.call(&operations::GMEDIC_APPOINTMENTS_CREATE, input).await
     }
@@ -1181,7 +1181,7 @@ pub struct GmedicAvailabilityApi<'a>(&'a Client);
 impl<'a> GmedicAvailabilityApi<'a> {
     /// List availability
     ///
-    /// List available intervals. At clinics using colored booking windows, send the verified bookingRoute. Check the full duration within a returned interval and a compatible agenda.
+    /// List available intervals. At clinics using colored booking windows, send the verified bookingRoute. Check the full duration within a returned interval and a compatible agenda. An agenda gMedic marks inactive answers AGENDA_INACTIVE: do not offer it.
     pub async fn list(&self, input: &types::GmedicAvailabilityListInput) -> Result<types::GmedicAvailabilityListOutput, Error> {
         self.0.call(&operations::GMEDIC_AVAILABILITY_LIST, input).await
     }
@@ -1194,7 +1194,7 @@ pub struct GmedicAvailableDaysApi<'a>(&'a Client);
 impl<'a> GmedicAvailableDaysApi<'a> {
     /// List available days
     ///
-    /// Use the organization gMedic account. Read-only request; provider failures are never empty results.
+    /// Use the organization gMedic account. Read-only request; provider failures are never empty results. An agenda gMedic marks inactive answers AGENDA_INACTIVE.
     pub async fn list(&self, input: &types::GmedicAvailableDaysListInput) -> Result<types::GmedicAvailableDaysListOutput, Error> {
         self.0.call(&operations::GMEDIC_AVAILABLE_DAYS_LIST, input).await
     }
@@ -1652,7 +1652,7 @@ impl<'a> OficlinicAppointmentsApi<'a> {
 
     /// Create an appointment
     ///
-    /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that search_booking_slots or list_booking_slots offered in an availability flow. Send what a person at the desk chooses: confirm true; the slot's flowId and slotId; the patient's documentType and documentNumber; the payer's planId and subplanId (list_payer_plans, list_payer_subplans); and in classification the patient's regime and affiliateType (list_regimes, list_affiliate_types) and, for copayments, salaryRange (list_salary_ranges). Leave the rest out: the service resolves it as the provider's own booking screen does. The payer, program and attention type are the flow's; the purpose is the form's default, 10; the contract is the payer's only active one, or none when it has none; billing takes its flags from the payer's row, its copayment rate, cap and moderator fee from the salary range's row, and its tariff from the payer's tariff matrix for the flow's service under the plan and subplan. A value the caller does send is used as given, and a billing object is sent unchanged with nothing resolved. BOOKING_VALUE_UNRESOLVED means a needed value could not be resolved from the provider's own data and nothing was written; send it and repeat: contractId when the payer has several active contracts; classification.relationship when the affiliate type is neither C nor N; classification.listStatus when the payer uses an attention list; referral.authorizationNumber when the payer requires authorization; a classification.salaryRange the regime lists; or billing when the payer's tariff grid has no positive tariff for the service. Before anything is written, the patient is resolved by citizenship card; the source must still count exactly one unit for the program and attention type; the regime, affiliate type, relationship and salary range, and the payer, plan, subplan and contract, must be listed by the provider; the service must be configured for the slot's professional; and a fresh read must still show the slot. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the identical request answers the recorded outcome; no idempotency key is needed. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
+    /// Book one appointment in e-Oficlinic (ASIGNAR_CITAS) for a slot that search_booking_slots or list_booking_slots offered in an availability flow. Send what a person at the desk chooses: confirm true; the slot's flowId and slotId; the patient's documentType and documentNumber; the payer's planId and subplanId (list_payer_plans, list_payer_subplans); and in classification the patient's regime and affiliateType (list_regimes, list_affiliate_types) and, for copayments, salaryRange (list_salary_ranges). Leave the rest out: the service resolves it as the provider's own booking screen does. The payer, program and attention type are the flow's; the purpose is the form's default, 10; the contract is the payer's only active one, or none when it has none; billing takes its flags from the payer's row, its copayment rate, cap and moderator fee from the salary range's row, and its tariff from the payer's tariff matrix for the flow's service under the plan and subplan. A value the caller does send is used as given, and a billing object is sent unchanged with nothing resolved. BOOKING_VALUE_UNRESOLVED means a needed value could not be resolved from the provider's own data and nothing was written; send it and repeat: contractId when the payer has several active contracts; classification.relationship when the affiliate type is neither C nor N; classification.listStatus when the payer uses an attention list; a classification.salaryRange the regime lists; or billing when the payer's tariff grid has no positive tariff for the service. Before anything is written, the patient is resolved by citizenship card; the source must still count exactly one unit for the program and attention type; the regime, affiliate type, relationship and salary range, and the payer, plan, subplan and contract, must be listed by the provider; the service must be configured for the slot's professional; and a fresh read must still show the slot. The intent and a fence on the slot are recorded before the single provider request, which is never resent. Success means the provider answered a strictly positive appointment number, the source's own creation signal (verification provider_acknowledgement). OUTCOME_UNKNOWN means the appointment may exist: do not book again; check lookup_appointments with status assigned and ask staff. WRITE_TARGET_UNRESOLVED means another key's write to this slot has no final outcome, so nothing was sent. WRITE_LEDGER_FULL means the connection's ledger refused a new write and nothing was sent. Repeating the identical request answers the recorded outcome; no idempotency key is needed. One-slot, one-unit bookings only. agentMode true answers concise Spanish text instead.
     pub async fn create(&self, input: &types::OficlinicAppointmentsCreateInput) -> Result<types::OficlinicAppointmentsCreateOutput, Error> {
         self.0.call(&operations::OFICLINIC_APPOINTMENTS_CREATE, input).await
     }
@@ -2994,7 +2994,7 @@ pub struct SuraAuthorizationsApi<'a>(&'a Client);
 impl<'a> SuraAuthorizationsApi<'a> {
     /// Look up an authorization
     ///
-    /// Read an existing SaludWeb authorization for the exact patient, issuer and authorization number. Reports its status, dates, the authorized procedures, the provider it is directed to, explicit charge type, fixed fee or copay percentage and provider-reported payments. Procedures that could not be read, unknown balance and copay cap remain null. Does not issue, attend, modify or pay an authorization.
+    /// Read an existing SaludWeb authorization for the exact patient, issuer and authorization number. Reports its status, dates, the authorized procedures, the provider it is directed to, explicit charge type, fixed fee or copay percentage and provider-reported payments. Procedures that could not be read, unknown balance and copay cap remain null. Does not issue, attend, modify or pay an authorization. It cannot search or list a patient’s authorizations: to check one, ask the person for its issuer code and number, and never say SURA is checking whether they have one. A pending or missing answer never means the patient has no authorization.
     pub async fn lookup(&self, input: &types::SuraAuthorizationsLookupInput) -> Result<types::SuraAuthorizationsLookupOutput, Error> {
         self.0.call(&operations::SURA_AUTHORIZATIONS_LOOKUP, input).await
     }
