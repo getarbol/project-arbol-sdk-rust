@@ -72711,6 +72711,8 @@ pub enum RaizAgentVoiceSettingsLlm {
     ArbolitoAdvanced,
     #[serde(rename = "arbolito/top")]
     ArbolitoTop,
+    #[serde(rename = "arbolito/voice-fast")]
+    ArbolitoVoiceFast,
 }
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
