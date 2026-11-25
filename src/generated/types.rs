@@ -1153,7 +1153,7 @@ pub struct AccountConnection {
     /// Staff only; empty for other callers.
     #[serde(rename = "logins")]
     pub logins: Vec<AccountConnectionLoginsItem>,
-    /// Its WhatsApp appointment reminders, or null when its integration cannot feed them. Until someone changes them they are off, at 09:00, the day before.
+    /// Its appointment reminders, or null when its integration cannot feed them. Until someone changes them they are off, at 09:00, the day before.
     #[serde(rename = "reminders")]
     pub reminders: Option<AccountConnectionReminders>,
     /// Whether Arbi, the organization's assistant, may use this connection. On until someone turns it off.
@@ -53876,10 +53876,27 @@ pub struct GmedicCreatePatientBodyData {
     pub mobile: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicCreatePatientBodyBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicCreatePatientBody {
     #[serde(rename = "data")]
     pub data: GmedicCreatePatientBodyData,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicCreatePatientBodyBookingRoute>,
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
 }
@@ -56880,10 +56897,27 @@ pub struct GmedicPatientsCreateInputData {
     pub mobile: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
+pub enum GmedicPatientsCreateInputBookingRoute {
+    #[serde(rename = "PRIVATE")]
+    PRIVATE,
+    #[serde(rename = "AXA_PREPAID")]
+    AXAPREPAID,
+    #[serde(rename = "AXA_ARL")]
+    AXAARL,
+    #[serde(rename = "PONAL_STARKEY")]
+    PONALSTARKEY,
+    #[serde(rename = "EPS_SURA")]
+    EPSSURA,
+}
+
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct GmedicPatientsCreateInput {
     #[serde(rename = "data")]
     pub data: GmedicPatientsCreateInputData,
+    /// Verified payment route, required for agent scheduling at clinics using colored booking windows.
+    #[serde(rename = "bookingRoute", default, skip_serializing_if = "Option::is_none")]
+    pub booking_route: Option<GmedicPatientsCreateInputBookingRoute>,
     #[serde(rename = "connectionId", default, skip_serializing_if = "Option::is_none")]
     pub connection_id: Option<String>,
 }
